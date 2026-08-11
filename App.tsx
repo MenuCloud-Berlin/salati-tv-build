@@ -4,7 +4,6 @@ import {
   BackHandler,
   Easing,
   Linking,
-  NativeModules,
   Pressable,
   StyleSheet,
   Text,
@@ -26,6 +25,7 @@ import { RecitersScreen } from '@/screens/RecitersScreen';
 import { ReelsScreen } from '@/screens/ReelsScreen';
 import { SettingsScreen } from '@/screens/SettingsScreen';
 import { VideosScreen } from '@/screens/VideosScreen';
+import { appleEinstellungen } from '@/lib/appleEinstellungen';
 import { azanLaeuft, azanStoppen, useAzanAusloeser, useAzanLauf } from '@/lib/azanRuf';
 import { useTranslation } from '@/lib/i18n';
 import { isScreen, screenFromLaunchArgument, screenFromUrl, type Screen } from '@/lib/nav';
@@ -45,7 +45,12 @@ import { useLatestRef } from '@/lib/useLatestRef';
 // zwischen den Pressables.
 export default function App() {
   useKeepAwake();
-  const [screen, setScreen] = useState<Screen>('clock');
+  // Startbildschirm ist die Uhr. Nur ein Startargument kann daran ruetteln
+  // (`-salatiScreen <name>`, s. lib/nav.ts) — es wird schon beim ersten Rendern
+  // gelesen, damit die Uhr nicht kurz aufblitzt.
+  const [screen, setScreen] = useState<Screen>(
+    () => screenFromLaunchArgument(appleEinstellungen()) ?? 'clock',
+  );
   const screenRef = useLatestRef(screen);
   const theme = useTheme();
 
@@ -157,10 +162,6 @@ export default function App() {
       const s = screenFromUrl(url);
       if (s) setScreen(s);
     };
-    // Startargument zuerst: Apple TV haelt eine von aussen geoeffnete Adresse
-    // hinter einer Rueckfrage an (s. lib/nav.screenFromLaunchArgument).
-    const ausArgument = screenFromLaunchArgument(NativeModules?.SettingsManager?.settings);
-    if (ausArgument) setScreen(ausArgument);
     void Linking.getInitialURL().then(anwenden).catch(() => {});
     const sub = Linking.addEventListener('url', ({ url }) => anwenden(url));
     return () => sub.remove();

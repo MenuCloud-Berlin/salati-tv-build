@@ -81,15 +81,22 @@ for SPRACHE in $SPRACHEN; do
   ORDNER="$ZIEL/$SPRACHE"
   mkdir -p "$ORDNER"
 
-  # Sprache am GERAET setzen, nicht nur am Prozess: die Startargumente
-  # `-AppleLanguages/-AppleLocale` landen zwar in den Voreinstellungen, aber
-  # `NSLocale.currentLocale` — woraus React Native seine Sprache ableitet —
-  # richtet sich nach dem Geraet. Im Lauf 31491392843 blieb die Oberflaeche
-  # deshalb englisch, obwohl „de" mitgegeben war.
+  # Sprache am GERAET setzen, und zwar im ausgeschalteten Zustand direkt in der
+  # Voreinstellungsdatei. `simctl spawn … defaults write` bleibt wirkungslos:
+  # der Voreinstellungsdienst des laufenden Simulators haelt seinen eigenen
+  # Stand und ueberschreibt die Datei wieder — die Oberflaeche blieb in den
+  # Laeufen 31491392843 und 31493692564 englisch.
   GEBIET="$(gebietsschema "$SPRACHE")"
-  xcrun simctl terminate "$UDID" "$BUNDLE_ID" >/dev/null 2>&1 || true
-  xcrun simctl spawn "$UDID" defaults write -g AppleLanguages -array "$SPRACHE"
-  xcrun simctl spawn "$UDID" defaults write -g AppleLocale -string "$GEBIET"
+  PLIST="$HOME/Library/Developer/CoreSimulator/Devices/$UDID/data/Library/Preferences/.GlobalPreferences.plist"
+  xcrun simctl shutdown "$UDID" >/dev/null 2>&1 || true
+  mkdir -p "$(dirname "$PLIST")"
+  # PlistBuddy legt die Datei beim Speichern an, wenn es sie nicht gibt.
+  [ -f "$PLIST" ] || /usr/libexec/PlistBuddy -c "Save" "$PLIST"
+  plutil -replace AppleLanguages -json "[\"$SPRACHE\"]" "$PLIST"
+  plutil -replace AppleLocale -string "$GEBIET" "$PLIST"
+  xcrun simctl boot "$UDID"
+  xcrun simctl bootstatus "$UDID" -b
+  echo "Sprache am Geraet: $(plutil -extract AppleLanguages json -o - "$PLIST") / $GEBIET"
 
   NR=0
   for EINTRAG in "${AUFNAHMEN[@]}"; do
