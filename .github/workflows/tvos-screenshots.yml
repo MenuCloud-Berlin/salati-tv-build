@@ -56,11 +56,17 @@ jobs:
             perl -i -pe 's/(?<![.\w])abs\(milliseconds\)/Swift.abs(milliseconds)/g' "$f"
           done < <(grep -rl "abs(milliseconds)" node_modules --include="*.swift" 2>/dev/null)
 
-      - name: Xcode 26 waehlen
+      # Das neueste Xcode 26 — Begruendung in .github/workflows/tvos.yml.
+      - name: Neuestes Xcode 26 waehlen
         run: |
-          sudo xcode-select -s /Applications/Xcode_26.0.app \
-            || sudo xcode-select -s /Applications/Xcode_26.1.app \
-            || sudo xcode-select -s /Applications/Xcode_26.2.app
+          set -e
+          gewaehlt=""
+          for v in 26.3 26.2 26.1.1 26.1 26.0.1 26.0; do
+            if [ -d "/Applications/Xcode_$v.app" ]; then
+              sudo xcode-select -s "/Applications/Xcode_$v.app" && gewaehlt="$v" && break
+            fi
+          done
+          [ -n "$gewaehlt" ] || { echo "::error::Kein Xcode 26 auf dem Laeufer."; exit 1; }
           xcodebuild -version
 
       # Bedingungslos und mit drei Anlaeufen: eine Vorabpruefung meldet
