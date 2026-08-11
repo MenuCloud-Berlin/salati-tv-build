@@ -1,29 +1,45 @@
 # Salati TV — offene Punkte
 
-> Stand 2026-08-09, Release **1.8.1 / versionCode 13**.
+> Stand 2026-08-11, Release **1.8.1** (Play versionCode 13, App Store Build 1).
 >
-> **Zuerst lesen:** vc12 wurde von Play abgelehnt. vc13 liegt hochgeladen in
-> beiden Tracks, ist aber noch NICHT zur Pruefung eingereicht (das geht nur in
-> der Console). Siehe den ersten offenen Punkt und
-> `docs/PLAY-ABLEHNUNG-2026-08-09.md`.
+> **Zuerst lesen:** Die App liegt seit dem 2026-08-11 auch im Apple App Store
+> zur Pruefung. Hergang und Fallstricke: `docs/APPLE-TV-2026-08-11.md`.
 > Erledigtes wird geloescht, nicht abgehakt. Die Historie steht im Git-Log und
 > in `docs/`.
->
-> Die frueher hier stehende Fassung war vom 24.07. und nannte vc5 / 1.0.3 als
-> aktuellen Stand — sechs Versionen alt. Sie ist ersetzt.
 
 ## Ausgeliefert
 
 | Kanal | Stand | Beleg |
 |---|---|---|
-| Google Play (internal + production) | **1.8.1, vc 13** (hochgeladen, Pruefung offen) | `node scripts/play-status.mjs` liest es von Google zurueck |
+| Apple App Store | **1.8.1 in Pruefung** | Einreichung `fa1446ab`, Element „1.8.1 TV_OS", `submittedDate 2026-08-11T14:13Z`, Version `WAITING_FOR_REVIEW`, `releaseType AFTER_APPROVAL`, Build 1 `VALID` |
+| Google Play (internal + production) | **1.8.1, vc 13**, Pruefung laeuft | `node scripts/play-status.mjs`; Console: „Aenderungen, die ueberprueft werden" |
 | APK-Download (salati.pro) | **1.8.1** | `node scripts/upload-apk-r2.mjs --pruefen` |
 | Webseite salati.pro | **live** | TV-Sektion mit sieben Bildern aus 1.4.0 und dem Knopf „APK fuer Fire TV laden" |
 
-Die Store-Screenshots liegen in **allen vier** Listing-Sprachen (de-DE, en-US,
-tr-TR, ar) — bis zum 2026-08-08 hatte nur `en-US` welche.
+Die Store-Bilder sind am 2026-08-11 komplett neu gemacht worden: acht je
+Sprache, aus 1.8.1 statt aus 1.4.0, je Store aus der eigenen Plattform
+(Apple-TV-Simulator bzw. Android-TV-Emulator) und mit Bildunterschrift. Vorher
+bekamen alle vier Sprachen dieselben sieben englischen Aufnahmen.
+
+    node scripts/androidtv-screenshots.mjs --apk <apk>     # Android-TV-Emulator
+    gh workflow run tvos-screenshots.yml --repo MenuCloud-Berlin/salati-tv-build
+    python scripts/store-bilder.py                          # Bildunterschriften
+    python scripts/store-bilder.py --quelle screenshots/androidtv --ziel screenshots/store/androidtv
+    node scripts/play-screenshots.mjs                       # Play
+    node scripts/asc-screenshots.mjs                        # App Store
 
 ## Was noch offen ist
+
+- [ ] **Apples Antwort abwarten.** 1.8.1 steht auf `WAITING_FOR_REVIEW`. Kommt
+      eine Ablehnung, steht der Grund in App Store Connect unter „Resolution
+      Center"; `node scripts/asc-bestand.mjs` zeigt den Bestand, der Stand der
+      Version kommt aus `node scripts/asc-listing.mjs --pruefen`.
+
+- [ ] **Der Apple-TV-Build laeuft noch nie auf echter Hardware.** Belegt ist:
+      er uebersetzt, signiert, laedt hoch und laeuft im tvOS-Simulator (die
+      32 Store-Bilder kommen von dort). NICHT belegt ist die Kopplung mit dem
+      Telefon ueber ein echtes WLAN und der Gebetsruf auf einem Geraet. Sobald
+      TestFlight die Fassung freigibt, auf einem Apple TV nachsehen.
 
 - [x] ~~Kopplung mit zwei echten Geraeten pruefen.~~ **Am 2026-08-08 belegt** —
       nicht mit zwei Telefonen, aber mit zwei ECHTEN APPS: die Handy-App
