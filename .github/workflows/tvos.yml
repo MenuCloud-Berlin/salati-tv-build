@@ -125,15 +125,20 @@ jobs:
       - name: tvOS-Plattform sicherstellen
         run: |
           set -e
-          da() { xcrun simctl list runtimes | grep -qi tvos; }
+          # KEINE Abkuerzung ueber eine Vorabpruefung. `-showsdks` listet die
+          # Plattform als Platzhalter, und `simctl list runtimes` zeigt die
+          # mitgelieferte AELTERE Simulator-Laufzeit — beide sagten schon
+          # „vorhanden", waehrend `archive` danach keinen tvOS-Zielort fand
+          # (Laeufe 31481821192 und 31485059459). Es zaehlt nur, dass der
+          # Download-Befehl selbst durchlaeuft.
+          ok=0
           for versuch in 1 2 3; do
-            if da; then echo "tvOS-Laufzeit vorhanden (nach $((versuch - 1)) Anlaeufen)"; break; fi
-            echo "Anlauf $versuch: Plattform laden"
-            sudo xcodebuild -downloadPlatform tvOS || echo "Anlauf $versuch fehlgeschlagen"
-            sleep 20
+            if sudo xcodebuild -downloadPlatform tvOS; then ok=1; break; fi
+            echo "Anlauf $versuch fehlgeschlagen — neuer Versuch in 30 s"
+            sleep 30
           done
-          da || { echo "::error::tvOS-Plattform liess sich nicht bereitstellen."; exit 1; }
-          xcrun simctl list runtimes | grep -i tvos
+          [ "$ok" = 1 ] || { echo "::error::tvOS-Plattform liess sich nicht laden."; exit 1; }
+          xcrun simctl list runtimes | grep -i tvos || true
 
       - name: expo prebuild (tvOS-Projekt erzeugen)
         run: npx expo prebuild -p ios --no-install
