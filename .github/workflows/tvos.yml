@@ -58,10 +58,29 @@ jobs:
           grep -n "buildNumber" app.config.js | grep -q "'${NUMMER}'"
           grep -n "buildNumber" app.config.js
 
-      # `weak let` in den Expo-Quellen wird NICHT mehr umgeschrieben. Der
-      # Schalter dafuer sitzt im Podfile (plugins/with-swift-weak-let.js) —
-      # dort steht auch, warum jeder Umbau der Quelle in einen zweiten Fehler
-      # laeuft.
+      # `weak let` (SE-0481) ist Swift-6.2-Neuland und im Sprachstand 6, mit dem
+      # beide Expo-Pakete uebersetzen, noch nicht eingeschaltet. Ohne den
+      # Schalter bricht der Build ab mit „'weak' must be a mutable variable".
+      #
+      # Es sind ZWEI Stellen: die Pods erledigt plugins/with-swift-weak-let.js
+      # (dort steht auch, warum die Quellen NICHT umgeschrieben werden);
+      # expo-modules-jsi ist ein SwiftPM-Paket, geht am Podfile vorbei und
+      # bringt seine eigene Merkmalsliste mit, in der WeakLet fehlt.
+      - name: WeakLet fuer expo-modules-jsi einschalten
+        run: |
+          set -e
+          node -e '
+            const fs = require("fs");
+            const datei = "node_modules/expo-modules-jsi/apple/Package.swift";
+            const anker = ".enableUpcomingFeature(\"InferIsolatedConformances\"),";
+            const neu = "\n        .enableUpcomingFeature(\"WeakLet\"),";
+            let s = fs.readFileSync(datei, "utf8");
+            if (s.includes("enableUpcomingFeature(\"WeakLet\")")) { console.log("schon da"); process.exit(0); }
+            if (!s.includes(anker)) { console.error("::error::Anker fehlt in " + datei); process.exit(1); }
+            fs.writeFileSync(datei, s.replace(anker, anker + neu));
+            console.log("WeakLet eingetragen");
+          '
+          grep -n "WeakLet" node_modules/expo-modules-jsi/apple/Package.swift
 
       - name: Swift-6.2-Fix mehrdeutiges abs() in expo-modules-jsi
         run: |
