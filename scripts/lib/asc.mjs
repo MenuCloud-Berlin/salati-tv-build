@@ -14,6 +14,10 @@ export const ISSUER = 'de348707-2ec6-4079-b3a4-74c17c31ba0c';
 export const KEY_PATH = 'C:/Users/domen/Documents/MenuCloud/AuthKey_H73GL4Q2AQ_Apple.p8';
 export const TEAM_ID = 'ZKG548NGDR';
 export const BUNDLE_ID = 'de.salatibox.tv';
+// Der App-Datensatz „Salati TV" (tvOS). Angelegt am 2026-08-11 ueber die
+// Oberflaeche — die API laesst `apps` nicht anlegen (403 FORBIDDEN_ERROR,
+// „The resource 'apps' does not allow 'CREATE'").
+export const APP_ID = '6800283177';
 
 export function token() {
   return jwt.sign({ iss: ISSUER, aud: 'appstoreconnect-v1' }, fs.readFileSync(KEY_PATH, 'utf8'), {
