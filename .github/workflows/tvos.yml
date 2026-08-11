@@ -58,38 +58,11 @@ jobs:
           grep -n "buildNumber" app.config.js | grep -q "'${NUMMER}'"
           grep -n "buildNumber" app.config.js
 
-      # Swift 6.2 (Xcode 26) lehnt `weak let` als Fehler ab. In Expo-Modulen
-      # stehen diese Deklarationen in `Sendable`-Klassen — aus `weak var` wird
-      # dort der naechste Fehler. `nonisolated(unsafe)` ist die dafuer
-      # vorgesehene Zusicherung. Hergang: apps/mobile/.github/workflows/ios.yml.
-      #
-      # Zwei Regeln, weil es zwei Faelle gibt. In expo-modules-core 57.0.7
-      # tragen zwei Zeilen (EventEmitter.swift 49/76) das Attribut BEREITS:
-      # `nonisolated(unsafe) weak let`. Die eine Regel setzte es ein zweites Mal
-      # davor („duplicate modifier", Laeufe 31482305866/31482318504), die andere
-      # liess sie in Ruhe und Swift blieb bei „'weak' must be a mutable
-      # variable" (Lauf 31483519425). Gebraucht wird beides: `let` zu `var`
-      # machen UND das Attribut genau einmal setzen.
-      - name: Swift-6.2-Fix weak-let in Expo-Modulen
-        run: |
-          cnt=0
-          while IFS= read -r f; do
-            perl -i -pe 's/nonisolated\(unsafe\) weak let /nonisolated(unsafe) weak var /g; s/(?<!nonisolated\(unsafe\) )\bweak let /nonisolated(unsafe) weak var /g' "$f"
-            cnt=$((cnt+1))
-          done < <(grep -rl "weak let " node_modules --include="*.swift" 2>/dev/null)
-          echo "weak-let -> nonisolated(unsafe) weak var in $cnt Swift-Dateien gepatcht"
-          # Nachweisen statt hoffen: keine Fundstelle darf uebrig bleiben, und
-          # keine darf das Attribut doppelt tragen.
-          if grep -rn "weak let " node_modules --include="*.swift" 2>/dev/null; then
-            echo "::error::Es sind weak-let-Zeilen uebrig geblieben."; exit 1
-          fi
-          if grep -rn "nonisolated(unsafe) nonisolated(unsafe)" node_modules --include="*.swift" 2>/dev/null; then
-            echo "::error::Doppeltes nonisolated(unsafe) — Swift lehnt das ab."; exit 1
-          fi
+      # `weak let` in den Expo-Quellen wird NICHT mehr umgeschrieben. Der
+      # Schalter dafuer sitzt im Podfile (plugins/with-swift-weak-let.js) —
+      # dort steht auch, warum jeder Umbau der Quelle in einen zweiten Fehler
+      # laeuft.
 
-      # `abs()` ist in JavaScriptCodable+Date.swift mehrdeutig, seit die Datei
-      # C++-Interop hereinzieht (dort liegt auch das C-`abs`). `Swift.abs`
-      # benennt die gemeinte Ueberladung.
       - name: Swift-6.2-Fix mehrdeutiges abs() in expo-modules-jsi
         run: |
           cnt=0
