@@ -16,6 +16,7 @@ const HIER = path.dirname(fileURLToPath(import.meta.url));
 const TEXTE = path.join(HIER, '..', 'store', 'appstore');
 const NUR_PRUEFEN = process.argv.includes('--pruefen');
 const KATEGORIE = 'LIFESTYLE'; // wie die Handy-App
+const COPYRIGHT = '© 2026 Domenic Moran';
 
 const version = /version: '([^']+)'/.exec(
   fs.readFileSync(path.join(HIER, '..', 'app.config.js'), 'utf8'),
@@ -37,7 +38,7 @@ if (!v && !NUR_PRUEFEN) {
     body: {
       data: {
         type: 'appStoreVersions',
-        attributes: { platform: 'TV_OS', versionString: version, releaseType: 'AFTER_APPROVAL' },
+        attributes: { platform: 'TV_OS', versionString: version, releaseType: 'AFTER_APPROVAL', copyright: COPYRIGHT },
         relationships: { app: { data: { type: 'apps', id: APP_ID } } },
       },
     },
@@ -54,6 +55,10 @@ if (!v && !NUR_PRUEFEN) {
   // bleibt nach Apples Freigabe stumm liegen, ohne dass irgendetwas warnt.
   const patch = {};
   if (v.attributes.versionString !== version) patch.versionString = version;
+  // Ohne Urheberrechtszeile weist Apple die Einreichung ab
+  // (ENTITY_ERROR.ATTRIBUTE.REQUIRED, 'copyright'). Gleiche Zeile wie bei der
+  // Handy-App.
+  if (v.attributes.copyright !== COPYRIGHT) patch.copyright = COPYRIGHT;
   if (v.attributes.releaseType !== 'AFTER_APPROVAL') patch.releaseType = 'AFTER_APPROVAL';
   if (!NUR_PRUEFEN && Object.keys(patch).length) {
     await asc(`/appStoreVersions/${v.id}`, {

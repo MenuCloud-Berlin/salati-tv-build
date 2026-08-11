@@ -19,7 +19,10 @@ import { fileURLToPath } from 'url';
 import { asc, token, APP_ID } from './lib/asc.mjs';
 
 const HIER = path.dirname(fileURLToPath(import.meta.url));
-const BILDER_BASIS = path.join(HIER, '..', 'screenshots', 'appletv');
+// Die FERTIGEN Bilder mit Bildunterschrift (scripts/store-bilder.py), nicht die
+// rohen Aufnahmen: in der Store-Vorschau sind sie daumennagelgross, und ohne
+// Zeile darueber sagt ein dunkler Bildschirm dort nichts.
+const BILDER_BASIS = path.join(HIER, '..', 'screenshots', 'store', 'appletv');
 const NUR_PRUEFEN = process.argv.includes('--pruefen');
 
 const KLASSE = 'APP_APPLE_TV';
