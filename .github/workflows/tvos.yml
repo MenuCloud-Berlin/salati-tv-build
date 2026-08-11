@@ -117,12 +117,23 @@ jobs:
       # bedingungslos geladen (ist die Plattform schon da, kehrt der Befehl
       # sofort zurueck) und am Simulator-Laufzeitpaket nachgewiesen: das legt
       # nur ein echter Download an.
+      #
+      # Der Download selbst ist unzuverlaessig: Lauf 31484296998 brach nach
+      # 20 Sekunden mit „Finding content… Unable to connect to simulator"
+      # (Ausgang 70) ab, waehrend derselbe Befehl 30 Minuten vorher durchlief.
+      # Deshalb drei Anlaeufe, und der Nachweis entscheidet, nicht der Ausgang.
       - name: tvOS-Plattform sicherstellen
         run: |
           set -e
-          sudo xcodebuild -downloadPlatform tvOS
-          xcrun simctl list runtimes | grep -i tvos \
-            || { echo "::error::tvOS-Plattform liess sich nicht bereitstellen."; exit 1; }
+          da() { xcrun simctl list runtimes | grep -qi tvos; }
+          for versuch in 1 2 3; do
+            if da; then echo "tvOS-Laufzeit vorhanden (nach $((versuch - 1)) Anlaeufen)"; break; fi
+            echo "Anlauf $versuch: Plattform laden"
+            sudo xcodebuild -downloadPlatform tvOS || echo "Anlauf $versuch fehlgeschlagen"
+            sleep 20
+          done
+          da || { echo "::error::tvOS-Plattform liess sich nicht bereitstellen."; exit 1; }
+          xcrun simctl list runtimes | grep -i tvos
 
       - name: expo prebuild (tvOS-Projekt erzeugen)
         run: npx expo prebuild -p ios --no-install
