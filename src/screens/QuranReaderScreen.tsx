@@ -1,0 +1,454 @@
+import { useEffect, useMemo, useState } from 'react';
+import {
+  BackHandler,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
+import { useVideoPlayer } from 'expo-video';
+
+import { AmbientGlow } from '@/components/AmbientGlow';
+import { FocusCard } from '@/components/FocusCard';
+import { StateView } from '@/components/StateView';
+import { SURAHS } from '@/data/surahs';
+import { useTranslation } from '@/lib/i18n';
+import {
+  activeWordIndex,
+  fetchSurahReader,
+  letzteLeseQuelle,
+  READER_RECITERS,
+  TRANSLATION_RESOURCES,
+  type ReaderVerse,
+} from '@/lib/quranText';
+import { useTvSettings } from '@/lib/settings';
+import type { Theme } from '@/lib/theme';
+import { useQuranFont, type QuranFontResult } from '@/lib/useQuranFont';
+import { useTheme } from '@/lib/useTheme';
+import { useLatestRef } from '@/lib/useLatestRef';
+
+// Koran-Reader für den TV: großer Untertitel-Look. Rezitation Vers für Vers mit
+// live markiertem Wort (Wort-Zeitstempel von quran.com), arabischer Text +
+// lateinische Umschrift + Übersetzung in der Oberflächensprache.
+//
+// Ausbau 2026-08-08 — bis 1.3.0 war dieser Bereich gegenüber der Handy-App
+// deutlich zurück:
+//   • Der arabische Text lief in der SYSTEMSCHRIFT des Fernsehers. Welche das
+//     ist, entscheidet die Firmware; auf Fire-TV-Geräten ist es regelmäßig eine
+//     Schrift ohne die gestapelten Koran-Zeichen. Jetzt dieselben acht Schriften
+//     wie auf dem Handy, inklusive der KFGQPC-Textumschreibung (`adaptQuranText`)
+//     und der Sukūn-Einstellung.
+//   • Schriftgrad, Umschrift und Übersetzung waren fest verdrahtet.
+//   • Es gab KEINE Bedienung außer Play/Pause: kein Vers zurück, kein
+//     Wiederholen — wer einen Vers noch einmal hören wollte, musste die Sure neu
+//     beginnen.
+//   • Die Suren-Auswahl war ein Raster mit 114 Kacheln; bis Sure 100 sind das
+//     rund 25 Mal DPAD_DOWN.
+export function QuranReaderScreen() {
+  const [stage, setStage] = useState<'picker' | 'reading'>('picker');
+  const [surah, setSurah] = useState(1);
+  const { height, width } = useWindowDimensions();
+
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (stage === 'reading') {
+        setStage('picker');
+        return true;
+      }
+      return false; // Picker: App-Root verlässt den Bereich
+    });
+    return () => sub.remove();
+  }, [stage]);
+
+  if (stage === 'picker') {
+    return <SurahPicker onPick={(n) => { setSurah(n); setStage('reading'); }} height={height} width={width} />;
+  }
+  return <Reader surah={surah} onNextSurah={(n) => setSurah(n)} height={height} width={width} />;
+}
+
+/** Zwanzig Suren je Block — eine Bildschirmseite, die ohne Scrollen erfassbar
+ *  ist, und sechs Blöcke, die in eine Zeile passen. */
+const BLOCK = 20;
+const BLOCK_STARTS = [1, 21, 41, 61, 81, 101];
+
+function SurahPicker({
+  onPick,
+  height,
+  width,
+}: {
+  onPick: (n: number) => void;
+  height: number;
+  width: number;
+}) {
+  const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+  const padH = clamp(width * 0.045, 28, 80);
+  const gap = clamp(width * 0.014, 12, 22);
+  const cols = width >= 1400 ? 5 : 4;
+  const cardW = Math.floor((width - padH * 2 - gap * (cols - 1)) / cols) - 1;
+  const { t, rtl } = useTranslation();
+  const theme = useTheme();
+  const arab = useQuranFont();
+  // Der Block wird beim Aufbau festgelegt und danach vom Nutzer gewechselt;
+  // die Auswahl selbst bleibt beim Verlassen NICHT erhalten — der Leser kommt
+  // ueblicherweise an einer anderen Sure heraus, als er begonnen hat.
+  const [blockStart, setBlockStart] = useState(1);
+  const s = useMemo(() => pickerStyles(height, padH, gap, cardW, rtl, theme), [height, padH, gap, cardW, rtl, theme]);
+  const sichtbar = SURAHS.filter((x) => x.n >= blockStart && x.n < blockStart + BLOCK);
+
+  return (
+    <View style={s.root}>
+      <Text style={s.title}>{t('home.quran')}</Text>
+      <Text style={s.sub}>{t('reader.pickerSubtitle')}</Text>
+
+      {/* Sprungleiste: ohne sie sind es bis Sure 100 rund 25 Mal DPAD_DOWN. */}
+      <View style={s.blockRow}>
+        {BLOCK_STARTS.map((start, i) => {
+          const bis = Math.min(start + BLOCK - 1, 114);
+          const aktiv = start === blockStart;
+          return (
+            <FocusCard
+              key={start}
+              hasTVPreferredFocus={i === 0}
+              onPress={() => setBlockStart(start)}
+              style={[s.blockCard, aktiv && s.activeCard]}>
+              <Text style={[s.blockLabel, aktiv && s.activeText]}>
+                {start}–{bis}
+              </Text>
+            </FocusCard>
+          );
+        })}
+      </View>
+
+      <ScrollView contentContainerStyle={s.grid} showsVerticalScrollIndicator={false}>
+        {sichtbar.map((sur) => (
+          <FocusCard key={sur.n} onPress={() => onPick(sur.n)} style={s.card}>
+            <Text style={s.num}>{sur.n}</Text>
+            <Text style={s.name} numberOfLines={1}>{sur.en}</Text>
+            {/* Auch der Suren-Name ist arabische Schrift und bekommt deshalb
+                dieselbe gewaehlte Koran-Schrift wie der Vers. */}
+            <Text style={[s.ar, arab.style]} numberOfLines={1}>{arab.text(sur.ar)}</Text>
+          </FocusCard>
+        ))}
+      </ScrollView>
+    </View>
+  );
+}
+
+function Reader({
+  surah,
+  onNextSurah,
+  height,
+  width,
+}: {
+  surah: number;
+  onNextSurah: (n: number) => void;
+  height: number;
+  width: number;
+}) {
+  const { t, locale, rtl } = useTranslation();
+  const theme = useTheme();
+  const { readerScale, readerTranslit, readerTranslation, readerAutoAdvance } = useTvSettings();
+  const arab = useQuranFont();
+  const [verses, setVerses] = useState<ReaderVerse[] | null>(null);
+  const [quelle, setQuelle] = useState<'netz' | 'ablage' | 'paket'>('netz');
+  const [error, setError] = useState(false);
+  const [idx, setIdx] = useState(0); // aktueller Vers-Index
+  const [posMs, setPosMs] = useState(0);
+  const [playing, setPlaying] = useState(true);
+  // „Vers wiederholen": spielt denselben Vers am Ende erneut, statt
+  // weiterzuschalten — die Funktion, die zum Auswendiglernen gebraucht wird und
+  // die es hier bisher gar nicht gab.
+  const [wiederholen, setWiederholen] = useState(false);
+  const reciterId = READER_RECITERS[0].id; // Alafasy (Wort-Sync)
+  // Wiederhol-Zaehler: ohne ihn war ein Ladefehler endgueltig (Audit 2026-07-28).
+  const [attempt, setAttempt] = useState(0);
+  const reload = () => setAttempt((a) => a + 1);
+
+  // Zuruecksetzen beim Wechsel von Sure/Sprache/Versuch: React-Muster
+  // „Zustand beim Rendern anpassen“ statt setState im Effektkoerper
+  // (react-hooks/set-state-in-effect). Der Effekt darunter laedt nur noch.
+  const ladeSchluessel = `${surah}|${locale}|${attempt}`;
+  const [letzterSchluessel, setLetzterSchluessel] = useState(ladeSchluessel);
+  if (letzterSchluessel !== ladeSchluessel) {
+    setLetzterSchluessel(ladeSchluessel);
+    setVerses(null);
+    setError(false);
+    setIdx(0);
+  }
+
+  const versesRef = useLatestRef(verses);
+  const idxRef = useLatestRef(idx);
+  const wiederholenRef = useLatestRef(wiederholen);
+  const autoRef = useLatestRef(readerAutoAdvance);
+
+  // Sure laden (bei Surenwechsel).
+  useEffect(() => {
+    let alive = true;
+    // Vers-Uebersetzung in der App-Sprache statt fest Deutsch (Audit T13):
+    // eine tuerkische Oberflaeche mit deutscher Uebersetzung darunter waere
+    // fuer den Nutzer schlechter als gar keine.
+    fetchSurahReader(surah, reciterId, TRANSLATION_RESOURCES[locale])
+      .then((v) => {
+        if (!alive) return;
+        setVerses(v);
+        // Woher der Text kommt, steht am Bildschirm: ohne Netz fehlt die
+        // Rezitation (ein Stream), beim mitgelieferten Text zusaetzlich die
+        // Uebersetzung. Ohne diesen Hinweis haelt der Nutzer die stumme
+        // Wiedergabe oder die fehlende Uebersetzung fuer einen Fehler.
+        setQuelle(letzteLeseQuelle());
+      })
+      .catch(() => alive && setError(true));
+    return () => {
+      alive = false;
+    };
+  }, [surah, reciterId, attempt, locale]);
+
+  const current = verses?.[idx];
+  const player = useVideoPlayer(null, (p) => {
+    p.loop = false;
+  });
+
+  // Beim Verswechsel die passende Audio-Quelle laden und abspielen.
+  useEffect(() => {
+    if (!current?.audioUrl) return;
+    try {
+      player.replace(current.audioUrl);
+      player.play();
+    } catch {
+      /* ignore */
+    }
+  }, [current?.audioUrl, player]);
+
+  // Vers-Ende → Wiederholen / nächster Vers / nächste Sure.
+  useEffect(() => {
+    const sub = player.addListener('playToEnd', () => {
+      const list = versesRef.current;
+      if (!list) return;
+      if (wiederholenRef.current) {
+        // Denselben Vers erneut: `seekBy` waere ungenau, ein neues `play()` ab
+        // Position 0 ist der klare Weg.
+        try {
+          player.currentTime = 0;
+          player.play();
+        } catch {
+          /* ignore */
+        }
+        return;
+      }
+      if (idxRef.current + 1 < list.length) {
+        setIdx(idxRef.current + 1);
+      } else if (autoRef.current) {
+        const next = surah < 114 ? surah + 1 : 1;
+        onNextSurah(next);
+      }
+      // Ohne Auto-Weiter bleibt der Leser am letzten Vers stehen — genau das
+      // ist der Sinn der Einstellung.
+    });
+    return () => sub.remove();
+  }, [player, surah, onNextSurah, versesRef, idxRef, wiederholenRef, autoRef]);
+
+  // Position pollen (Wort-Sync). 80ms — Wort-Segmente sind teils <500ms.
+  useEffect(() => {
+    const id = setInterval(() => {
+      setPosMs(Math.round((player.currentTime ?? 0) * 1000));
+      setPlaying(player.playing);
+    }, 80);
+    return () => clearInterval(id);
+  }, [player]);
+
+  const toggle = () => {
+    if (player.playing) player.pause();
+    else player.play();
+  };
+  const springe = (delta: number) => {
+    const list = versesRef.current;
+    if (!list) return;
+    const ziel = idxRef.current + delta;
+    if (ziel >= 0 && ziel < list.length) setIdx(ziel);
+  };
+
+  const s = useMemo(
+    () => readerStyles(height, width, rtl, theme, readerScale),
+    [height, width, rtl, theme, readerScale],
+  );
+  const meta = SURAHS.find((x) => x.n === surah);
+  const activeWord = current ? activeWordIndex(current.segments, posMs) : -1;
+
+  // Audit 2026-07-28: Fehler- und Ladezustand des Lesers hatten KEIN
+  // fokussierbares Element — auf Android TV fand die Fernbedienung dort keinen
+  // Anker. Zudem war der Fehler endgueltig, obwohl der Abruf ueber drei
+  // quran.com-Endpunkte laeuft und einzelne davon oft nur kurz haengen.
+  if (error) {
+    return (
+      <StateView messageKey="reader.loadError" onAction={reload} />
+    );
+  }
+  if (!verses || !current) {
+    return <StateView loading onAction={reload} />;
+  }
+
+  return (
+    <View style={s.root}>
+      {/* Ruhiger Lichtschein — als echter Verlauf, nicht als runde Flaeche:
+          die zeigte am Fernseher zwei klar umrissene Scheiben (s. AmbientGlow). */}
+      <AmbientGlow color={theme.accent} size={Math.min(width, height) * 1.1} top={-height * 0.3} left={-width * 0.12} />
+      <AmbientGlow color={theme.glowRing} size={Math.min(width, height) * 1.2} bottom={-height * 0.35} right={-width * 0.12} intensity={0.12} />
+
+      <View style={s.header}>
+        <Text style={s.surahName} numberOfLines={1}>
+          {surah}. {meta?.en ?? ''} · <Text style={arab.style}>{arab.text(meta?.ar ?? '')}</Text>
+        </Text>
+        <Text style={s.verseNo}>{t('reader.verseOf', { n: current.n, total: verses.length })}</Text>
+      </View>
+
+      <View style={s.stage}>
+        <ArabicVerse verse={current} activeWord={activeWord} arab={arab} styles={s} />
+        {readerTranslit ? (
+          <Text style={s.translit} numberOfLines={3}>
+            {current.words.map((w) => w.translit).join(' ')}
+          </Text>
+        ) : null}
+        {readerTranslation && current.translation ? (
+          <Text style={s.translation} numberOfLines={4}>
+            {current.translation}
+          </Text>
+        ) : null}
+      </View>
+
+      {/* Bedienleiste. Vorher war die gesamte Versflaeche EIN Knopf (Play/Pause)
+          und es gab sonst nichts — kein Zurueck zum vorigen Vers, kein
+          Wiederholen. Der Initialfokus liegt auf Play/Pause, weil das die
+          Taste ist, die man im Sitzen zuerst sucht. */}
+      <View style={s.controls}>
+        <FocusCard onPress={() => springe(-1)} style={s.ctrl}>
+          <Text style={s.ctrlGlyph}>⏮</Text>
+        </FocusCard>
+        <FocusCard hasTVPreferredFocus onPress={toggle} style={s.ctrlWide}>
+          <Text style={s.ctrlGlyph}>{playing ? '❚❚' : '▶'}</Text>
+        </FocusCard>
+        <FocusCard onPress={() => springe(1)} style={s.ctrl}>
+          <Text style={s.ctrlGlyph}>⏭</Text>
+        </FocusCard>
+        <FocusCard
+          onPress={() => setWiederholen((v) => !v)}
+          style={[s.ctrl, wiederholen && s.ctrlActive]}>
+          <Text style={[s.ctrlGlyph, wiederholen && s.ctrlActiveText]}>↻</Text>
+        </FocusCard>
+      </View>
+
+      <Text style={s.hint}>
+        {quelle === 'paket'
+          ? t('common.offlineReaderPaket')
+          : quelle === 'ablage'
+            ? t('common.offlineReader')
+            : wiederholen
+              ? t('reader.repeatOn')
+              : t('reader.controlHint')}
+      </Text>
+    </View>
+  );
+}
+
+/**
+ * Der arabische Vers, Wort für Wort.
+ *
+ * Eigene Komponente, weil hier zwei Dinge zusammenkommen, die nichts
+ * miteinander zu tun haben: die Wort-Markierung (Zeitstempel) und die
+ * Schrift-Umschreibung (`arab.text`). Jedes Wort läuft EINZELN durch die
+ * Umschreibung — den ganzen Vers auf einmal umzuschreiben und dann zu
+ * zerlegen, würde an den Stellen falsch trennen, an denen die KFGQPC-Ausgabe
+ * ein Zeichen ersetzt.
+ */
+function ArabicVerse({
+  verse,
+  activeWord,
+  arab,
+  styles,
+}: {
+  verse: ReaderVerse;
+  activeWord: number;
+  arab: QuranFontResult;
+  styles: ReturnType<typeof readerStyles>;
+}) {
+  return (
+    <View style={styles.arabicRow}>
+      {verse.words.map((w, wi) => (
+        <Text key={wi} style={[styles.arabic, arab.style, wi === activeWord && styles.arabicActive]}>
+          {arab.text(w.ar)}{' '}
+        </Text>
+      ))}
+    </View>
+  );
+}
+
+function pickerStyles(h: number, padH: number, gap: number, cardW: number, rtl: boolean, theme: Theme) {
+  const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+  return StyleSheet.create({
+    root: { flex: 1, backgroundColor: theme.bg, paddingHorizontal: padH, paddingTop: clamp(h * 0.05, 24, 56), paddingBottom: 12 },
+    title: { color: theme.accent, fontSize: clamp(h * 0.05, 26, 44), fontWeight: '800', letterSpacing: rtl ? 0 : 2, textAlign: rtl ? 'right' : 'left' },
+    sub: { color: theme.textMuted, fontSize: clamp(h * 0.03, 15, 24), marginTop: 4, marginBottom: 10, textAlign: rtl ? 'right' : 'left' },
+    blockRow: { flexDirection: rtl ? 'row-reverse' : 'row', gap, marginBottom: clamp(h * 0.022, 10, 20) },
+    blockCard: {
+      paddingHorizontal: clamp(cardW * 0.1, 14, 26),
+      paddingVertical: clamp(h * 0.018, 8, 16),
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    blockLabel: { color: theme.text, fontSize: clamp(h * 0.032, 15, 24), fontWeight: '700' },
+    activeCard: { borderColor: theme.accent, borderWidth: 2, backgroundColor: theme.cardActive },
+    activeText: { color: theme.accent },
+    grid: { flexDirection: rtl ? 'row-reverse' : 'row', flexWrap: 'wrap', gap, paddingVertical: clamp(h * 0.02, 10, 22) },
+    card: { width: cardW, height: clamp(h * 0.2, 96, 140), padding: clamp(h * 0.022, 12, 20), justifyContent: 'center' },
+    num: { color: theme.accent, fontSize: clamp(h * 0.026, 14, 20), fontWeight: '700' },
+    name: { color: theme.text, fontSize: clamp(h * 0.032, 16, 24), fontWeight: '600', marginTop: 2 },
+    ar: { color: theme.textMuted, fontSize: clamp(h * 0.03, 15, 22), marginTop: 2, textAlign: 'right' },
+  });
+}
+
+/**
+ * Schriftgrad und Zeilenhoehe des Verses.
+ *
+ * Eigene, exportierte Funktion, weil das die einzige Stelle ist, an der die
+ * Einstellung `readerScale` wirklich etwas bewirkt — und weil sie sich so
+ * direkt pruefen laesst, ohne den halben Bildschirm zu rendern.
+ *
+ * Der eingestellte Schriftgrad wirkt NUR auf den Vers und seine beiden
+ * Begleitzeilen; Kopfzeile und Bedienleiste bleiben, wo sie sind. Sonst schoebe
+ * die groesste Stufe die Bedienung aus dem Bild. Die Obergrenzen sind bewusst
+ * hoch genug, dass die groesste Stufe auf einem 1080-dp-Panel auch wirklich
+ * groesser wird als die kleinste — eine Deckelung, die beide Stufen auf
+ * denselben Wert klemmt, waere eine Einstellung ohne Wirkung.
+ */
+export function readerVerseMetrics(h: number, scale: number): { fontSize: number; lineHeight: number } {
+  const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+  return {
+    fontSize: clamp(h * 0.1 * scale, 30, 150),
+    lineHeight: clamp(h * 0.15 * scale, 44, 210),
+  };
+}
+
+function readerStyles(h: number, w: number, rtl: boolean, theme: Theme, scale: number) {
+  const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+  const { fontSize: arabSize, lineHeight: arabLine } = readerVerseMetrics(h, scale);
+  const ctrl = clamp(h * 0.09, 50, 92);
+  return StyleSheet.create({
+    root: { flex: 1, backgroundColor: theme.bg, overflow: 'hidden', paddingHorizontal: clamp(w * 0.06, 40, 130), paddingVertical: clamp(h * 0.04, 20, 52) },
+    header: { flexDirection: rtl ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' },
+    surahName: { color: theme.accent, fontSize: clamp(h * 0.038, 18, 30), fontWeight: '700', flexShrink: 1 },
+    verseNo: { color: theme.textMuted, fontSize: clamp(h * 0.032, 15, 26) },
+    stage: { flex: 1, justifyContent: 'center', paddingVertical: clamp(h * 0.02, 12, 30) },
+    arabicRow: { flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'flex-end' },
+    arabic: { color: theme.text, fontSize: arabSize, lineHeight: arabLine, fontWeight: '500' },
+    arabicActive: { color: theme.accent },
+    translit: { color: theme.accent, opacity: 0.85, fontSize: clamp(h * 0.036 * scale, 16, 40), textAlign: 'center', marginTop: clamp(h * 0.025, 14, 32), letterSpacing: 0.5 },
+    translation: { color: theme.text, opacity: 0.9, fontSize: clamp(h * 0.038 * scale, 16, 42), textAlign: 'center', marginTop: clamp(h * 0.02, 12, 26), lineHeight: clamp(h * 0.052 * scale, 24, 60) },
+    controls: { flexDirection: rtl ? 'row-reverse' : 'row', justifyContent: 'center', alignItems: 'center', gap: clamp(w * 0.014, 12, 24) },
+    ctrl: { width: ctrl, height: ctrl, borderRadius: ctrl / 2, alignItems: 'center', justifyContent: 'center' },
+    ctrlWide: { width: ctrl * 1.6, height: ctrl, borderRadius: ctrl / 2, alignItems: 'center', justifyContent: 'center' },
+    ctrlActive: { borderColor: theme.accent, borderWidth: 2, backgroundColor: theme.cardActive },
+    ctrlGlyph: { color: theme.text, fontSize: clamp(ctrl * 0.36, 18, 34), fontWeight: '700' },
+    ctrlActiveText: { color: theme.accent },
+    hint: { color: theme.textFaint, fontSize: clamp(h * 0.028, 13, 22), textAlign: 'center', marginTop: clamp(h * 0.018, 8, 18) },
+  });
+}

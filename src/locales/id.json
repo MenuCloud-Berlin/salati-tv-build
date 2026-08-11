@@ -1,0 +1,235 @@
+{
+  "clock": {
+    "hijriDate": "{day} {month} {year}",
+    "localTime": "Waktu setempat {city} · OK membuka menu",
+    "next": "Salat berikutnya",
+    "openMenu": "OK membuka menu",
+    "timeLeft": "sisa {time}"
+  },
+  "common": {
+    "loading": "Memuat…",
+    "offlineList": "Tanpa jaringan — daftar terakhir yang dimuat",
+    "offlineReader": "Tanpa jaringan — teks dari penyimpanan, tilawah butuh koneksi",
+    "offlineReaderPaket": "Tanpa jaringan — teks bawaan, terjemahan dan tilawah butuh koneksi",
+    "offlineStreams": "Tanpa jaringan — daftar dari penyimpanan, pemutaran butuh koneksi",
+    "retry": "Coba lagi"
+  },
+  "home": {
+    "clock": "Jam salat",
+    "clockHint": "Waktu salat & hitung mundur",
+    "pairing": "Hubungkan",
+    "pairingHint": "Ponsel sebagai remote",
+    "podcasts": "Podcast",
+    "podcastsHint": "Untuk didengarkan",
+    "quiz": "Kuis",
+    "quizHint": "Layar kedua dengan ponsel",
+    "quran": "Baca Al-Qur’an",
+    "quranHint": "Dengan tilawah & terjemahan",
+    "radio": "Radio Al-Qur'an",
+    "radioHint": "Tilawah 24/7",
+    "reciters": "Qari",
+    "recitersHint": "Dengarkan Al-Qur’an",
+    "reels": "Reels",
+    "reelsHint": "Klip singkat",
+    "settings": "Pengaturan",
+    "settingsHint": "Lokasi & metode",
+    "tagline": "Waktu salat · Al-Qur’an · Belajar",
+    "videos": "Video",
+    "videosHint": "Tata bahasa & pelajaran"
+  },
+  "pairing": {
+    "action": "Hubungkan TV",
+    "connectedMany": "{n} ponsel terhubung",
+    "connectedOne": "1 ponsel terhubung",
+    "manual": "Manual: {host}:{port} · Kode {token}",
+    "noNetwork": "Jaringan tidak tersedia",
+    "noWifi": "Tidak ada Wi-Fi",
+    "qrPending": "Membuat kode QR …",
+    "ready": "Siap — menunggu koneksi",
+    "restart": "Mulai ulang koneksi",
+    "starting": "Memulai …",
+    "step1": "1 · Buka aplikasi Salati di ponsel",
+    "step2": "2 · Ketuk “{action}” lalu pindai kodenya",
+    "step3": "3 · Kendalikan TV & kuis dari ponsel",
+    "title": "Hubungkan ponsel"
+  },
+  "player": {
+    "error": "Pemutaran gagal — periksa koneksi.",
+    "hintPause": "OK = jeda · Kembali = daftar",
+    "hintResume": "OK = lanjutkan · Kembali = daftar",
+    "kickerPodcast": "Podcast",
+    "kickerRadio": "Radio Al-Qur'an",
+    "kickerRecitation": "Tilawah",
+    "saveError": "Gagal menyimpan — periksa koneksi.",
+    "saveHint": "OK menyimpan surah ini agar bisa diputar tanpa internet",
+    "savedHint": "Tersimpan · OK menghapus berkasnya",
+    "saving": "Menyimpan …"
+  },
+  "podcasts": {
+    "episodeLabel": "Episode",
+    "fallbackSeries": "Podcast Salati",
+    "loadError": "Podcast tidak dapat dimuat.",
+    "title": "Podcast"
+  },
+  "prayers": {
+    "asr": "Asar",
+    "asrShort": "Asar",
+    "dhuhr": "Zuhur",
+    "dhuhrShort": "Zuhur",
+    "fajr": "Subuh",
+    "fajrShort": "Subuh",
+    "isha": "Isya",
+    "ishaShort": "Isya",
+    "maghrib": "Magrib",
+    "maghribShort": "Magrib",
+    "sunrise": "Syuruq (terbit)",
+    "sunriseShort": "Syuruq"
+  },
+  "quiz": {
+    "answerPhoneOrRemote": "Jawab di ponsel atau dengan remote",
+    "answerRemote": "Jawab dengan remote",
+    "backHint": "Tekan Kembali untuk ke menu",
+    "playAgain": "Main lagi",
+    "progress": "Pertanyaan {i} / {n}"
+  },
+  "radio": {
+    "loadError": "Stasiun radio tidak dapat dimuat.",
+    "title": "Radio Al-Qur'an"
+  },
+  "reader": {
+    "controlHint": "OK = jeda · ⏮ ⏭ ayat · ↻ ulangi ayat",
+    "loadError": "Surah tidak dapat dimuat.",
+    "pickerSubtitle": "Pilih surah · tilawah dengan sorotan kata & terjemahan",
+    "repeatOn": "Ayat diulang · ↻ menghentikan pengulangan",
+    "verseOf": "Ayat {n} / {total}"
+  },
+  "reciters": {
+    "loadError": "Qari tidak dapat dimuat.",
+    "surahN": "Surah {n}",
+    "title": "Qari"
+  },
+  "reels": {
+    "episodeLabel": "Episode",
+    "loadError": "Gagal memuat reels",
+    "title": "Reels"
+  },
+  "settings": {
+    "asrEarlier": "Lebih awal (Syafi'i/Maliki/Hanbali - standar)",
+    "asrLater": "Lebih lambat (Hanafi)",
+    "asrSchool": "Mazhab Asar",
+    "azan": {
+      "allOff": "Matikan semua",
+      "hint": "Azan hanya berkumandang selama Salati tampil di layar — televisi tidak membuka aplikasi dengan sendirinya. Tekan Kembali untuk menghentikan azan yang sedang berbunyi.",
+      "licenseHint": "Rekaman berasal dari Wikimedia Commons dengan lisensi bebas. Dua di antaranya mensyaratkan pencantuman pembuatnya — karena itu tercantum di sini.",
+      "licenses": "Asal rekaman",
+      "off": "Mati",
+      "preview": "Dengarkan",
+      "recording": "Azan {n}",
+      "stop": "Hentikan",
+      "suggest": "Terapkan saran",
+      "tathwib": "Azan 3 memuat tatswib („salat lebih baik daripada tidur\"), jadi cocok untuk Subuh.",
+      "title": "Azan tiap salat",
+      "volume": "Volume"
+    },
+    "current": "Saat ini",
+    "format12": "12 jam (2:30 PM)",
+    "format24": "24 jam (14:30)",
+    "highLatitude": {
+      "auto": "Otomatis (disarankan)",
+      "hint": "Di utara sekitar lintang 48°, pada musim panas matahari tidak turun cukup rendah untuk mencapai sudut Subuh dan Isya. Aturan ini menentukan cara kedua waktu itu diturunkan dari panjang malam. Tergantung aturannya, waktu Subuh dan Isya bisa berbeda hingga satu jam, dan tidak ada solusi yang disepakati semua pihak. Jika ingin mengikuti masjid Anda, pilih aturan yang sesuai dengan waktunya.",
+      "middleOfNight": "Tengah malam",
+      "seventhOfNight": "Sepertujuh malam",
+      "title": "Aturan lintang tinggi",
+      "twilightAngle": "Berdasarkan sudut"
+    },
+    "language": "Bahasa",
+    "location": "Lokasi",
+    "method": "Metode perhitungan",
+    "methodRegions": {
+      "arabia": "Jazirah Arab",
+      "europe": "Eropa",
+      "middleEast": "Timur Tengah",
+      "northAfrica": "Afrika Utara",
+      "northAmerica": "Amerika Utara",
+      "southAsia": "Asia Selatan",
+      "southeastAsia": "Asia Tenggara",
+      "worldwide": "Seluruh dunia"
+    },
+    "quranFont": {
+      "hint": {
+        "amiri": "Naskh klasik bergaya cetakan lama",
+        "amiriQuran": "Seperti Amiri, dengan ruang lebih untuk tanda Al-Qur’an yang bertumpuk",
+        "harmattan": "Bentuk huruf Afrika Barat, seperti cetakan di kawasan itu",
+        "kfgqpc": "Huruf Utsmani resmi Kompleks Raja Fahd (edisi Madinah)",
+        "lateef": "Goresan halus, dekat dengan cetakan Asia Selatan",
+        "noto": "Modern dan bersih, mudah dibaca di layar kecil",
+        "notoSans": "Tanpa kait, kontras tertinggi — untuk penglihatan lemah",
+        "scheherazade": "Harakat sangat jelas, cocok juga untuk gaya IndoPak"
+      },
+      "title": "Font Al-Qur’an"
+    },
+    "railHint": "Pilih di sebelah kanan · Tombol kembali keluar dari pengaturan",
+    "readerAutoAdvance": "Lanjut ke surah berikutnya",
+    "readerContent": "Di bawah ayat",
+    "readerScale": {
+      "large": "Besar",
+      "medium": "Sedang",
+      "small": "Kecil",
+      "title": "Ukuran huruf Al-Qur'an",
+      "xlarge": "Sangat besar"
+    },
+    "readerTranslation": "Terjemahan",
+    "readerTranslit": "Transliterasi",
+    "sections": {
+      "azan": "Azan",
+      "display": "Tampilan",
+      "prayer": "Waktu salat",
+      "reader": "Al-Qur'an",
+      "storage": "Penyimpanan"
+    },
+    "storage": {
+      "deleteAll": "Hapus semua",
+      "deleteHint": "OK menghapus",
+      "empty": "Belum ada yang tersimpan",
+      "hint": "Surah tersimpan bisa diputar tanpa internet. Berkas ada di dalam aplikasi — hilang saat dicopot.",
+      "title": "Tilawah tersimpan",
+      "used": "{n} surah · {size}",
+      "usedOne": "1 surah · {size}"
+    },
+    "sukun": {
+      "hint": "Hanya berlaku untuk “KFGQPC HAFS Uthmanic”. Mushaf Madinah cetak menulis sukun sebagai kait kecil; lingkaran di sana berarti huruf yang ditulis tetapi tidak dibaca. Dengan “Lingkaran” keduanya tampak sama.",
+      "kreis": "Lingkaran",
+      "madina": "Cetakan Madinah (kait)",
+      "title": "Tanda sukun"
+    },
+    "theme": {
+      "hint": "Berlaku di semua bagian. “Kertas” adalah satu-satunya latar terang — untuk ruangan terang dan membaca di siang hari.",
+      "mitternacht": "Tengah malam",
+      "nachtblau": "Biru malam",
+      "papier": "Kertas",
+      "smaragd": "Zamrud",
+      "tiefschwarz": "Hitam pekat (OLED)",
+      "title": "Skema warna"
+    },
+    "timeAdjust": {
+      "minutesShort": "mnt",
+      "reset": "Setel ulang semua koreksi",
+      "title": "Koreksi menit"
+    },
+    "timeFormat": "Format waktu",
+    "title": "Pengaturan"
+  },
+  "time": {
+    "hoursShort": "j",
+    "minutesShort": "mnt",
+    "secondsShort": "dtk"
+  },
+  "videos": {
+    "loadError": "Video tidak dapat dimuat.",
+    "title": "Video"
+  },
+  "azan": {
+    "running": "Azan · {prayer}",
+    "runningHint": "Kembali menghentikan azan"
+  }
+}

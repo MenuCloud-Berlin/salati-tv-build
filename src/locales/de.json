@@ -1,0 +1,235 @@
+{
+  "clock": {
+    "hijriDate": "{day}. {month} {year}",
+    "localTime": "Ortszeit {city} · OK öffnet das Menü",
+    "next": "Nächstes Gebet",
+    "openMenu": "OK öffnet das Menü",
+    "timeLeft": "noch {time}"
+  },
+  "common": {
+    "loading": "Wird geladen…",
+    "offlineList": "Ohne Netz — zuletzt geladene Liste",
+    "offlineReader": "Ohne Netz — Text aus dem Speicher, Rezitation braucht eine Verbindung",
+    "offlineReaderPaket": "Ohne Netz — mitgelieferter Text, Übersetzung und Rezitation brauchen eine Verbindung",
+    "offlineStreams": "Ohne Netz — Liste aus dem Speicher, Wiedergabe braucht eine Verbindung",
+    "retry": "Erneut versuchen"
+  },
+  "home": {
+    "clock": "Gebetsuhr",
+    "clockHint": "Gebetszeiten & Countdown",
+    "pairing": "Verbinden",
+    "pairingHint": "Handy als Fernbedienung",
+    "podcasts": "Podcasts",
+    "podcastsHint": "Zum Zuhören",
+    "quiz": "Quiz",
+    "quizHint": "Zweitschirm mit dem Handy",
+    "quran": "Koran lesen",
+    "quranHint": "Mit Rezitation & Übersetzung",
+    "radio": "Koran-Radio",
+    "radioHint": "24/7 Rezitation",
+    "reciters": "Rezitatoren",
+    "recitersHint": "Koran hören",
+    "reels": "Reels",
+    "reelsHint": "Kurze Clips",
+    "settings": "Einstellungen",
+    "settingsHint": "Standort & Methode",
+    "tagline": "Gebetszeiten · Koran · Lernen",
+    "videos": "Videos",
+    "videosHint": "Grammatik & Lektionen"
+  },
+  "pairing": {
+    "action": "TV verbinden",
+    "connectedMany": "{n} Handys verbunden",
+    "connectedOne": "1 Handy verbunden",
+    "manual": "Manuell: {host}:{port} · Code {token}",
+    "noNetwork": "Netzwerk nicht verfügbar",
+    "noWifi": "Kein WLAN",
+    "qrPending": "QR wird erzeugt …",
+    "ready": "Bereit — warte auf Verbindung",
+    "restart": "Verbindung neu starten",
+    "starting": "Wird gestartet …",
+    "step1": "1 · Öffne die Salati-App auf dem Handy",
+    "step2": "2 · Tippe auf „{action}“ und scanne den Code",
+    "step3": "3 · Steuere TV & Quiz vom Handy aus",
+    "title": "Handy verbinden"
+  },
+  "player": {
+    "error": "Wiedergabe fehlgeschlagen — Verbindung prüfen.",
+    "hintPause": "OK = Pause · Zurück = Liste",
+    "hintResume": "OK = Fortsetzen · Zurück = Liste",
+    "kickerPodcast": "Podcast",
+    "kickerRadio": "Koran-Radio",
+    "kickerRecitation": "Rezitation",
+    "saveError": "Speichern fehlgeschlagen — Verbindung prüfen.",
+    "saveHint": "OK speichert diese Sure für die Wiedergabe ohne Internet",
+    "savedHint": "Gespeichert · OK löscht die Datei wieder",
+    "saving": "Wird gespeichert …"
+  },
+  "podcasts": {
+    "episodeLabel": "Folge",
+    "fallbackSeries": "Salati Podcast",
+    "loadError": "Podcasts konnten nicht geladen werden.",
+    "title": "Podcasts"
+  },
+  "prayers": {
+    "asr": "Asr",
+    "asrShort": "Asr",
+    "dhuhr": "Dhuhr",
+    "dhuhrShort": "Dhuhr",
+    "fajr": "Fajr",
+    "fajrShort": "Fajr",
+    "isha": "Isha",
+    "ishaShort": "Isha",
+    "maghrib": "Maghrib",
+    "maghribShort": "Maghrib",
+    "sunrise": "Shuruq (Sonnenaufgang)",
+    "sunriseShort": "Shuruq"
+  },
+  "quiz": {
+    "answerPhoneOrRemote": "Antworte am Handy oder mit der Fernbedienung",
+    "answerRemote": "Antworte mit der Fernbedienung",
+    "backHint": "Zurück zum Menü mit der Zurück-Taste",
+    "playAgain": "Nochmal spielen",
+    "progress": "Frage {i} / {n}"
+  },
+  "radio": {
+    "loadError": "Radio-Sender konnten nicht geladen werden.",
+    "title": "Koran-Radio"
+  },
+  "reader": {
+    "controlHint": "OK = Pause · ⏮ ⏭ Vers · ↻ Vers wiederholen",
+    "loadError": "Sure konnte nicht geladen werden.",
+    "pickerSubtitle": "Sure wählen · Rezitation mit Wort-Markierung & Übersetzung",
+    "repeatOn": "Vers wird wiederholt · ↻ beendet die Wiederholung",
+    "verseOf": "Vers {n} / {total}"
+  },
+  "reciters": {
+    "loadError": "Rezitatoren konnten nicht geladen werden.",
+    "surahN": "Sure {n}",
+    "title": "Rezitatoren"
+  },
+  "reels": {
+    "episodeLabel": "Folge",
+    "loadError": "Reels konnten nicht geladen werden",
+    "title": "Reels"
+  },
+  "settings": {
+    "asrEarlier": "Früher (Shafi/Maliki/Hanbali - Standard)",
+    "asrLater": "Später (Hanafi)",
+    "asrSchool": "Asr-Schule",
+    "azan": {
+      "allOff": "Alle aus",
+      "hint": "Der Ruf erklingt nur, solange Salati auf dem Bildschirm ist — der Fernseher weckt die App nicht von selbst. Ein laufender Ruf endet mit der Zurück-Taste.",
+      "licenseHint": "Die Aufnahmen stammen von Wikimedia Commons und stehen unter freien Lizenzen. Zwei davon verlangen die Nennung des Urhebers — deshalb stehen sie hier.",
+      "licenses": "Herkunft der Aufnahmen",
+      "off": "Aus",
+      "preview": "Probehören",
+      "recording": "Adhan {n}",
+      "stop": "Beenden",
+      "suggest": "Vorschlag übernehmen",
+      "tathwib": "Adhan 3 trägt das Tathwib („Das Gebet ist besser als der Schlaf\") und passt damit zu Fadschr.",
+      "title": "Gebetsruf je Gebet",
+      "volume": "Lautstärke"
+    },
+    "current": "Aktuell",
+    "format12": "12-Stunden (2:30 PM)",
+    "format24": "24-Stunden (14:30)",
+    "highLatitude": {
+      "auto": "Automatisch (empfohlen)",
+      "hint": "Nördlich von etwa 48° Breite - also in weiten Teilen Deutschlands - sinkt die Sonne im Sommer nachts nicht tief genug, um die Fajr- und Isha-Winkel zu erreichen. Die Regel legt fest, wie beide Zeiten dann aus der Länge der Nacht abgeleitet werden. Je nach Regel können Fajr und Isha dabei um bis zu einer Stunde auseinanderliegen; eine allgemein anerkannte Lösung gibt es nicht. Wenn du dich nach deiner Moschee richten möchtest, wähle die Regel, die zu deren Zeiten passt.",
+      "middleOfNight": "Mitte der Nacht",
+      "seventhOfNight": "Siebtel der Nacht",
+      "title": "Hochbreiten-Regel",
+      "twilightAngle": "Winkelbasiert"
+    },
+    "language": "Sprache",
+    "location": "Standort",
+    "method": "Berechnungsmethode",
+    "methodRegions": {
+      "arabia": "Arabische Halbinsel",
+      "europe": "Europa",
+      "middleEast": "Naher und Mittlerer Osten",
+      "northAfrica": "Nordafrika",
+      "northAmerica": "Nordamerika",
+      "southAsia": "Südasien",
+      "southeastAsia": "Südostasien",
+      "worldwide": "Weltweit"
+    },
+    "quranFont": {
+      "hint": {
+        "amiri": "Klassischer Naskh im Stil alter Druckausgaben",
+        "amiriQuran": "Wie Amiri, mit mehr Raum für gestapelte Koran-Zeichen",
+        "harmattan": "Westafrikanisches Schriftbild, wie in der Region gedruckt",
+        "kfgqpc": "Offizielle Uthmani-Druckschrift des King-Fahd-Komplexes (Madina-Ausgabe)",
+        "lateef": "Feiner Strich, an südasiatischen Druckbildern orientiert",
+        "noto": "Modern und klar, gut lesbar auf kleinen Bildschirmen",
+        "notoSans": "Serifenlos, höchster Kontrast — für schwaches Sehen",
+        "scheherazade": "Sehr deutliche Vokalzeichen, auch für den IndoPak-Stil geeignet"
+      },
+      "title": "Koran-Schriftart"
+    },
+    "railHint": "Rechts wählen · Zurück-Taste verlässt die Einstellungen",
+    "readerAutoAdvance": "Weiter zur nächsten Sure",
+    "readerContent": "Unter dem Vers",
+    "readerScale": {
+      "large": "Groß",
+      "medium": "Mittel",
+      "small": "Klein",
+      "title": "Koran-Schriftgröße",
+      "xlarge": "Sehr groß"
+    },
+    "readerTranslation": "Übersetzung",
+    "readerTranslit": "Umschrift",
+    "sections": {
+      "azan": "Gebetsruf",
+      "display": "Darstellung",
+      "prayer": "Gebetszeiten",
+      "reader": "Koran",
+      "storage": "Speicher"
+    },
+    "storage": {
+      "deleteAll": "Alle löschen",
+      "deleteHint": "OK löscht",
+      "empty": "Nichts gespeichert",
+      "hint": "Eine gespeicherte Sure spielt ohne Internet. Die Dateien liegen in der App — beim Deinstallieren sind sie weg.",
+      "title": "Gespeicherte Rezitationen",
+      "used": "{n} Suren · {size}",
+      "usedOne": "Eine Sure · {size}"
+    },
+    "sukun": {
+      "hint": "Wirkt nur bei „KFGQPC HAFS Uthmanic\". Der gedruckte Madina-Mushaf setzt das Sukūn als kleinen Haken; der Kreis bedeutet dort einen geschriebenen, aber nicht gesprochenen Buchstaben. Wählst du „Kreis\", sehen beide gleich aus.",
+      "kreis": "Kreis",
+      "madina": "Madina-Druck (Haken)",
+      "title": "Sukūn-Zeichen"
+    },
+    "theme": {
+      "hint": "Wirkt auf alle Bereiche. „Papier\" ist der einzige helle Untergrund — gedacht für helle Räume und zum Lesen am Tag.",
+      "mitternacht": "Mitternacht",
+      "nachtblau": "Nachtblau",
+      "papier": "Papier",
+      "smaragd": "Smaragd",
+      "tiefschwarz": "Tiefschwarz (OLED)",
+      "title": "Farbwelt"
+    },
+    "timeAdjust": {
+      "minutesShort": "Min.",
+      "reset": "Alle Korrekturen zurücksetzen",
+      "title": "Minuten-Korrektur"
+    },
+    "timeFormat": "Zeitformat",
+    "title": "Einstellungen"
+  },
+  "time": {
+    "hoursShort": "h",
+    "minutesShort": "min",
+    "secondsShort": "s"
+  },
+  "videos": {
+    "loadError": "Videos konnten nicht geladen werden.",
+    "title": "Videos"
+  },
+  "azan": {
+    "running": "Gebetsruf · {prayer}",
+    "runningHint": "Zurück beendet den Ruf"
+  }
+}

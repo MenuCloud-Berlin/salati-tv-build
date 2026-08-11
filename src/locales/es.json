@@ -1,0 +1,235 @@
+{
+  "clock": {
+    "hijriDate": "{day} {month} {year}",
+    "localTime": "Hora local de {city} · OK abre el menú",
+    "next": "Próxima oración",
+    "openMenu": "OK abre el menú",
+    "timeLeft": "faltan {time}"
+  },
+  "common": {
+    "loading": "Cargando…",
+    "offlineList": "Sin conexión — última lista cargada",
+    "offlineReader": "Sin conexión — texto desde la memoria, la recitación requiere conexión",
+    "offlineReaderPaket": "Sin conexión — texto incluido; la traducción y la recitación requieren conexión",
+    "offlineStreams": "Sin conexión — lista desde la memoria, la reproducción requiere conexión",
+    "retry": "Reintentar"
+  },
+  "home": {
+    "clock": "Reloj de oración",
+    "clockHint": "Horarios de oración y cuenta atrás",
+    "pairing": "Conectar",
+    "pairingHint": "El móvil como mando a distancia",
+    "podcasts": "Pódcast",
+    "podcastsHint": "Para escuchar",
+    "quiz": "Quiz",
+    "quizHint": "Segunda pantalla con el móvil",
+    "quran": "Leer el Corán",
+    "quranHint": "Con recitación y traducción",
+    "radio": "Radio del Corán",
+    "radioHint": "Recitación 24/7",
+    "reciters": "Recitadores",
+    "recitersHint": "Escuchar el Corán",
+    "reels": "Reels",
+    "reelsHint": "Clips cortos",
+    "settings": "Ajustes",
+    "settingsHint": "Ubicación y método",
+    "tagline": "Horarios de oración · Corán · Aprendizaje",
+    "videos": "Vídeos",
+    "videosHint": "Gramática y lecciones"
+  },
+  "pairing": {
+    "action": "Conectar TV",
+    "connectedMany": "{n} móviles conectados",
+    "connectedOne": "1 móvil conectado",
+    "manual": "Manual: {host}:{port} · Código {token}",
+    "noNetwork": "Red no disponible",
+    "noWifi": "Sin Wi-Fi",
+    "qrPending": "Generando el código QR …",
+    "ready": "Listo: esperando conexión",
+    "restart": "Reiniciar la conexión",
+    "starting": "Iniciando …",
+    "step1": "1 · Abre la app Salati en el móvil",
+    "step2": "2 · Toca «{action}» y escanea el código",
+    "step3": "3 · Controla la TV y el quiz desde el móvil",
+    "title": "Conectar el móvil"
+  },
+  "player": {
+    "error": "Error de reproducción: comprueba la conexión.",
+    "hintPause": "OK = pausa · Atrás = lista",
+    "hintResume": "OK = continuar · Atrás = lista",
+    "kickerPodcast": "Pódcast",
+    "kickerRadio": "Radio del Corán",
+    "kickerRecitation": "Recitación",
+    "saveError": "No se pudo guardar — comprueba la conexión.",
+    "saveHint": "OK guarda esta sura para escucharla sin internet",
+    "savedHint": "Guardada · OK borra el archivo",
+    "saving": "Guardando …"
+  },
+  "podcasts": {
+    "episodeLabel": "Episodio",
+    "fallbackSeries": "Salati Podcast",
+    "loadError": "No se pudieron cargar los pódcast.",
+    "title": "Pódcast"
+  },
+  "prayers": {
+    "asr": "Asr",
+    "asrShort": "Asr",
+    "dhuhr": "Dhuhr",
+    "dhuhrShort": "Dhuhr",
+    "fajr": "Fajr",
+    "fajrShort": "Fajr",
+    "isha": "Isha",
+    "ishaShort": "Isha",
+    "maghrib": "Maghrib",
+    "maghribShort": "Maghrib",
+    "sunrise": "Shuruq (amanecer)",
+    "sunriseShort": "Shuruq"
+  },
+  "quiz": {
+    "answerPhoneOrRemote": "Responde en el móvil o con el mando",
+    "answerRemote": "Responde con el mando",
+    "backHint": "Pulsa Atrás para volver al menú",
+    "playAgain": "Jugar de nuevo",
+    "progress": "Pregunta {i} / {n}"
+  },
+  "radio": {
+    "loadError": "No se pudieron cargar las emisoras.",
+    "title": "Radio del Corán"
+  },
+  "reader": {
+    "controlHint": "OK = pausa · ⏮ ⏭ versículo · ↻ repetir versículo",
+    "loadError": "No se pudo cargar la sura.",
+    "pickerSubtitle": "Elige una sura · recitación con palabra resaltada y traducción",
+    "repeatOn": "Repitiendo el versículo · ↻ detiene la repetición",
+    "verseOf": "Versículo {n} / {total}"
+  },
+  "reciters": {
+    "loadError": "No se pudieron cargar los recitadores.",
+    "surahN": "Sura {n}",
+    "title": "Recitadores"
+  },
+  "reels": {
+    "episodeLabel": "Episodio",
+    "loadError": "No se pudieron cargar los reels",
+    "title": "Reels"
+  },
+  "settings": {
+    "asrEarlier": "Temprano (Shafi/Maliki/Hanbali - estándar)",
+    "asrLater": "Tarde (Hanafi)",
+    "asrSchool": "Escuela para Asr",
+    "azan": {
+      "allOff": "Desactivar todo",
+      "hint": "La llamada suena solo mientras Salati está en pantalla; el televisor no abre la aplicación por sí solo. Pulsa Atrás para detener una llamada en curso.",
+      "licenseHint": "Las grabaciones proceden de Wikimedia Commons con licencias libres. Dos exigen citar al autor; por eso figuran aquí.",
+      "licenses": "Procedencia de las grabaciones",
+      "off": "Desactivado",
+      "preview": "Escuchar",
+      "recording": "Adhan {n}",
+      "stop": "Detener",
+      "suggest": "Aplicar sugerencia",
+      "tathwib": "El adhan 3 incluye el tazwib («la oración es mejor que el sueño») y por eso corresponde al fajr.",
+      "title": "Llamada por cada oración",
+      "volume": "Volumen"
+    },
+    "current": "Actual",
+    "format12": "12 horas (2:30 PM)",
+    "format24": "24 horas (14:30)",
+    "highLatitude": {
+      "auto": "Automático (recomendado)",
+      "hint": "Al norte de unos 48° de latitud, en verano el sol ya no baja lo suficiente para alcanzar los ángulos del Fajr y del Isha. Esta regla determina cómo se deducen ambas horas a partir de la duración de la noche. Según la regla, el Fajr y el Isha pueden diferir hasta en una hora, y no existe una solución aceptada por todos. Si quieres seguir a tu mezquita, elige la regla que coincida con sus horarios.",
+      "middleOfNight": "Mitad de la noche",
+      "seventhOfNight": "Un séptimo de la noche",
+      "title": "Regla de latitudes altas",
+      "twilightAngle": "Basado en el ángulo"
+    },
+    "language": "Idioma",
+    "location": "Ubicación",
+    "method": "Método de cálculo",
+    "methodRegions": {
+      "arabia": "Península arábiga",
+      "europe": "Europa",
+      "middleEast": "Oriente Medio",
+      "northAfrica": "Norte de África",
+      "northAmerica": "Norteamérica",
+      "southAsia": "Asia meridional",
+      "southeastAsia": "Sudeste asiático",
+      "worldwide": "Mundial"
+    },
+    "quranFont": {
+      "hint": {
+        "amiri": "Naskh clásico al estilo de las ediciones impresas antiguas",
+        "amiriQuran": "Como Amiri, con más espacio para los signos coránicos superpuestos",
+        "harmattan": "Trazo de África Occidental, como se imprime en la región",
+        "kfgqpc": "Tipografía uthmani oficial del Complejo Rey Fahd (edición de Medina)",
+        "lateef": "Trazo fino, próximo a las impresiones del sur de Asia",
+        "noto": "Moderna y clara, fácil de leer en pantallas pequeñas",
+        "notoSans": "Sin remates, máximo contraste — para baja visión",
+        "scheherazade": "Vocales muy nítidas, también apta para el estilo IndoPak"
+      },
+      "title": "Fuente del Corán"
+    },
+    "railHint": "Elige a la derecha · Atrás sale de los ajustes",
+    "readerAutoAdvance": "Continuar a la siguiente sura",
+    "readerContent": "Debajo del versículo",
+    "readerScale": {
+      "large": "Grande",
+      "medium": "Mediano",
+      "small": "Pequeño",
+      "title": "Tamaño del texto del Corán",
+      "xlarge": "Extra grande"
+    },
+    "readerTranslation": "Traducción",
+    "readerTranslit": "Transliteración",
+    "sections": {
+      "azan": "Llamada a la oración",
+      "display": "Apariencia",
+      "prayer": "Horarios de oración",
+      "reader": "Corán",
+      "storage": "Almacenamiento"
+    },
+    "storage": {
+      "deleteAll": "Borrar todo",
+      "deleteHint": "OK borra",
+      "empty": "Nada guardado",
+      "hint": "Una sura guardada suena sin internet. Los archivos están dentro de la app; al desinstalarla se borran.",
+      "title": "Recitaciones guardadas",
+      "used": "{n} suras · {size}",
+      "usedOne": "1 sura · {size}"
+    },
+    "sukun": {
+      "hint": "Solo afecta a «KFGQPC HAFS Uthmanic». El mushaf impreso de Medina dibuja el sukun como un pequeño gancho; el círculo indica allí una letra escrita pero no pronunciada. Con «Círculo» ambos se ven igual.",
+      "kreis": "Círculo",
+      "madina": "Impresión de Medina (gancho)",
+      "title": "Signo de sukun"
+    },
+    "theme": {
+      "hint": "Se aplica a todas las secciones. «Papel» es el único fondo claro, pensado para salas luminosas y lectura de día.",
+      "mitternacht": "Medianoche",
+      "nachtblau": "Azul noche",
+      "papier": "Papel",
+      "smaragd": "Esmeralda",
+      "tiefschwarz": "Negro profundo (OLED)",
+      "title": "Combinación de colores"
+    },
+    "timeAdjust": {
+      "minutesShort": "min",
+      "reset": "Restablecer todos los ajustes",
+      "title": "Ajuste de minutos"
+    },
+    "timeFormat": "Formato de hora",
+    "title": "Ajustes"
+  },
+  "time": {
+    "hoursShort": "h",
+    "minutesShort": "min",
+    "secondsShort": "s"
+  },
+  "videos": {
+    "loadError": "No se pudieron cargar los vídeos.",
+    "title": "Vídeos"
+  },
+  "azan": {
+    "running": "Llamada a la oración · {prayer}",
+    "runningHint": "Atrás detiene la llamada"
+  }
+}

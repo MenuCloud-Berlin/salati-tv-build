@@ -1,0 +1,235 @@
+{
+  "clock": {
+    "hijriDate": "{day} {month} {year}",
+    "localTime": "{city} yerel saati · OK menüyü açar",
+    "next": "Sonraki namaz",
+    "openMenu": "OK menüyü açar",
+    "timeLeft": "{time} kaldı"
+  },
+  "common": {
+    "loading": "Yükleniyor…",
+    "offlineList": "Çevrimdışı — en son yüklenen liste",
+    "offlineReader": "Çevrimdışı — metin bellekten, tilavet için bağlantı gerekir",
+    "offlineReaderPaket": "Çevrimdışı — pakette gelen metin, meal ve tilavet için bağlantı gerekir",
+    "offlineStreams": "Çevrimdışı — liste bellekten, oynatma için bağlantı gerekir",
+    "retry": "Tekrar dene"
+  },
+  "home": {
+    "clock": "Namaz saati",
+    "clockHint": "Namaz vakitleri ve geri sayım",
+    "pairing": "Bağlan",
+    "pairingHint": "Telefon uzaktan kumanda olarak",
+    "podcasts": "Podcast'ler",
+    "podcastsHint": "Dinlemek için",
+    "quiz": "Quiz",
+    "quizHint": "Telefonla ikinci ekran",
+    "quran": "Kur’an oku",
+    "quranHint": "Tilavet ve mealle",
+    "radio": "Kur'an Radyosu",
+    "radioHint": "7/24 tilavet",
+    "reciters": "Kâriler",
+    "recitersHint": "Kur’an dinle",
+    "reels": "Reels",
+    "reelsHint": "Kısa klipler",
+    "settings": "Ayarlar",
+    "settingsHint": "Konum ve yöntem",
+    "tagline": "Namaz vakitleri · Kur’an · Öğrenme",
+    "videos": "Videolar",
+    "videosHint": "Dil bilgisi ve dersler"
+  },
+  "pairing": {
+    "action": "TV'ye bağlan",
+    "connectedMany": "{n} telefon bağlı",
+    "connectedOne": "1 telefon bağlı",
+    "manual": "Elle: {host}:{port} · Kod {token}",
+    "noNetwork": "Ağ kullanılamıyor",
+    "noWifi": "Wi-Fi yok",
+    "qrPending": "QR kodu oluşturuluyor …",
+    "ready": "Hazır — bağlantı bekleniyor",
+    "restart": "Bağlantıyı yeniden başlat",
+    "starting": "Başlatılıyor …",
+    "step1": "1 · Telefonda Salati uygulamasını aç",
+    "step2": "2 · “{action}” öğesine dokun ve kodu tara",
+    "step3": "3 · TV’yi ve testi telefondan yönet",
+    "title": "Telefonu bağla"
+  },
+  "player": {
+    "error": "Oynatma başarısız — bağlantını kontrol et.",
+    "hintPause": "OK = duraklat · Geri = liste",
+    "hintResume": "OK = devam et · Geri = liste",
+    "kickerPodcast": "Podcast",
+    "kickerRadio": "Kur'an Radyosu",
+    "kickerRecitation": "Tilavet",
+    "saveError": "Kaydetme başarısız — bağlantıyı kontrol edin.",
+    "saveHint": "OK bu sureyi internetsiz dinlemek için kaydeder",
+    "savedHint": "Kaydedildi · OK dosyayı yeniden siler",
+    "saving": "Kaydediliyor …"
+  },
+  "podcasts": {
+    "episodeLabel": "Bölüm",
+    "fallbackSeries": "Salati Podcast",
+    "loadError": "Podcast’ler yüklenemedi.",
+    "title": "Podcast'ler"
+  },
+  "prayers": {
+    "asr": "İkindi",
+    "asrShort": "İkindi",
+    "dhuhr": "Öğle",
+    "dhuhrShort": "Öğle",
+    "fajr": "Sabah",
+    "fajrShort": "Sabah",
+    "isha": "Yatsı",
+    "ishaShort": "Yatsı",
+    "maghrib": "Akşam",
+    "maghribShort": "Akşam",
+    "sunrise": "Güneş (doğuş)",
+    "sunriseShort": "Güneş"
+  },
+  "quiz": {
+    "answerPhoneOrRemote": "Telefondan ya da uzaktan kumandayla cevapla",
+    "answerRemote": "Uzaktan kumandayla cevapla",
+    "backHint": "Menüye dönmek için Geri tuşuna bas",
+    "playAgain": "Tekrar oyna",
+    "progress": "Soru {i} / {n}"
+  },
+  "radio": {
+    "loadError": "Radyo kanalları yüklenemedi.",
+    "title": "Kur'an Radyosu"
+  },
+  "reader": {
+    "controlHint": "OK = duraklat · ⏮ ⏭ ayet · ↻ ayeti tekrarla",
+    "loadError": "Sure yüklenemedi.",
+    "pickerSubtitle": "Sure seç · kelime vurgulu tilavet ve meal",
+    "repeatOn": "Ayet tekrarlanıyor · ↻ tekrarı bitirir",
+    "verseOf": "Ayet {n} / {total}"
+  },
+  "reciters": {
+    "loadError": "Hafızlar yüklenemedi.",
+    "surahN": "Sure {n}",
+    "title": "Kâriler"
+  },
+  "reels": {
+    "episodeLabel": "Bölüm",
+    "loadError": "Reels yüklenemedi",
+    "title": "Reels"
+  },
+  "settings": {
+    "asrEarlier": "Erken (Şafiî/Malikî/Hanbelî - standart)",
+    "asrLater": "Geç (Hanefî)",
+    "asrSchool": "İkindi mezhebi",
+    "azan": {
+      "allOff": "Hepsi kapalı",
+      "hint": "Ezan yalnızca Salati ekrandayken okunur — televizyon uygulamayı kendiliğinden açmaz. Okunan ezanı Geri tuşu durdurur.",
+      "licenseHint": "Kayıtlar Wikimedia Commons’tan alınmış olup serbest lisanslıdır. İkisi kaynak gösterilmesini şart koşar; bu yüzden burada belirtilmiştir.",
+      "licenses": "Kayıtların kaynağı",
+      "off": "Kapalı",
+      "preview": "Dinle",
+      "recording": "Ezan {n}",
+      "stop": "Durdur",
+      "suggest": "Öneriyi uygula",
+      "tathwib": "Ezan 3 tesvib („namaz uykudan hayırlıdır\") içerir, bu yüzden sabah vaktine uygundur.",
+      "title": "Her vakit için ezan",
+      "volume": "Ses düzeyi"
+    },
+    "current": "Şu an",
+    "format12": "12 saat (2:30 PM)",
+    "format24": "24 saat (14:30)",
+    "highLatitude": {
+      "auto": "Otomatik (önerilen)",
+      "hint": "Yaklaşık 48° enlemin kuzeyinde güneş yazın imsak ve yatsı açılarına ulaşacak kadar alçalmaz. Bu kural, her iki vaktin gecenin uzunluğundan nasıl türetileceğini belirler. Kurala göre imsak ile yatsı arasında bir saate varan fark oluşabilir; herkesçe kabul edilmiş bir çözüm yoktur. Kendi caminizi esas almak isterseniz onun vakitlerine uyan kuralı seçin.",
+      "middleOfNight": "Gecenin ortası",
+      "seventhOfNight": "Gecenin yedide biri",
+      "title": "Yüksek enlem kuralı",
+      "twilightAngle": "Açıya dayalı"
+    },
+    "language": "Dil",
+    "location": "Konum",
+    "method": "Hesaplama yöntemi",
+    "methodRegions": {
+      "arabia": "Arap Yarımadası",
+      "europe": "Avrupa",
+      "middleEast": "Orta Doğu",
+      "northAfrica": "Kuzey Afrika",
+      "northAmerica": "Kuzey Amerika",
+      "southAsia": "Güney Asya",
+      "southeastAsia": "Güneydoğu Asya",
+      "worldwide": "Dünya geneli"
+    },
+    "quranFont": {
+      "hint": {
+        "amiri": "Eski matbu baskılar tarzında klasik nesih",
+        "amiriQuran": "Amiri gibi, üst üste gelen Kur’an işaretleri için daha çok yer",
+        "harmattan": "Batı Afrika yazı biçimi, bölgede basıldığı gibi",
+        "kfgqpc": "Kral Fahd Kompleksi’nin resmî Osmanî hattı (Medine baskısı)",
+        "lateef": "İnce çizgili, Güney Asya baskılarına yakın",
+        "noto": "Modern ve net, küçük ekranlarda kolay okunur",
+        "notoSans": "Tırnaksız, en yüksek karşıtlık — zayıf görme için",
+        "scheherazade": "Harekeleri çok belirgin, IndoPak tarzına da uygun"
+      },
+      "title": "Kur’an yazı tipi"
+    },
+    "railHint": "Sağdan seç · Geri tuşu ayarlardan çıkar",
+    "readerAutoAdvance": "Sonraki sureye geç",
+    "readerContent": "Ayetin altında",
+    "readerScale": {
+      "large": "Büyük",
+      "medium": "Orta",
+      "small": "Küçük",
+      "title": "Kur'an yazı boyutu",
+      "xlarge": "Çok büyük"
+    },
+    "readerTranslation": "Çeviri",
+    "readerTranslit": "Çeviriyazı",
+    "sections": {
+      "azan": "Ezan",
+      "display": "Görünüm",
+      "prayer": "Namaz vakitleri",
+      "reader": "Kur'an",
+      "storage": "Depolama"
+    },
+    "storage": {
+      "deleteAll": "Tümünü sil",
+      "deleteHint": "OK siler",
+      "empty": "Kayıtlı bir şey yok",
+      "hint": "Kaydedilen sure internetsiz çalar. Dosyalar uygulamanın içinde durur — kaldırınca silinirler.",
+      "title": "Kaydedilen tilavetler",
+      "used": "{n} sure · {size}",
+      "usedOne": "1 sure · {size}"
+    },
+    "sukun": {
+      "hint": "Yalnızca “KFGQPC HAFS Uthmanic” için geçerli. Basılı Medine mushafı sükûnu küçük bir kanca olarak çizer; daire orada yazılan ama okunmayan harfi gösterir. “Daire” seçilirse ikisi aynı görünür.",
+      "kreis": "Daire",
+      "madina": "Medine baskısı (kanca)",
+      "title": "Sükûn işareti"
+    },
+    "theme": {
+      "hint": "Tüm bölümlerde geçerlidir. “Kâğıt” tek açık zemindir — aydınlık odalar ve gündüz okuma için.",
+      "mitternacht": "Gece yarısı",
+      "nachtblau": "Gece mavisi",
+      "papier": "Kâğıt",
+      "smaragd": "Zümrüt",
+      "tiefschwarz": "Derin siyah (OLED)",
+      "title": "Renk dünyası"
+    },
+    "timeAdjust": {
+      "minutesShort": "dk",
+      "reset": "Tüm düzeltmeleri sıfırla",
+      "title": "Dakika düzeltmesi"
+    },
+    "timeFormat": "Saat biçimi",
+    "title": "Ayarlar"
+  },
+  "time": {
+    "hoursShort": "sa",
+    "minutesShort": "dk",
+    "secondsShort": "sn"
+  },
+  "videos": {
+    "loadError": "Videolar yüklenemedi.",
+    "title": "Videolar"
+  },
+  "azan": {
+    "running": "Ezan · {prayer}",
+    "runningHint": "Geri tuşu ezanı durdurur"
+  }
+}
