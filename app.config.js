@@ -117,6 +117,9 @@ module.exports = {
     // Release-Signierung mit dem echten Upload-Keystore; ueberlebt `expo prebuild`,
     // weil android/ gitignored ist und neu erzeugt wird.
     './plugins/with-release-signing',
+    // Nur der tvOS-Build uebersetzt ExpoModulesCore aus den Quellen; die
+    // brauchen ein Swift-Merkmal, das im Sprachstand 6 noch aus ist.
+    './plugins/with-swift-weak-let',
     ['expo-splash-screen', { backgroundColor: '#0b0b0d', image: './assets/icon-adaptive.png', imageWidth: 200 }],
     'expo-font',
     'expo-video',

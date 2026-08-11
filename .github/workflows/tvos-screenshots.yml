@@ -33,13 +33,10 @@ jobs:
       - name: pnpm install
         run: pnpm install --no-frozen-lockfile
 
-      - name: Swift-6.2-Fix weak-let in Expo-Modulen
-        run: |
-          while IFS= read -r f; do
-            perl -i -pe 's/nonisolated\(unsafe\) weak let /nonisolated(unsafe) weak var /g; s/(?<!nonisolated\(unsafe\) )\bweak let /nonisolated(unsafe) weak var /g' "$f"
-          done < <(grep -rl "weak let " node_modules --include="*.swift" 2>/dev/null)
-          ! grep -rq "weak let " node_modules --include="*.swift" 2>/dev/null
-          ! grep -rq "nonisolated(unsafe) nonisolated(unsafe)" node_modules --include="*.swift" 2>/dev/null
+      # `weak let` in den Expo-Quellen wird NICHT mehr umgeschrieben. Der
+      # Schalter dafuer sitzt im Podfile (plugins/with-swift-weak-let.js) —
+      # dort steht auch, warum jeder Umbau der Quelle in einen zweiten Fehler
+      # laeuft.
 
       - name: Swift-6.2-Fix mehrdeutiges abs() in expo-modules-jsi
         run: |
@@ -54,9 +51,6 @@ jobs:
             || sudo xcode-select -s /Applications/Xcode_26.2.app
           xcodebuild -version
 
-      # Bedingungslos: `-showsdks` listet die Plattform auch als blossen
-      # Platzhalter (s. .github/workflows/tvos.yml). Nachweis ist das
-      # Simulator-Laufzeitpaket — ohne das gibt es ohnehin keine Bilder.
       # Bedingungslos und mit drei Anlaeufen: eine Vorabpruefung meldet
       # faelschlich „vorhanden", und der Download bricht gelegentlich mit
       # „Unable to connect to simulator" ab (Begruendung in tvos.yml).
