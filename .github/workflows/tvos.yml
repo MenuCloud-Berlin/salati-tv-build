@@ -63,19 +63,29 @@ jobs:
       # dort der naechste Fehler. `nonisolated(unsafe)` ist die dafuer
       # vorgesehene Zusicherung. Hergang: apps/mobile/.github/workflows/ios.yml.
       #
-      # Der Rueckblick im Muster ist NICHT schmueckendes Beiwerk: in
-      # expo-modules-core 57.0.7 tragen zwei Zeilen (EventEmitter.swift 49/76)
-      # das Attribut bereits. Ohne ihn stand dort zweimal `nonisolated(unsafe)`,
-      # und Swift brach mit „duplicate modifier" ab — beide Laeufe vom
-      # 2026-08-11 (31482305866, 31482318504) sind genau daran gescheitert.
+      # Zwei Regeln, weil es zwei Faelle gibt. In expo-modules-core 57.0.7
+      # tragen zwei Zeilen (EventEmitter.swift 49/76) das Attribut BEREITS:
+      # `nonisolated(unsafe) weak let`. Die eine Regel setzte es ein zweites Mal
+      # davor („duplicate modifier", Laeufe 31482305866/31482318504), die andere
+      # liess sie in Ruhe und Swift blieb bei „'weak' must be a mutable
+      # variable" (Lauf 31483519425). Gebraucht wird beides: `let` zu `var`
+      # machen UND das Attribut genau einmal setzen.
       - name: Swift-6.2-Fix weak-let in Expo-Modulen
         run: |
           cnt=0
           while IFS= read -r f; do
-            perl -i -pe 's/(?<!nonisolated\(unsafe\) )\bweak let /nonisolated(unsafe) weak var /g' "$f"
+            perl -i -pe 's/nonisolated\(unsafe\) weak let /nonisolated(unsafe) weak var /g; s/(?<!nonisolated\(unsafe\) )\bweak let /nonisolated(unsafe) weak var /g' "$f"
             cnt=$((cnt+1))
           done < <(grep -rl "weak let " node_modules --include="*.swift" 2>/dev/null)
           echo "weak-let -> nonisolated(unsafe) weak var in $cnt Swift-Dateien gepatcht"
+          # Nachweisen statt hoffen: keine Fundstelle darf uebrig bleiben, und
+          # keine darf das Attribut doppelt tragen.
+          if grep -rn "weak let " node_modules --include="*.swift" 2>/dev/null; then
+            echo "::error::Es sind weak-let-Zeilen uebrig geblieben."; exit 1
+          fi
+          if grep -rn "nonisolated(unsafe) nonisolated(unsafe)" node_modules --include="*.swift" 2>/dev/null; then
+            echo "::error::Doppeltes nonisolated(unsafe) — Swift lehnt das ab."; exit 1
+          fi
 
       # `abs()` ist in JavaScriptCodable+Date.swift mehrdeutig, seit die Datei
       # C++-Interop hereinzieht (dort liegt auch das C-`abs`). `Swift.abs`
