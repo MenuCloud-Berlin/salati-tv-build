@@ -36,8 +36,10 @@ jobs:
       - name: Swift-6.2-Fix weak-let in Expo-Modulen
         run: |
           while IFS= read -r f; do
-            perl -i -pe 's/(?<!nonisolated\(unsafe\) )\bweak let /nonisolated(unsafe) weak var /g' "$f"
+            perl -i -pe 's/nonisolated\(unsafe\) weak let /nonisolated(unsafe) weak var /g; s/(?<!nonisolated\(unsafe\) )\bweak let /nonisolated(unsafe) weak var /g' "$f"
           done < <(grep -rl "weak let " node_modules --include="*.swift" 2>/dev/null)
+          ! grep -rq "weak let " node_modules --include="*.swift" 2>/dev/null
+          ! grep -rq "nonisolated(unsafe) nonisolated(unsafe)" node_modules --include="*.swift" 2>/dev/null
 
       - name: Swift-6.2-Fix mehrdeutiges abs() in expo-modules-jsi
         run: |
