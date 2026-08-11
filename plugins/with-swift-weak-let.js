@@ -17,7 +17,17 @@
 // 2026-08-11 durchgespielt worden (Lauf 31485877889): aus einer Konstanten
 // wird eine Veraenderliche, und dieselbe Zeile scheitert zwei Zeilen spaeter an
 //     sending 'emitter' risks causing data races
-// Expo meint genau das, was da steht. Es fehlt nur der Schalter.
+// Expo meint genau das, was da steht.
+//
+// ZWEITER TEIL — `SWIFT_VERSION = 5.0` fuer ExpoModulesCore. Mit Xcode 26.3
+// uebersetzt `weak let` zwar, aber derselbe `sending`-Fehler kommt aus den
+// UNVERAENDERTEN Quellen (Lauf 31489675507, EventEmitter.swift 52/79): im
+// Sprachstand 6 ist die strenge Nebenlaeufigkeitspruefung ein Fehler, im
+// Sprachstand 5 eine Warnung. Fuer iOS faellt das nie auf, weil Expo dort ein
+// fertiges XCFramework ausliefert — dieser Code wird nur fuer den Fernseher
+// ueberhaupt uebersetzt. Es geht also NICHT darum, eigenen Code an der Pruefung
+// vorbeizuschummeln, sondern darum, eine fremde Bibliothek so zu uebersetzen,
+// wie ihr Hersteller sie ausliefert. Nur dieses eine Ziel ist betroffen.
 const { withDangerousMod } = require('expo/config-plugins');
 const fs = require('fs');
 const path = require('path');
@@ -33,6 +43,9 @@ const BLOCK = `
         flags = flags.join(' ') if flags.is_a?(Array)
         unless flags.include?('WeakLet')
           konfiguration.build_settings['OTHER_SWIFT_FLAGS'] = flags + ' -enable-upcoming-feature WeakLet'
+        end
+        if ziel.name == 'ExpoModulesCore'
+          konfiguration.build_settings['SWIFT_VERSION'] = '5.0'
         end
       end
     end
