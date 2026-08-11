@@ -3,6 +3,7 @@ import {
   Animated,
   BackHandler,
   Easing,
+  Linking,
   Pressable,
   StyleSheet,
   Text,
@@ -26,7 +27,7 @@ import { SettingsScreen } from '@/screens/SettingsScreen';
 import { VideosScreen } from '@/screens/VideosScreen';
 import { azanLaeuft, azanStoppen, useAzanAusloeser, useAzanLauf } from '@/lib/azanRuf';
 import { useTranslation } from '@/lib/i18n';
-import { isScreen, type Screen } from '@/lib/nav';
+import { isScreen, screenFromUrl, type Screen } from '@/lib/nav';
 import { onPairCommand, startPairing, stopPairing } from '@/lib/pairing';
 import { hydrateOfflineAudio, verwaisteEintraegeAufraeumen } from '@/lib/offlineAudio';
 import { applyRemoteSettings } from '@/lib/settings';
@@ -143,6 +144,22 @@ export default function App() {
       stopPairing();
     };
   }, [goBack, screenRef]);
+
+  // Deep Links: `salatitv://screen/<name>` schaltet um. Das ist dieselbe
+  // Umschaltung wie ueber die Handy-Fernbedienung, nur ueber den Weg, den das
+  // Betriebssystem selbst mitbringt — damit laesst sich der Fernseher von aussen
+  // auf einen Bildschirm stellen, ohne dass jemand die Fernbedienung in der Hand
+  // hat. Genau das braucht die Bildschirmfoto-Automatik fuer den App Store
+  // (`xcrun simctl openurl`) und der Emulator-Lauf unter Android (`adb`).
+  useEffect(() => {
+    const anwenden = (url: string | null) => {
+      const s = screenFromUrl(url);
+      if (s) setScreen(s);
+    };
+    void Linking.getInitialURL().then(anwenden).catch(() => {});
+    const sub = Linking.addEventListener('url', ({ url }) => anwenden(url));
+    return () => sub.remove();
+  }, []);
 
   // Der Wurzel-Hintergrund traegt die Themenfarbe: waehrend des Einblendens
   // ist der neue Screen noch halbtransparent, und darunter darf nicht das alte

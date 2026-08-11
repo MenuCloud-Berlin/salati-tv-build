@@ -1,0 +1,101 @@
+name: tvOS Screenshots
+
+# Nimmt die App-Store-Bilder im Apple-TV-Simulator auf. Sie muessen aus der
+# tvOS-App kommen: Bilder aus dem Android-Emulator zeigen zwar dieselben
+# Bildschirme, aber nicht die Plattform, fuer die sie verkauft werden.
+#
+# Gebaut wird fuer den Simulator (unsigniert) — kein Zertifikat noetig.
+
+on:
+  workflow_dispatch:
+    inputs:
+      sprachen:
+        description: 'Sprachen, durch Leerzeichen getrennt (z. B. "de en")'
+        required: true
+        default: 'de en'
+
+env:
+  EXPO_TV: '1'
+
+jobs:
+  screenshots:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: pnpm installieren
+        run: npm install -g pnpm@10.33.0
+
+      - name: pnpm install
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Swift-6.2-Fix weak-let in Expo-Modulen
+        run: |
+          while IFS= read -r f; do
+            perl -i -pe 's/\bweak let /nonisolated(unsafe) weak var /g' "$f"
+          done < <(grep -rl "weak let " node_modules --include="*.swift" 2>/dev/null)
+
+      - name: Swift-6.2-Fix mehrdeutiges abs() in expo-modules-jsi
+        run: |
+          while IFS= read -r f; do
+            perl -i -pe 's/(?<![.\w])abs\(milliseconds\)/Swift.abs(milliseconds)/g' "$f"
+          done < <(grep -rl "abs(milliseconds)" node_modules --include="*.swift" 2>/dev/null)
+
+      - name: Xcode 26 waehlen
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.0.app \
+            || sudo xcode-select -s /Applications/Xcode_26.1.app \
+            || sudo xcode-select -s /Applications/Xcode_26.2.app
+          xcodebuild -version
+
+      # Bedingungslos: `-showsdks` listet die Plattform auch als blossen
+      # Platzhalter (s. .github/workflows/tvos.yml). Nachweis ist das
+      # Simulator-Laufzeitpaket — ohne das gibt es ohnehin keine Bilder.
+      - name: tvOS-Plattform sicherstellen
+        run: |
+          set -e
+          sudo xcodebuild -downloadPlatform tvOS
+          xcrun simctl list runtimes | grep -i tvos \
+            || { echo "::error::tvOS-Plattform liess sich nicht bereitstellen."; exit 1; }
+
+      - name: expo prebuild
+        run: npx expo prebuild -p ios --no-install
+
+      - name: CocoaPods installieren
+        working-directory: ios
+        run: pod install --repo-update
+
+      - name: Fuer den Simulator bauen
+        working-directory: ios
+        run: |
+          set -o pipefail
+          PROJ=$(ls -d *.xcodeproj | head -1)
+          NAME=$(basename "$PROJ" .xcodeproj)
+          echo "PROJEKT=$NAME" >> "$GITHUB_ENV"
+          xcodebuild build \
+            -workspace "${NAME}.xcworkspace" \
+            -scheme "${NAME}" \
+            -configuration Release \
+            -sdk appletvsimulator \
+            -derivedDataPath "$RUNNER_TEMP/dd" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            SWIFT_STRICT_CONCURRENCY=minimal \
+            SWIFT_TREAT_WARNINGS_AS_ERRORS=NO
+
+      - name: Bilder aufnehmen
+        run: |
+          APP=$(ls -d "$RUNNER_TEMP"/dd/Build/Products/Release-appletvsimulator/*.app | head -1)
+          bash scripts/tvos-screenshots.sh "$APP" ${{ inputs.sprachen }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tvos-screenshots
+          path: screenshots/appletv/**
+          if-no-files-found: error
+          retention-days: 7

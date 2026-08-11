@@ -10,7 +10,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { SCREENS, isScreen } from '@/lib/nav';
+import { SCREENS, isScreen, screenFromUrl } from '@/lib/nav';
 
 const APP_TSX = path.join(__dirname, '..', '..', 'App.tsx');
 
@@ -38,6 +38,36 @@ describe('isScreen', () => {
     // neueres Handy schickt einen Namen, den diese Version nicht kennt.
     for (const v of ['hifz', '', 'Clock', null, undefined, 42, {}]) {
       expect(isScreen(v)).toBe(false);
+    }
+  });
+});
+
+describe('screenFromUrl', () => {
+  it('liest jeden Bildschirm aus seiner Adresse', () => {
+    for (const s of SCREENS) expect(screenFromUrl(`salatitv://screen/${s}`)).toBe(s);
+  });
+
+  it('nimmt einen abschliessenden Schraegstrich hin', () => {
+    expect(screenFromUrl('salatitv://screen/home/')).toBe('home');
+  });
+
+  it('ruehrt die Kopplungs-Nutzlast nicht an', () => {
+    // Genau die Adresse, die der Fernseher fuer das Handy erzeugt. Sie darf
+    // nicht versehentlich einen Bildschirm oeffnen.
+    expect(screenFromUrl('salatitv://pair?host=192.168.1.9&port=8787&token=abc')).toBeNull();
+  });
+
+  it('weist Unbekanntes und Fremdes ab', () => {
+    for (const v of [
+      'salatitv://screen/hifz',
+      'salatitv://screen/',
+      'https://salati.pro/screen/home',
+      'salatitv://screen/home?x=1',
+      '',
+      null,
+      undefined,
+    ]) {
+      expect(screenFromUrl(v as string | null | undefined)).toBeNull();
     }
   });
 });

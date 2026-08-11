@@ -36,3 +36,22 @@ export type Screen = (typeof SCREENS)[number];
 export function isScreen(value: unknown): value is Screen {
   return typeof value === 'string' && (SCREENS as readonly string[]).includes(value);
 }
+
+/**
+ * Bildschirm aus einer Deep-Link-Adresse lesen: `salatitv://screen/home`.
+ *
+ * Dieselbe Umschaltung, die das Handy ueber die Kopplung ausloest — nur ueber
+ * den Weg, den das Betriebssystem selbst mitbringt. Genutzt von der
+ * Bildschirmfoto-Automatik (`xcrun simctl openurl`, `adb am start -d`), die
+ * sonst keinen Weg haette, die Fernbedienung zu bedienen.
+ *
+ * Streng geprueft: `salatitv://pair?host=…` ist die Nutzlast, die der Fernseher
+ * fuer das HANDY erzeugt (s. `pairPayload`). Bekaeme er sie zurueck, darf sie
+ * nichts umschalten — deshalb muss der Wirt genau `screen` heissen.
+ */
+export function screenFromUrl(url: string | null | undefined): Screen | null {
+  if (typeof url !== 'string') return null;
+  const treffer = /^salatitv:\/\/screen\/([a-z]+)\/?$/i.exec(url.trim());
+  const name = treffer?.[1]?.toLowerCase();
+  return isScreen(name) ? name : null;
+}
