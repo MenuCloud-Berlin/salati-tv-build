@@ -29,23 +29,35 @@ const SA_PATH = 'C:/Users/domen/Documents/menucloud-mobile-build/play-service-ac
 const SPRACHEN = ['de-DE', 'en-US', 'tr-TR', 'ar'];
 
 /**
- * Reihenfolge = Reihenfolge im Store. Erst die Uhr (das, wofuer die App laeuft),
- * dann der Koran-Leser, dann der Einstieg; die Schriftauswahl an vierter Stelle,
- * weil sie die auffaelligste Neuerung von 1.4.0 ist und auf einem Standbild
- * sofort zu erkennen.
+ * Reihenfolge = Reihenfolge im Store: erst die Uhr (das, wofuer die App laeuft),
+ * dann der Einstieg, dann Koran, Rezitatoren, Radio, Videos, Quiz und die
+ * Einstellungen.
  *
- * Aufgenommen am 2026-08-08 aus der ausgelieferten 1.4.0 (versionCode 8) am
- * Android-TV-Emulator, 1920x1080.
+ * Die Bilder liegen JE SPRACHE vor und tragen eine Bildunterschrift. Bis zum
+ * 2026-08-11 bekamen alle vier Sprachen dieselben sieben englischen Aufnahmen
+ * aus 1.4.0 (versionCode 8): auf der deutschen Store-Seite stand also eine
+ * englische Oberflaeche, und die war ausserdem vier Versionen alt.
+ *
+ * Erzeugt von:
+ *   node scripts/androidtv-screenshots.mjs --apk <apk>   (Android-TV-Emulator)
+ *   python scripts/store-bilder.py --quelle screenshots/androidtv  *          --ziel screenshots/store/androidtv               (Bildunterschriften)
  */
-const SHOTS = [
-  '10-clock.png',
-  '11-quran.png',
-  '12-home.png',
-  '13-settings.png',
-  '14-reciters.png',
-  '15-quiz.png',
-  '16-pairing.png',
-].map((n) => path.join(TV, 'screenshots', n));
+const REIHENFOLGE = [
+  '01-clock.png',
+  '02-home.png',
+  '03-quran.png',
+  '04-reciters.png',
+  '05-radio.png',
+  '06-videos.png',
+  '07-quiz.png',
+  '08-settings.png',
+];
+
+/** ASC-Sprachcode des Eintrags -> Ordner unter screenshots/store/androidtv/. */
+const ORDNER = { 'de-DE': 'de', 'en-US': 'en', 'tr-TR': 'tr', ar: 'ar' };
+
+const bilderFuer = (lang) =>
+  REIHENFOLGE.map((n) => path.join(TV, 'screenshots', 'store', 'androidtv', ORDNER[lang], n));
 
 const sa = JSON.parse(fs.readFileSync(SA_PATH, 'utf8'));
 async function token() {
@@ -98,12 +110,14 @@ function masse(datei) {
 TOK = await token();
 console.log('auth ok');
 
-for (const datei of SHOTS) {
-  if (!fs.existsSync(datei)) throw new Error(`Screenshot fehlt: ${datei}`);
-  const { w, h } = masse(datei);
-  if (w !== 1920 || h !== 1080) throw new Error(`${path.basename(datei)} ist ${w}x${h}, erwartet 1920x1080`);
+for (const lang of SPRACHEN) {
+  for (const datei of bilderFuer(lang)) {
+    if (!fs.existsSync(datei)) throw new Error(`Screenshot fehlt: ${datei}`);
+    const { w, h } = masse(datei);
+    if (w !== 1920 || h !== 1080) throw new Error(`${datei} ist ${w}x${h}, erwartet 1920x1080`);
+  }
 }
-console.log(`${SHOTS.length} Screenshots geprueft: alle 1920x1080`);
+console.log(`${SPRACHEN.length} Sprachen x ${REIHENFOLGE.length} Bilder geprueft: alle 1920x1080`);
 
 const edit = await api(`${BASE}/edits`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
 if (!edit.ok) throw new Error('edit: ' + edit.status + ' ' + JSON.stringify(edit.j));
@@ -124,8 +138,9 @@ for (const lang of SPRACHEN) {
   // Store zeigt weiter zuerst die Oberflaeche von 1.0.3.
   const del = await api(`${BASE}/edits/${id}/listings/${lang}/tvScreenshots`, { method: 'DELETE' });
   if (!del.ok && del.status !== 404) console.log(`  ${lang} loeschen: HTTP ${del.status}`);
+  const bilder = bilderFuer(lang);
   let hoch = 0;
-  for (const datei of SHOTS) {
+  for (const datei of bilder) {
     const u = await api(`${UP}/edits/${id}/listings/${lang}/tvScreenshots?uploadType=media`, {
       method: 'POST',
       headers: { 'Content-Type': 'image/png' },
@@ -134,7 +149,7 @@ for (const lang of SPRACHEN) {
     if (u.ok) hoch++;
     else console.log(`  ${lang} ${path.basename(datei)}: FEHLER ${u.status} ${JSON.stringify(u.j).slice(0, 200)}`);
   }
-  console.log(`  ${lang}: ${hoch}/${SHOTS.length} hochgeladen`);
+  console.log(`  ${lang}: ${hoch}/${bilder.length} hochgeladen`);
 }
 
 const commit = await api(`${BASE}/edits/${id}:commit`, { method: 'POST' });
