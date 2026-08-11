@@ -2,8 +2,14 @@
 # Nimmt die App-Store-Bildschirmfotos im Apple-TV-Simulator auf — aus der
 # wirklich gebauten tvOS-App, nicht aus dem Android-Emulator.
 #
-# Gesteuert wird ueber Deep Links (`salatitv://screen/<name>`, s. lib/nav.ts):
+# Gesteuert wird ueber ein Startargument (`-salatiScreen <name>`, s. lib/nav.ts):
 # der Simulator kennt keine Fernbedienung, die sich von aussen druecken liesse.
+#
+# NICHT ueber Deep Links, obwohl die App sie versteht: Apple TV legt vor eine
+# von aussen geoeffnete Adresse eine Rueckfrage („Open in ‚Salati TV'?"), und die
+# bleibt ohne Tastendruck stehen. Am 2026-08-11 zeigten deshalb alle acht Bilder
+# dieselbe Uhr mit offenem Fenster (Lauf 31491392843). Je Bildschirm ein
+# frischer Start kostet ein paar Sekunden und ist dafuer eindeutig.
 #
 # Aufruf (auf einem macOS-Runner, nach `expo prebuild` + `pod install`):
 #   bash scripts/tvos-screenshots.sh <Pfad-zur-gebauten-.app> [sprache …]
@@ -33,18 +39,19 @@ gebietsschema() {
 BUNDLE_ID=de.salatibox.tv
 ZIEL="$(cd "$(dirname "$0")/.." && pwd)/screenshots/appletv"
 
-# Reihenfolge = Reihenfolge auf der Store-Seite. Zahl = Wartezeit in Sekunden,
-# bevor abgedrueckt wird: die Listen kommen ueber das Netz, und ein Foto vom
-# Ladezustand nuetzt niemandem.
+# Reihenfolge = Reihenfolge auf der Store-Seite. Zahl = Wartezeit in Sekunden
+# nach dem Start, bevor abgedrueckt wird. Sie deckt zweierlei ab: den Kaltstart
+# (jedes Bild bekommt einen frischen Start) und das Nachladen der Listen ueber
+# das Netz — ein Foto vom Ladezustand nuetzt niemandem.
 AUFNAHMEN=(
-  "clock:8"
-  "home:5"
-  "quran:9"
-  "reciters:9"
-  "radio:9"
-  "videos:9"
-  "quiz:6"
-  "settings:5"
+  "clock:15"
+  "home:14"
+  "quran:20"
+  "reciters:20"
+  "radio:20"
+  "videos:20"
+  "quiz:16"
+  "settings:14"
 )
 
 # --- Simulator besorgen ------------------------------------------------------
@@ -74,20 +81,25 @@ for SPRACHE in $SPRACHEN; do
   ORDNER="$ZIEL/$SPRACHE"
   mkdir -p "$ORDNER"
 
-  # Sprache je Lauf ueber Startargumente. `lib/locale.ts` liest unter Apple
-  # `SettingsManager.settings.AppleLocale` — genau das setzen diese Argumente
-  # fuer den Prozess, ohne am Simulator selbst etwas zu verstellen.
+  # Sprache am GERAET setzen, nicht nur am Prozess: die Startargumente
+  # `-AppleLanguages/-AppleLocale` landen zwar in den Voreinstellungen, aber
+  # `NSLocale.currentLocale` — woraus React Native seine Sprache ableitet —
+  # richtet sich nach dem Geraet. Im Lauf 31491392843 blieb die Oberflaeche
+  # deshalb englisch, obwohl „de" mitgegeben war.
+  GEBIET="$(gebietsschema "$SPRACHE")"
   xcrun simctl terminate "$UDID" "$BUNDLE_ID" >/dev/null 2>&1 || true
-  xcrun simctl launch "$UDID" "$BUNDLE_ID" \
-    -AppleLanguages "($SPRACHE)" -AppleLocale "$(gebietsschema "$SPRACHE")" >/dev/null
-  sleep 12   # erster Start: Schriften laden, Gebetszeiten rechnen
+  xcrun simctl spawn "$UDID" defaults write -g AppleLanguages -array "$SPRACHE"
+  xcrun simctl spawn "$UDID" defaults write -g AppleLocale -string "$GEBIET"
 
   NR=0
   for EINTRAG in "${AUFNAHMEN[@]}"; do
     SCREEN="${EINTRAG%%:*}"
     WARTEN="${EINTRAG##*:}"
     NR=$((NR + 1))
-    xcrun simctl openurl "$UDID" "salatitv://screen/$SCREEN"
+    xcrun simctl terminate "$UDID" "$BUNDLE_ID" >/dev/null 2>&1 || true
+    xcrun simctl launch "$UDID" "$BUNDLE_ID" \
+      -salatiScreen "$SCREEN" \
+      -AppleLanguages "($SPRACHE)" -AppleLocale "$GEBIET" >/dev/null
     sleep "$WARTEN"
     DATEI=$(printf '%s/%02d-%s.png' "$ORDNER" "$NR" "$SCREEN")
     xcrun simctl io "$UDID" screenshot --type=png "$DATEI"

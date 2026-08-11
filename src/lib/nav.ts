@@ -49,6 +49,26 @@ export function isScreen(value: unknown): value is Screen {
  * fuer das HANDY erzeugt (s. `pairPayload`). Bekaeme er sie zurueck, darf sie
  * nichts umschalten — deshalb muss der Wirt genau `screen` heissen.
  */
+/**
+ * Bildschirm aus einem Startargument lesen: `-salatiScreen home`.
+ *
+ * Warum zusaetzlich zum Deep Link: Apple TV fragt bei einer von aussen
+ * geoeffneten Adresse zurueck („Open in ‚Salati TV'?") und wartet auf einen
+ * Tastendruck — im Simulator gibt es keinen, also blieb die Bildschirmfoto-
+ * Automatik an genau diesem Fenster haengen (Lauf 31491392843, alle acht Bilder
+ * zeigten dieselbe Uhr mit Rueckfrage). Ein Startargument geht diesen Weg gar
+ * nicht erst: es steht beim Start schon in den Voreinstellungen des Prozesses
+ * (`NativeModules.SettingsManager.settings`, NSArgumentDomain).
+ *
+ * Fuer eine installierte App ist das wirkungslos — Startargumente lassen sich
+ * einer aus dem Store geladenen tvOS-App nicht mitgeben.
+ */
+export function screenFromLaunchArgument(einstellungen: unknown): Screen | null {
+  if (!einstellungen || typeof einstellungen !== 'object') return null;
+  const wert = (einstellungen as Record<string, unknown>).salatiScreen;
+  return isScreen(wert) ? wert : null;
+}
+
 export function screenFromUrl(url: string | null | undefined): Screen | null {
   if (typeof url !== 'string') return null;
   const treffer = /^salatitv:\/\/screen\/([a-z]+)\/?$/i.exec(url.trim());
