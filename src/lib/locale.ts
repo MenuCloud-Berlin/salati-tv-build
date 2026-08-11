@@ -1,5 +1,7 @@
 import { NativeModules, Platform } from 'react-native';
 
+import { appleEinstellungen } from '@/lib/appleEinstellungen';
+
 /**
  * Sprachliste der TV-App — bewusst IDENTISCH zur Handy-App
  * (`apps/mobile/src/lib/locale-detect.ts`), damit ein Nutzer auf beiden
@@ -110,8 +112,10 @@ function readPlatformLocale(): string | null {
     const native = NativeModules?.I18nManager?.localeIdentifier as string | undefined;
     if (native) return native;
     if (Platform.OS === 'ios') {
-      const settings = NativeModules?.SettingsManager?.settings as Record<string, unknown> | undefined;
-      const apple = settings?.AppleLocale as string | undefined;
+      // Ueber `appleEinstellungen()`, nicht ueber `SettingsManager.settings`:
+      // mit der neuen Architektur liegen Modul-Konstanten hinter
+      // `getConstants()`, der Feldzugriff liest stumm `undefined`.
+      const apple = appleEinstellungen()?.AppleLocale as string | undefined;
       if (apple) return apple;
     }
     return new Intl.DateTimeFormat().resolvedOptions().locale ?? null;
