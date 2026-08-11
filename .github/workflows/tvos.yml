@@ -91,11 +91,21 @@ jobs:
           done < <(grep -rl "abs(milliseconds)" node_modules --include="*.swift" 2>/dev/null)
           echo "abs() eindeutig gemacht in $cnt Swift-Dateien"
 
-      - name: Xcode 26 waehlen (Expo SDK 57 verlangt swift-tools 6.2)
+      # Das NEUESTE Xcode 26, nicht das aelteste. `weak let` (SE-0481) steht in
+      # den Expo-Quellen; Xcode 26.0.1 weist es ab — auch mit
+      # `-enable-upcoming-feature WeakLet`, das es stillschweigend ignoriert
+      # (Lauf 31488684622: der Schalter stand nachweislich im Aufruf, der Fehler
+      # blieb). Erst eine spaetere Swift-Fassung uebersetzt diese Zeilen.
+      - name: Neuestes Xcode 26 waehlen
         run: |
-          sudo xcode-select -s /Applications/Xcode_26.0.app \
-            || sudo xcode-select -s /Applications/Xcode_26.1.app \
-            || sudo xcode-select -s /Applications/Xcode_26.2.app
+          set -e
+          gewaehlt=""
+          for v in 26.3 26.2 26.1.1 26.1 26.0.1 26.0; do
+            if [ -d "/Applications/Xcode_$v.app" ]; then
+              sudo xcode-select -s "/Applications/Xcode_$v.app" && gewaehlt="$v" && break
+            fi
+          done
+          [ -n "$gewaehlt" ] || { echo "::error::Kein Xcode 26 auf dem Laeufer."; exit 1; }
           xcodebuild -version
 
       # Xcode 26 liefert nur die macOS- und iOS-Plattform mit; tvOS, watchOS und
