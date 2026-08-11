@@ -10,7 +10,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { SCREENS, isScreen, screenFromUrl } from '@/lib/nav';
+import { SCREENS, isScreen, screenFromLaunchArgument, screenFromUrl } from '@/lib/nav';
 
 const APP_TSX = path.join(__dirname, '..', '..', 'App.tsx');
 
@@ -38,6 +38,26 @@ describe('isScreen', () => {
     // neueres Handy schickt einen Namen, den diese Version nicht kennt.
     for (const v of ['hifz', '', 'Clock', null, undefined, 42, {}]) {
       expect(isScreen(v)).toBe(false);
+    }
+  });
+});
+
+describe('screenFromLaunchArgument', () => {
+  it('liest jeden Bildschirm aus den Voreinstellungen', () => {
+    for (const s of SCREENS) expect(screenFromLaunchArgument({ salatiScreen: s })).toBe(s);
+  });
+
+  it('weist Unbekanntes ab und faellt ueber nichts', () => {
+    for (const v of [
+      { salatiScreen: 'hifz' },
+      { salatiScreen: 42 },
+      { AppleLocale: 'de_DE' },
+      {},
+      null,
+      undefined,
+      'home',
+    ]) {
+      expect(screenFromLaunchArgument(v)).toBeNull();
     }
   });
 });

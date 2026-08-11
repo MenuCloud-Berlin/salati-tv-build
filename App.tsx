@@ -4,6 +4,7 @@ import {
   BackHandler,
   Easing,
   Linking,
+  NativeModules,
   Pressable,
   StyleSheet,
   Text,
@@ -27,7 +28,7 @@ import { SettingsScreen } from '@/screens/SettingsScreen';
 import { VideosScreen } from '@/screens/VideosScreen';
 import { azanLaeuft, azanStoppen, useAzanAusloeser, useAzanLauf } from '@/lib/azanRuf';
 import { useTranslation } from '@/lib/i18n';
-import { isScreen, screenFromUrl, type Screen } from '@/lib/nav';
+import { isScreen, screenFromLaunchArgument, screenFromUrl, type Screen } from '@/lib/nav';
 import { onPairCommand, startPairing, stopPairing } from '@/lib/pairing';
 import { hydrateOfflineAudio, verwaisteEintraegeAufraeumen } from '@/lib/offlineAudio';
 import { applyRemoteSettings } from '@/lib/settings';
@@ -156,6 +157,10 @@ export default function App() {
       const s = screenFromUrl(url);
       if (s) setScreen(s);
     };
+    // Startargument zuerst: Apple TV haelt eine von aussen geoeffnete Adresse
+    // hinter einer Rueckfrage an (s. lib/nav.screenFromLaunchArgument).
+    const ausArgument = screenFromLaunchArgument(NativeModules?.SettingsManager?.settings);
+    if (ausArgument) setScreen(ausArgument);
     void Linking.getInitialURL().then(anwenden).catch(() => {});
     const sub = Linking.addEventListener('url', ({ url }) => anwenden(url));
     return () => sub.remove();
