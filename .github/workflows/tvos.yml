@@ -94,18 +94,19 @@ jobs:
       # visionOS werden getrennt geladen. Ohne diesen Schritt kompiliert der
       # Archiv-Lauf minutenlang und bricht dann mit „Unable to find a destination
       # matching … tvOS 26.0 is not installed" ab (Lauf 31481377395).
+      # `xcodebuild -showsdks` taugt NICHT als Nachweis: es listet „tvOS 26.0"
+      # auch dann, wenn nur der Platzhalter da ist. Lauf 31481821192 hat genau
+      # daran 3 Minuten verbrannt — der Schritt meldete „SDK ist vorhanden",
+      # und `archive` fand danach keinen tvOS-Zielort. Deshalb wird
+      # bedingungslos geladen (ist die Plattform schon da, kehrt der Befehl
+      # sofort zurueck) und am Simulator-Laufzeitpaket nachgewiesen: das legt
+      # nur ein echter Download an.
       - name: tvOS-Plattform sicherstellen
         run: |
           set -e
-          if xcodebuild -showsdks 2>/dev/null | grep -q "appletvos"; then
-            echo "tvOS-SDK ist vorhanden."
-          else
-            echo "tvOS-SDK fehlt — wird geladen."
-            sudo xcodebuild -downloadPlatform tvOS
-          fi
-          xcodebuild -showsdks | grep -iE "tvos|iOS " || true
-          xcodebuild -showsdks | grep -q "appletvos" \
-            || { echo "::error::tvOS-SDK liess sich nicht bereitstellen."; exit 1; }
+          sudo xcodebuild -downloadPlatform tvOS
+          xcrun simctl list runtimes | grep -i tvos \
+            || { echo "::error::tvOS-Plattform liess sich nicht bereitstellen."; exit 1; }
 
       - name: expo prebuild (tvOS-Projekt erzeugen)
         run: npx expo prebuild -p ios --no-install
