@@ -57,19 +57,20 @@ jobs:
       # Bedingungslos: `-showsdks` listet die Plattform auch als blossen
       # Platzhalter (s. .github/workflows/tvos.yml). Nachweis ist das
       # Simulator-Laufzeitpaket — ohne das gibt es ohnehin keine Bilder.
-      # Drei Anlaeufe: der Download bricht gelegentlich mit „Unable to connect
-      # to simulator" ab (s. .github/workflows/tvos.yml).
+      # Bedingungslos und mit drei Anlaeufen: eine Vorabpruefung meldet
+      # faelschlich „vorhanden", und der Download bricht gelegentlich mit
+      # „Unable to connect to simulator" ab (Begruendung in tvos.yml).
       - name: tvOS-Plattform sicherstellen
         run: |
           set -e
-          da() { xcrun simctl list runtimes | grep -qi tvos; }
+          ok=0
           for versuch in 1 2 3; do
-            if da; then break; fi
-            sudo xcodebuild -downloadPlatform tvOS || echo "Anlauf $versuch fehlgeschlagen"
-            sleep 20
+            if sudo xcodebuild -downloadPlatform tvOS; then ok=1; break; fi
+            echo "Anlauf $versuch fehlgeschlagen — neuer Versuch in 30 s"
+            sleep 30
           done
-          da || { echo "::error::tvOS-Plattform liess sich nicht bereitstellen."; exit 1; }
-          xcrun simctl list runtimes | grep -i tvos
+          [ "$ok" = 1 ] || { echo "::error::tvOS-Plattform liess sich nicht laden."; exit 1; }
+          xcrun simctl list runtimes | grep -i tvos || true
 
       - name: expo prebuild
         run: npx expo prebuild -p ios --no-install
