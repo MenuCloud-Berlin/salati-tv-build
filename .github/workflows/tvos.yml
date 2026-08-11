@@ -90,6 +90,23 @@ jobs:
             || sudo xcode-select -s /Applications/Xcode_26.2.app
           xcodebuild -version
 
+      # Xcode 26 liefert nur die macOS- und iOS-Plattform mit; tvOS, watchOS und
+      # visionOS werden getrennt geladen. Ohne diesen Schritt kompiliert der
+      # Archiv-Lauf minutenlang und bricht dann mit „Unable to find a destination
+      # matching … tvOS 26.0 is not installed" ab (Lauf 31481377395).
+      - name: tvOS-Plattform sicherstellen
+        run: |
+          set -e
+          if xcodebuild -showsdks 2>/dev/null | grep -q "appletvos"; then
+            echo "tvOS-SDK ist vorhanden."
+          else
+            echo "tvOS-SDK fehlt — wird geladen."
+            sudo xcodebuild -downloadPlatform tvOS
+          fi
+          xcodebuild -showsdks | grep -iE "tvos|iOS " || true
+          xcodebuild -showsdks | grep -q "appletvos" \
+            || { echo "::error::tvOS-SDK liess sich nicht bereitstellen."; exit 1; }
+
       - name: expo prebuild (tvOS-Projekt erzeugen)
         run: npx expo prebuild -p ios --no-install
 
