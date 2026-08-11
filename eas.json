@@ -1,0 +1,62 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_TV": "1",
+        "npm_config_minimum_release_age": "0",
+        "NPM_CONFIG_MINIMUM_RELEASE_AGE": "0"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "channel": "production",
+      "android": {
+        "credentialsSource": "remote"
+      },
+      "env": {
+        "EXPO_TV": "1",
+        "npm_config_minimum_release_age": "0",
+        "NPM_CONFIG_MINIMUM_RELEASE_AGE": "0"
+      }
+    },
+    "production-apk": {
+      "autoIncrement": true,
+      "android": {
+        "buildType": "apk",
+        "credentialsSource": "remote"
+      },
+      "env": {
+        "EXPO_TV": "1",
+        "npm_config_minimum_release_age": "0",
+        "NPM_CONFIG_MINIMUM_RELEASE_AGE": "0"
+      }
+    },
+    "aab": {
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "env": {
+        "EXPO_TV": "1",
+        "npm_config_minimum_release_age": "0",
+        "NPM_CONFIG_MINIMUM_RELEASE_AGE": "0"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "android": {
+        "serviceAccountKeyPath": "C:/Users/domen/Documents/menucloud-mobile-build/play-service-account.json",
+        "track": "internal"
+      }
+    }
+  }
+}

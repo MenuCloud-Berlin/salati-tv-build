@@ -1,0 +1,235 @@
+{
+  "clock": {
+    "hijriDate": "{day} {month} {year}",
+    "localTime": "Heure locale de {city} · OK ouvre le menu",
+    "next": "Prochaine prière",
+    "openMenu": "OK ouvre le menu",
+    "timeLeft": "dans {time}"
+  },
+  "common": {
+    "loading": "Chargement…",
+    "offlineList": "Hors ligne — dernière liste chargée",
+    "offlineReader": "Hors ligne — texte en mémoire, la récitation nécessite une connexion",
+    "offlineReaderPaket": "Hors ligne — texte fourni ; la traduction et la récitation nécessitent une connexion",
+    "offlineStreams": "Hors ligne — liste en mémoire, la lecture nécessite une connexion",
+    "retry": "Réessayer"
+  },
+  "home": {
+    "clock": "Horloge de prière",
+    "clockHint": "Horaires de prière et compte à rebours",
+    "pairing": "Connecter",
+    "pairingHint": "Le téléphone comme télécommande",
+    "podcasts": "Podcasts",
+    "podcastsHint": "À écouter",
+    "quiz": "Quiz",
+    "quizHint": "Second écran avec le téléphone",
+    "quran": "Lire le Coran",
+    "quranHint": "Avec récitation et traduction",
+    "radio": "Radio du Coran",
+    "radioHint": "Récitation 24h/24",
+    "reciters": "Récitateurs",
+    "recitersHint": "Écouter le Coran",
+    "reels": "Reels",
+    "reelsHint": "Clips courts",
+    "settings": "Réglages",
+    "settingsHint": "Lieu et méthode",
+    "tagline": "Horaires de prière · Coran · Apprentissage",
+    "videos": "Vidéos",
+    "videosHint": "Grammaire et leçons"
+  },
+  "pairing": {
+    "action": "Connecter la TV",
+    "connectedMany": "{n} téléphones connectés",
+    "connectedOne": "1 téléphone connecté",
+    "manual": "Manuel : {host}:{port} · Code {token}",
+    "noNetwork": "Réseau indisponible",
+    "noWifi": "Pas de Wi-Fi",
+    "qrPending": "Génération du code QR …",
+    "ready": "Prêt — en attente de connexion",
+    "restart": "Redémarrer la connexion",
+    "starting": "Démarrage …",
+    "step1": "1 · Ouvre l’application Salati sur le téléphone",
+    "step2": "2 · Appuie sur « {action} » et scanne le code",
+    "step3": "3 · Pilote la TV et le quiz depuis le téléphone",
+    "title": "Connecter le téléphone"
+  },
+  "player": {
+    "error": "Échec de la lecture — vérifie la connexion.",
+    "hintPause": "OK = pause · Retour = liste",
+    "hintResume": "OK = reprendre · Retour = liste",
+    "kickerPodcast": "Podcast",
+    "kickerRadio": "Radio du Coran",
+    "kickerRecitation": "Récitation",
+    "saveError": "Échec de l’enregistrement — vérifie la connexion.",
+    "saveHint": "OK enregistre cette sourate pour l’écouter sans internet",
+    "savedHint": "Enregistrée · OK supprime le fichier",
+    "saving": "Enregistrement …"
+  },
+  "podcasts": {
+    "episodeLabel": "Épisode",
+    "fallbackSeries": "Salati Podcast",
+    "loadError": "Impossible de charger les podcasts.",
+    "title": "Podcasts"
+  },
+  "prayers": {
+    "asr": "Asr",
+    "asrShort": "Asr",
+    "dhuhr": "Dhuhr",
+    "dhuhrShort": "Dhuhr",
+    "fajr": "Fajr",
+    "fajrShort": "Fajr",
+    "isha": "Isha",
+    "ishaShort": "Isha",
+    "maghrib": "Maghrib",
+    "maghribShort": "Maghrib",
+    "sunrise": "Chourouq (lever du soleil)",
+    "sunriseShort": "Chourouq"
+  },
+  "quiz": {
+    "answerPhoneOrRemote": "Réponds sur le téléphone ou avec la télécommande",
+    "answerRemote": "Réponds avec la télécommande",
+    "backHint": "Appuie sur Retour pour revenir au menu",
+    "playAgain": "Rejouer",
+    "progress": "Question {i} / {n}"
+  },
+  "radio": {
+    "loadError": "Impossible de charger les stations radio.",
+    "title": "Radio du Coran"
+  },
+  "reader": {
+    "controlHint": "OK = pause · ⏮ ⏭ verset · ↻ répéter le verset",
+    "loadError": "Impossible de charger la sourate.",
+    "pickerSubtitle": "Choisis une sourate · récitation avec mot surligné et traduction",
+    "repeatOn": "Verset répété · ↻ arrête la répétition",
+    "verseOf": "Verset {n} / {total}"
+  },
+  "reciters": {
+    "loadError": "Impossible de charger les récitateurs.",
+    "surahN": "Sourate {n}",
+    "title": "Récitateurs"
+  },
+  "reels": {
+    "episodeLabel": "Épisode",
+    "loadError": "Impossible de charger les reels",
+    "title": "Reels"
+  },
+  "settings": {
+    "asrEarlier": "Tôt (Shafi/Maliki/Hanbali - standard)",
+    "asrLater": "Tard (Hanafi)",
+    "asrSchool": "École pour l'Asr",
+    "azan": {
+      "allOff": "Tout désactiver",
+      "hint": "L’appel retentit uniquement lorsque Salati est affiché ; le téléviseur n’ouvre pas l’application de lui-même. La touche Retour arrête un appel en cours.",
+      "licenseHint": "Les enregistrements proviennent de Wikimedia Commons sous licences libres. Deux d’entre eux exigent de citer l’auteur : ils figurent donc ici.",
+      "licenses": "Origine des enregistrements",
+      "off": "Désactivé",
+      "preview": "Écouter",
+      "recording": "Adhan {n}",
+      "stop": "Arrêter",
+      "suggest": "Appliquer la suggestion",
+      "tathwib": "L’adhan 3 comporte le tathwib (« la prière vaut mieux que le sommeil ») et convient donc au fajr.",
+      "title": "Appel pour chaque prière",
+      "volume": "Volume"
+    },
+    "current": "Actuelle",
+    "format12": "12 heures (2:30 PM)",
+    "format24": "24 heures (14:30)",
+    "highLatitude": {
+      "auto": "Automatique (recommandé)",
+      "hint": "Au nord d'environ 48° de latitude, en été le soleil ne descend plus assez bas pour atteindre les angles du Fajr et de l'Isha. Cette règle définit comment ces deux heures sont alors déduites de la durée de la nuit. Selon la règle, le Fajr et l'Isha peuvent différer jusqu'à une heure, et il n'existe pas de solution reconnue par tous. Si vous souhaitez suivre votre mosquée, choisissez la règle qui correspond à ses horaires.",
+      "middleOfNight": "Milieu de la nuit",
+      "seventhOfNight": "Un septième de la nuit",
+      "title": "Règle des hautes latitudes",
+      "twilightAngle": "Basé sur l'angle"
+    },
+    "language": "Langue",
+    "location": "Position",
+    "method": "Méthode de calcul",
+    "methodRegions": {
+      "arabia": "Péninsule Arabique",
+      "europe": "Europe",
+      "middleEast": "Moyen-Orient",
+      "northAfrica": "Afrique du Nord",
+      "northAmerica": "Amérique du Nord",
+      "southAsia": "Asie du Sud",
+      "southeastAsia": "Asie du Sud-Est",
+      "worldwide": "Monde entier"
+    },
+    "quranFont": {
+      "hint": {
+        "amiri": "Naskh classique dans le style des anciennes éditions imprimées",
+        "amiriQuran": "Comme Amiri, avec plus de place pour les signes coraniques superposés",
+        "harmattan": "Écriture ouest-africaine, telle qu’imprimée dans la région",
+        "kfgqpc": "Caractère uthmani officiel du Complexe du Roi Fahd (édition de Médine)",
+        "lateef": "Trait fin, proche des impressions d’Asie du Sud",
+        "noto": "Moderne et net, facile à lire sur petits écrans",
+        "notoSans": "Sans empattement, contraste maximal — pour basse vision",
+        "scheherazade": "Voyelles très nettes, convient aussi au style indo-pakistanais"
+      },
+      "title": "Police du Coran"
+    },
+    "railHint": "Choisis à droite · Retour quitte les réglages",
+    "readerAutoAdvance": "Continuer vers la sourate suivante",
+    "readerContent": "Sous le verset",
+    "readerScale": {
+      "large": "Grand",
+      "medium": "Moyen",
+      "small": "Petit",
+      "title": "Taille du texte du Coran",
+      "xlarge": "Très grand"
+    },
+    "readerTranslation": "Traduction",
+    "readerTranslit": "Translittération",
+    "sections": {
+      "azan": "Appel à la prière",
+      "display": "Apparence",
+      "prayer": "Horaires de prière",
+      "reader": "Coran",
+      "storage": "Stockage"
+    },
+    "storage": {
+      "deleteAll": "Tout supprimer",
+      "deleteHint": "OK supprime",
+      "empty": "Rien d’enregistré",
+      "hint": "Une sourate enregistrée se lit sans internet. Les fichiers sont dans l’app ; la désinstaller les supprime.",
+      "title": "Récitations enregistrées",
+      "used": "{n} sourates · {size}",
+      "usedOne": "1 sourate · {size}"
+    },
+    "sukun": {
+      "hint": "Ne concerne que « KFGQPC HAFS Uthmanic ». Le mushaf de Médine imprime le soukoun sous forme de petit crochet ; le cercle y désigne une lettre écrite mais non prononcée. Avec « Cercle », les deux se ressemblent.",
+      "kreis": "Cercle",
+      "madina": "Impression de Médine (crochet)",
+      "title": "Signe du soukoun"
+    },
+    "theme": {
+      "hint": "S’applique à toutes les sections. « Papier » est le seul fond clair — pour les pièces lumineuses et la lecture de jour.",
+      "mitternacht": "Minuit",
+      "nachtblau": "Bleu nuit",
+      "papier": "Papier",
+      "smaragd": "Émeraude",
+      "tiefschwarz": "Noir profond (OLED)",
+      "title": "Palette de couleurs"
+    },
+    "timeAdjust": {
+      "minutesShort": "min",
+      "reset": "Réinitialiser toutes les corrections",
+      "title": "Correction en minutes"
+    },
+    "timeFormat": "Format de l'heure",
+    "title": "Réglages"
+  },
+  "time": {
+    "hoursShort": "h",
+    "minutesShort": "min",
+    "secondsShort": "s"
+  },
+  "videos": {
+    "loadError": "Impossible de charger les vidéos.",
+    "title": "Vidéos"
+  },
+  "azan": {
+    "running": "Appel à la prière · {prayer}",
+    "runningHint": "Retour arrête l’appel"
+  }
+}

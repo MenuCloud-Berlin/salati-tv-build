@@ -1,0 +1,235 @@
+{
+  "clock": {
+    "hijriDate": "{day} {month} {year}",
+    "localTime": "Local time in {city} · OK opens the menu",
+    "next": "Next prayer",
+    "openMenu": "OK opens the menu",
+    "timeLeft": "{time} left"
+  },
+  "common": {
+    "loading": "Loading…",
+    "offlineList": "Offline — last loaded list",
+    "offlineReader": "Offline — text from storage, recitation needs a connection",
+    "offlineReaderPaket": "Offline — bundled text, translation and recitation need a connection",
+    "offlineStreams": "Offline — list from storage, playback needs a connection",
+    "retry": "Retry"
+  },
+  "home": {
+    "clock": "Prayer clock",
+    "clockHint": "Prayer times & countdown",
+    "pairing": "Connect",
+    "pairingHint": "Phone as remote control",
+    "podcasts": "Podcasts",
+    "podcastsHint": "To listen to",
+    "quiz": "Quiz",
+    "quizHint": "Second screen with your phone",
+    "quran": "Read the Quran",
+    "quranHint": "With recitation & translation",
+    "radio": "Quran Radio",
+    "radioHint": "24/7 recitation",
+    "reciters": "Reciters",
+    "recitersHint": "Listen to the Quran",
+    "reels": "Reels",
+    "reelsHint": "Short clips",
+    "settings": "Settings",
+    "settingsHint": "Location & method",
+    "tagline": "Prayer times · Quran · Learning",
+    "videos": "Videos",
+    "videosHint": "Grammar & lessons"
+  },
+  "pairing": {
+    "action": "Connect TV",
+    "connectedMany": "{n} phones connected",
+    "connectedOne": "1 phone connected",
+    "manual": "Manual: {host}:{port} · Code {token}",
+    "noNetwork": "Network unavailable",
+    "noWifi": "No Wi-Fi",
+    "qrPending": "Generating QR code …",
+    "ready": "Ready — waiting for a connection",
+    "restart": "Restart connection",
+    "starting": "Starting …",
+    "step1": "1 · Open the Salati app on your phone",
+    "step2": "2 · Tap “{action}” and scan the code",
+    "step3": "3 · Control the TV and the quiz from your phone",
+    "title": "Connect your phone"
+  },
+  "player": {
+    "error": "Playback failed — check your connection.",
+    "hintPause": "OK = pause · Back = list",
+    "hintResume": "OK = resume · Back = list",
+    "kickerPodcast": "Podcast",
+    "kickerRadio": "Quran Radio",
+    "kickerRecitation": "Recitation",
+    "saveError": "Saving failed — check the connection.",
+    "saveHint": "OK saves this surah for playback without internet",
+    "savedHint": "Saved · OK removes the file again",
+    "saving": "Saving …"
+  },
+  "podcasts": {
+    "episodeLabel": "Episode",
+    "fallbackSeries": "Salati Podcast",
+    "loadError": "Podcasts could not be loaded.",
+    "title": "Podcasts"
+  },
+  "prayers": {
+    "asr": "Asr",
+    "asrShort": "Asr",
+    "dhuhr": "Dhuhr",
+    "dhuhrShort": "Dhuhr",
+    "fajr": "Fajr",
+    "fajrShort": "Fajr",
+    "isha": "Isha",
+    "ishaShort": "Isha",
+    "maghrib": "Maghrib",
+    "maghribShort": "Maghrib",
+    "sunrise": "Shuruq (sunrise)",
+    "sunriseShort": "Shuruq"
+  },
+  "quiz": {
+    "answerPhoneOrRemote": "Answer on your phone or with the remote",
+    "answerRemote": "Answer with the remote",
+    "backHint": "Press Back to return to the menu",
+    "playAgain": "Play again",
+    "progress": "Question {i} / {n}"
+  },
+  "radio": {
+    "loadError": "Radio stations could not be loaded.",
+    "title": "Quran Radio"
+  },
+  "reader": {
+    "controlHint": "OK = pause · ⏮ ⏭ verse · ↻ repeat verse",
+    "loadError": "Could not load the surah.",
+    "pickerSubtitle": "Choose a surah · recitation with word highlighting & translation",
+    "repeatOn": "Repeating this verse · ↻ stops repeating",
+    "verseOf": "Verse {n} / {total}"
+  },
+  "reciters": {
+    "loadError": "Reciters could not be loaded.",
+    "surahN": "Surah {n}",
+    "title": "Reciters"
+  },
+  "reels": {
+    "episodeLabel": "Episode",
+    "loadError": "Couldn't load reels",
+    "title": "Reels"
+  },
+  "settings": {
+    "asrEarlier": "Earlier (Shafi/Maliki/Hanbali - standard)",
+    "asrLater": "Later (Hanafi)",
+    "asrSchool": "Asr school",
+    "azan": {
+      "allOff": "All off",
+      "hint": "The call sounds only while Salati is on screen — the TV does not wake the app by itself. Press Back to end a call that is playing.",
+      "licenseHint": "The recordings come from Wikimedia Commons under free licences. Two of them require crediting the author — that is why they are listed here.",
+      "licenses": "Where the recordings come from",
+      "off": "Off",
+      "preview": "Listen",
+      "recording": "Adhan {n}",
+      "stop": "Stop",
+      "suggest": "Use suggestion",
+      "tathwib": "Adhan 3 includes the tathwib („prayer is better than sleep\") and therefore suits Fajr.",
+      "title": "Call to prayer per prayer",
+      "volume": "Volume"
+    },
+    "current": "Current",
+    "format12": "12-hour (2:30 PM)",
+    "format24": "24-hour (14:30)",
+    "highLatitude": {
+      "auto": "Automatic (recommended)",
+      "hint": "North of about 48° latitude the sun no longer dips far enough below the horizon in summer to reach the Fajr and Isha angles. This rule decides how both times are then derived from the length of the night. Depending on the rule, Fajr and Isha can end up as much as an hour apart, and there is no universally accepted answer. If you want to follow your mosque, pick the rule that matches its times.",
+      "middleOfNight": "Middle of the night",
+      "seventhOfNight": "One seventh of the night",
+      "title": "High-latitude rule",
+      "twilightAngle": "Angle based"
+    },
+    "language": "Language",
+    "location": "Location",
+    "method": "Calculation method",
+    "methodRegions": {
+      "arabia": "Arabian Peninsula",
+      "europe": "Europe",
+      "middleEast": "Middle East",
+      "northAfrica": "North Africa",
+      "northAmerica": "North America",
+      "southAsia": "South Asia",
+      "southeastAsia": "Southeast Asia",
+      "worldwide": "Worldwide"
+    },
+    "quranFont": {
+      "hint": {
+        "amiri": "Classical Naskh in the style of older printed editions",
+        "amiriQuran": "Like Amiri, with more room for stacked Quranic marks",
+        "harmattan": "West African letterforms, as printed in the region",
+        "kfgqpc": "Official Uthmani print face of the King Fahd Complex (Madinah edition)",
+        "lateef": "Fine strokes, oriented on South Asian printing",
+        "noto": "Modern and clean, easy to read on small screens",
+        "notoSans": "Sans-serif, highest contrast — for low vision",
+        "scheherazade": "Very clear vowel marks, also suited to the IndoPak style"
+      },
+      "title": "Quran font"
+    },
+    "railHint": "Choose on the right · Back leaves settings",
+    "readerAutoAdvance": "Continue to next surah",
+    "readerContent": "Below the verse",
+    "readerScale": {
+      "large": "Large",
+      "medium": "Medium",
+      "small": "Small",
+      "title": "Quran font size",
+      "xlarge": "Extra large"
+    },
+    "readerTranslation": "Translation",
+    "readerTranslit": "Transliteration",
+    "sections": {
+      "azan": "Call to prayer",
+      "display": "Appearance",
+      "prayer": "Prayer times",
+      "reader": "Quran",
+      "storage": "Storage"
+    },
+    "storage": {
+      "deleteAll": "Delete all",
+      "deleteHint": "OK deletes",
+      "empty": "Nothing saved",
+      "hint": "A saved surah plays without internet. The files live inside the app — uninstalling removes them.",
+      "title": "Saved recitations",
+      "used": "{n} surahs · {size}",
+      "usedOne": "1 surah · {size}"
+    },
+    "sukun": {
+      "hint": "Applies to “KFGQPC HAFS Uthmanic” only. The printed Madinah mushaf draws the sukūn as a small hook; the circle there means a letter that is written but not pronounced. Choosing “Circle” makes both look the same.",
+      "kreis": "Circle",
+      "madina": "Madinah print (hook)",
+      "title": "Sukūn mark"
+    },
+    "theme": {
+      "hint": "Applies everywhere. “Paper” is the only light background — made for bright rooms and daytime reading.",
+      "mitternacht": "Midnight",
+      "nachtblau": "Night blue",
+      "papier": "Paper",
+      "smaragd": "Emerald",
+      "tiefschwarz": "Deep black (OLED)",
+      "title": "Colour scheme"
+    },
+    "timeAdjust": {
+      "minutesShort": "min",
+      "reset": "Reset all adjustments",
+      "title": "Minute adjustment"
+    },
+    "timeFormat": "Time format",
+    "title": "Settings"
+  },
+  "time": {
+    "hoursShort": "h",
+    "minutesShort": "m",
+    "secondsShort": "s"
+  },
+  "videos": {
+    "loadError": "Videos could not be loaded.",
+    "title": "Videos"
+  },
+  "azan": {
+    "running": "Call to prayer · {prayer}",
+    "runningHint": "Back ends the call"
+  }
+}

@@ -1,0 +1,235 @@
+{
+  "clock": {
+    "hijriDate": "{day} {month} {year}",
+    "localTime": "Saa za {city} · OK hufungua menyu",
+    "next": "Sala inayofuata",
+    "openMenu": "OK hufungua menyu",
+    "timeLeft": "imebaki {time}"
+  },
+  "common": {
+    "loading": "Inapakia…",
+    "offlineList": "Nje ya mtandao — orodha iliyopakiwa mwisho",
+    "offlineReader": "Nje ya mtandao — maandishi kutoka kwenye hifadhi, kisomo kinahitaji muunganisho",
+    "offlineReaderPaket": "Nje ya mtandao — maandishi yaliyomo; tafsiri na kisomo vinahitaji muunganisho",
+    "offlineStreams": "Nje ya mtandao — orodha kutoka kwenye hifadhi, uchezaji unahitaji muunganisho",
+    "retry": "Jaribu tena"
+  },
+  "home": {
+    "clock": "Saa ya sala",
+    "clockHint": "Nyakati za sala na hesabu ya kurudi nyuma",
+    "pairing": "Unganisha",
+    "pairingHint": "Simu kama rimoti",
+    "podcasts": "Podikasti",
+    "podcastsHint": "Kwa kusikiliza",
+    "quiz": "Maswali",
+    "quizHint": "Skrini ya pili kwa simu",
+    "quran": "Soma Qur’ani",
+    "quranHint": "Pamoja na kisomo na tafsiri",
+    "radio": "Redio ya Qur'an",
+    "radioHint": "Kisomo cha saa 24",
+    "reciters": "Wasomaji",
+    "recitersHint": "Sikiliza Qur’ani",
+    "reels": "Reels",
+    "reelsHint": "Klipu fupi",
+    "settings": "Mipangilio",
+    "settingsHint": "Mahali na mbinu",
+    "tagline": "Nyakati za sala · Qur’ani · Kujifunza",
+    "videos": "Video",
+    "videosHint": "Sarufi na masomo"
+  },
+  "pairing": {
+    "action": "Unganisha TV",
+    "connectedMany": "Simu {n} zimeunganishwa",
+    "connectedOne": "Simu 1 imeunganishwa",
+    "manual": "Kwa mkono: {host}:{port} · Msimbo {token}",
+    "noNetwork": "Mtandao haupatikani",
+    "noWifi": "Hakuna Wi-Fi",
+    "qrPending": "Inatengeneza msimbo wa QR …",
+    "ready": "Tayari — inasubiri muunganisho",
+    "restart": "Anzisha upya muunganisho",
+    "starting": "Inaanza …",
+    "step1": "1 · Fungua programu ya Salati kwenye simu",
+    "step2": "2 · Gusa “{action}” kisha changanua msimbo",
+    "step3": "3 · Dhibiti TV na jaribio kutoka kwenye simu",
+    "title": "Unganisha simu"
+  },
+  "player": {
+    "error": "Uchezaji umeshindikana — angalia muunganisho.",
+    "hintPause": "OK = simamisha · Nyuma = orodha",
+    "hintResume": "OK = endelea · Nyuma = orodha",
+    "kickerPodcast": "Podikasti",
+    "kickerRadio": "Redio ya Qur'an",
+    "kickerRecitation": "Kisomo",
+    "saveError": "Kuhifadhi kumeshindikana — angalia muunganisho.",
+    "saveHint": "OK huhifadhi sura hii ili icheze bila intaneti",
+    "savedHint": "Imehifadhiwa · OK huifuta faili",
+    "saving": "Inahifadhi …"
+  },
+  "podcasts": {
+    "episodeLabel": "Kipindi",
+    "fallbackSeries": "Podikasti ya Salati",
+    "loadError": "Podikasti hazikuweza kupakiwa.",
+    "title": "Podikasti"
+  },
+  "prayers": {
+    "asr": "Asr",
+    "asrShort": "Asr",
+    "dhuhr": "Dhuhr",
+    "dhuhrShort": "Dhuhr",
+    "fajr": "Fajr",
+    "fajrShort": "Fajr",
+    "isha": "Isha",
+    "ishaShort": "Isha",
+    "maghrib": "Maghrib",
+    "maghribShort": "Maghrib",
+    "sunrise": "Macheo (Shuruq)",
+    "sunriseShort": "Macheo"
+  },
+  "quiz": {
+    "answerPhoneOrRemote": "Jibu kwenye simu au kwa rimoti",
+    "answerRemote": "Jibu kwa rimoti",
+    "backHint": "Bonyeza Nyuma kurudi kwenye menyu",
+    "playAgain": "Cheza tena",
+    "progress": "Swali {i} / {n}"
+  },
+  "radio": {
+    "loadError": "Vituo vya redio havikuweza kupakiwa.",
+    "title": "Redio ya Qur'an"
+  },
+  "reader": {
+    "controlHint": "OK = sitisha · ⏮ ⏭ aya · ↻ rudia aya",
+    "loadError": "Sura haikuweza kupakiwa.",
+    "pickerSubtitle": "Chagua sura · kisomo chenye kuangazia neno na tafsiri",
+    "repeatOn": "Aya inarudiwa · ↻ husitisha kurudia",
+    "verseOf": "Aya {n} / {total}"
+  },
+  "reciters": {
+    "loadError": "Wasomaji hawakuweza kupakiwa.",
+    "surahN": "Sura {n}",
+    "title": "Wasomaji"
+  },
+  "reels": {
+    "episodeLabel": "Kipindi",
+    "loadError": "Imeshindwa kupakia reels",
+    "title": "Reels"
+  },
+  "settings": {
+    "asrEarlier": "Mapema zaidi (Shafi'i/Maliki/Hanbali - kawaida)",
+    "asrLater": "Baadaye (Hanafi)",
+    "asrSchool": "Madhehebu ya Asr",
+    "azan": {
+      "allOff": "Zima zote",
+      "hint": "Adhana husikika tu wakati Salati iko kwenye skrini — televisheni haifungui programu yenyewe. Bonyeza Rudi ili kusimamisha adhana inayoendelea.",
+      "licenseHint": "Rekodi zimetoka Wikimedia Commons chini ya leseni huru. Mbili kati yake zinahitaji kutaja mtunzi — ndiyo maana zimeorodheshwa hapa.",
+      "licenses": "Asili ya rekodi",
+      "off": "Imezimwa",
+      "preview": "Sikiliza",
+      "recording": "Adhana {n}",
+      "stop": "Simamisha",
+      "suggest": "Tumia pendekezo",
+      "tathwib": "Adhana 3 ina tathwib („swala ni bora kuliko usingizi\"), kwa hivyo inafaa Alfajiri.",
+      "title": "Adhana kwa kila swala",
+      "volume": "Sauti"
+    },
+    "current": "Sasa",
+    "format12": "Saa 12 (2:30 PM)",
+    "format24": "Saa 24 (14:30)",
+    "highLatitude": {
+      "auto": "Otomatiki (inapendekezwa)",
+      "hint": "Kaskazini mwa takriban latitudo 48°, wakati wa kiangazi jua halishuki chini vya kutosha kufikia pembe za Fajr na Isha. Kanuni hii huamua jinsi nyakati hizo mbili zinavyopatikana kutokana na urefu wa usiku. Kulingana na kanuni, Fajr na Isha zinaweza kutofautiana hadi saa moja, na hakuna suluhisho linalokubalika kwa wote. Ukitaka kufuata msikiti wako, chagua kanuni inayolingana na nyakati zake.",
+      "middleOfNight": "Katikati ya usiku",
+      "seventhOfNight": "Sehemu ya saba ya usiku",
+      "title": "Kanuni ya latitudo za juu",
+      "twilightAngle": "Kwa kutumia pembe"
+    },
+    "language": "Lugha",
+    "location": "Eneo",
+    "method": "Njia ya hesabu",
+    "methodRegions": {
+      "arabia": "Rasi ya Uarabuni",
+      "europe": "Ulaya",
+      "middleEast": "Mashariki ya Kati",
+      "northAfrica": "Afrika Kaskazini",
+      "northAmerica": "Amerika Kaskazini",
+      "southAsia": "Asia Kusini",
+      "southeastAsia": "Asia ya Kusini-Mashariki",
+      "worldwide": "Duniani kote"
+    },
+    "quranFont": {
+      "hint": {
+        "amiri": "Naskh ya kale kwa mtindo wa machapisho ya zamani",
+        "amiriQuran": "Kama Amiri, kwa nafasi zaidi ya alama za Qur’ani zilizopangana",
+        "harmattan": "Muundo wa herufi za Afrika Magharibi, kama unavyochapishwa huko",
+        "kfgqpc": "Hati rasmi ya Uthmani ya Kituo cha Mfalme Fahd (toleo la Madina)",
+        "lateef": "Mistari myembamba, karibu na machapisho ya Asia Kusini",
+        "noto": "Ya kisasa na safi, rahisi kusoma kwenye skrini ndogo",
+        "notoSans": "Bila serifu, utofautishaji wa juu — kwa uoni hafifu",
+        "scheherazade": "Harakati wazi sana, inafaa pia mtindo wa IndoPak"
+      },
+      "title": "Fonti ya Qur’ani"
+    },
+    "railHint": "Chagua upande wa kulia · Kitufe cha kurudi hutoka kwenye mipangilio",
+    "readerAutoAdvance": "Endelea kwenye sura inayofuata",
+    "readerContent": "Chini ya aya",
+    "readerScale": {
+      "large": "Kubwa",
+      "medium": "Wastani",
+      "small": "Ndogo",
+      "title": "Ukubwa wa fonti ya Qur'an",
+      "xlarge": "Kubwa zaidi"
+    },
+    "readerTranslation": "Tafsiri",
+    "readerTranslit": "Matamshi",
+    "sections": {
+      "azan": "Adhana",
+      "display": "Muonekano",
+      "prayer": "Nyakati za sala",
+      "reader": "Qur'an",
+      "storage": "Hifadhi"
+    },
+    "storage": {
+      "deleteAll": "Futa vyote",
+      "deleteHint": "OK hufuta",
+      "empty": "Hakuna kilichohifadhiwa",
+      "hint": "Sura iliyohifadhiwa hucheza bila intaneti. Faili zipo ndani ya programu — huondoka ikiondolewa.",
+      "title": "Kisomo kilichohifadhiwa",
+      "used": "Sura {n} · {size}",
+      "usedOne": "Sura 1 · {size}"
+    },
+    "sukun": {
+      "hint": "Inahusu “KFGQPC HAFS Uthmanic” pekee. Msahafu wa Madina uliochapishwa huandika sukuni kama kulabu ndogo; duara humaanisha herufi iliyoandikwa lakini haisomwi. Ukichagua “Duara”, zote mbili zitafanana.",
+      "kreis": "Duara",
+      "madina": "Chapa ya Madina (kulabu)",
+      "title": "Alama ya sukuni"
+    },
+    "theme": {
+      "hint": "Hutumika kila sehemu. “Karatasi” ndio mandharinyuma pekee angavu — kwa vyumba vyenye mwanga na kusoma mchana.",
+      "mitternacht": "Usiku wa manane",
+      "nachtblau": "Buluu ya usiku",
+      "papier": "Karatasi",
+      "smaragd": "Zumaridi",
+      "tiefschwarz": "Nyeusi nzito (OLED)",
+      "title": "Mpangilio wa rangi"
+    },
+    "timeAdjust": {
+      "minutesShort": "dak",
+      "reset": "Rejesha marekebisho yote",
+      "title": "Marekebisho ya dakika"
+    },
+    "timeFormat": "Muundo wa muda",
+    "title": "Mipangilio"
+  },
+  "time": {
+    "hoursShort": "sa",
+    "minutesShort": "dk",
+    "secondsShort": "sek"
+  },
+  "videos": {
+    "loadError": "Video hazikuweza kupakiwa.",
+    "title": "Video"
+  },
+  "azan": {
+    "running": "Adhana · {prayer}",
+    "runningHint": "Rudi husimamisha adhana"
+  }
+}
