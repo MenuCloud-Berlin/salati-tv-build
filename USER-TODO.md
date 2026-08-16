@@ -1,9 +1,11 @@
 # Salati TV — offene Punkte
 
-> Stand 2026-08-11, Release **1.8.1** (Play versionCode 13, App Store Build 1).
+> Stand 2026-08-16, Release **1.9.0** (Play versionCode 14, App Store Build 2).
+> Vorgaenger 1.8.1 ist in BEIDEN Laeden durch: App Store `READY_FOR_SALE`,
+> Play production `completed` mit vc 13.
 >
-> **Zuerst lesen:** Die App liegt seit dem 2026-08-11 auch im Apple App Store
-> zur Pruefung. Hergang und Fallstricke: `docs/APPLE-TV-2026-08-11.md`.
+> **Zuerst lesen:** Hergang und Fallstricke der Apple-Einreichung stehen in
+> `docs/APPLE-TV-2026-08-11.md`.
 > Erledigtes wird geloescht, nicht abgehakt. Die Historie steht im Git-Log und
 > in `docs/`.
 
@@ -11,10 +13,10 @@
 
 | Kanal | Stand | Beleg |
 |---|---|---|
-| Apple App Store | **1.8.1 in Pruefung** | Einreichung `fa1446ab`, Element „1.8.1 TV_OS", `submittedDate 2026-08-11T14:13Z`, Version `WAITING_FOR_REVIEW`, `releaseType AFTER_APPROVAL`, Build 1 `VALID` |
-| Google Play (internal + production) | **1.8.1, vc 13**, Pruefung laeuft | `node scripts/play-status.mjs`; Console: „Aenderungen, die ueberprueft werden" |
+| Apple App Store | **1.8.1 freigegeben** | `node scripts/asc-listing.mjs --pruefen`: Version 1.8.1 `READY_FOR_SALE`, Auftritt `READY_FOR_SALE`, alle vier Sprachen |
+| Google Play (internal + production) | **1.8.1, vc 13, freigegeben** | `node scripts/play-status.mjs`: production `completed` vc 13 |
 | APK-Download (salati.pro) | **1.8.1** | `node scripts/upload-apk-r2.mjs --pruefen` |
-| Webseite salati.pro | **live** | TV-Sektion mit sieben Bildern aus 1.4.0 und dem Knopf „APK fuer Fire TV laden" |
+| Webseite salati.pro | **live** | TV-Sektion mit sieben Bildern aus 1.8.1 (am 2026-08-11 ersetzt) und dem Knopf „APK fuer Fire TV laden" |
 
 Die Store-Bilder sind am 2026-08-11 komplett neu gemacht worden: acht je
 Sprache, aus 1.8.1 statt aus 1.4.0, je Store aus der eigenen Plattform
@@ -48,11 +50,6 @@ bekamen alle vier Sprachen dieselben sieben englischen Aufnahmen.
   wirklich mit. Lauf 31513664177: gruen.
 
 ## Was noch offen ist
-
-- [ ] **Apples Antwort abwarten.** 1.8.1 steht auf `WAITING_FOR_REVIEW`. Kommt
-      eine Ablehnung, steht der Grund in App Store Connect unter „Resolution
-      Center"; `node scripts/asc-bestand.mjs` zeigt den Bestand, der Stand der
-      Version kommt aus `node scripts/asc-listing.mjs --pruefen`.
 
 - [ ] **Der Apple-TV-Build laeuft noch nie auf echter Hardware.** Belegt ist:
       er uebersetzt, signiert, laedt hoch und laeuft im tvOS-Simulator (die
