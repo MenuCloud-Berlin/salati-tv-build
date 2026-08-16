@@ -28,6 +28,25 @@ bekamen alle vier Sprachen dieselben sieben englischen Aufnahmen.
     node scripts/play-screenshots.mjs                       # Play
     node scripts/asc-screenshots.mjs                        # App Store
 
+## Am 2026-08-11 mit aufgeraeumt
+
+- **Eine Textquelle statt zwei.** Die Store-Texte lagen doppelt (Play in
+  `store/listing/*.md`, Apple in `store/appstore/*.json`) und waren
+  auseinandergelaufen: die Play-Beschreibung war vier Versionen alt. Jetzt gibt
+  es nur noch `store/texte/` (`scripts/lib/store-texte.mjs`); `{{GERAET}}` wird
+  je Laden aufgeloest, weil Apple keine Verweise auf fremde Plattformen duldet.
+  `npm run pruefe-store` prueft Laengen, Wortwahl, Bildunterschriften und
+  Bildmasse vor jeder Einreichung.
+- **Webseite zeigt 1.8.1.** Die sieben TV-Bilder auf salati.pro stammten aus
+  1.4.0 und waren englisch; jetzt sind sie aus 1.8.1 und deutsch. Nebenbefund:
+  `tv-settings` stand gar nicht in `optimize-web-images.mjs`, wurde also bei
+  jedem Durchlauf uebersehen. Live geprueft: sieben Dateien, HTTP 200, Groessen
+  byte-genau wie lokal erzeugt.
+- **Die CI lief wochenlang stumm rot.** `pnpm/action-setup` scheiterte an
+  `virtual-store-dir` aus der `.npmrc`; danach fielen drei Gebetszeit-Tests um,
+  weil ihre Zeitzone von der Maschine kam. Beides behoben, Lint laeuft jetzt
+  wirklich mit. Lauf 31513664177: gruen.
+
 ## Was noch offen ist
 
 - [ ] **Apples Antwort abwarten.** 1.8.1 steht auf `WAITING_FOR_REVIEW`. Kommt

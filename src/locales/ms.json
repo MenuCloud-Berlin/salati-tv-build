@@ -60,6 +60,8 @@
     "kickerPodcast": "Podcast",
     "kickerRadio": "Radio Al-Quran",
     "kickerRecitation": "Tilawah",
+    "laeuftImHintergrund": "Dimainkan di latar belakang",
+    "pausiert": "Dijeda",
     "saveError": "Gagal menyimpan — semak sambungan.",
     "saveHint": "OK menyimpan surah ini untuk dimainkan tanpa internet",
     "savedHint": "Tersimpan · OK memadam fail",
@@ -101,6 +103,8 @@
     "loadError": "Surah tidak dapat dimuatkan.",
     "pickerSubtitle": "Pilih surah · tilawah dengan sorotan perkataan & terjemahan",
     "repeatOn": "Ayat diulang · ↻ menghentikan ulangan",
+    "sectionHint": "Ayat panjang · ⏮ ⏭ menyelak dalam ayat, kemudian ke seterusnya",
+    "sectionOf": "Bahagian {n} / {total}",
     "verseOf": "Ayat {n} / {total}"
   },
   "reciters": {
@@ -130,6 +134,14 @@
       "tathwib": "Azan 3 mengandungi tathwib („solat itu lebih baik daripada tidur\"), sesuai untuk Subuh.",
       "title": "Azan bagi setiap solat",
       "volume": "Kelantangan"
+    },
+    "background": {
+      "title": "Latar belakang",
+      "hint": "Berada di belakang semua bahagian dan sesuai dengan setiap warna.",
+      "ruhig": "Polos",
+      "schein": "Cahaya",
+      "verlauf": "Kecerunan",
+      "muster": "Corak"
     },
     "current": "Semasa",
     "format12": "12 jam (2:30 PM)",

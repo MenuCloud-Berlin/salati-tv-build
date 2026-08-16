@@ -16,6 +16,7 @@ export type IconName =
   | 'phone'
   | 'settings'
   | 'play'
+  | 'pause'
   | 'back'
   | 'up'
   | 'down'
@@ -92,6 +93,9 @@ export function Icon({ name, size = 28, color = '#d4af37' }: { name: IconName; s
         </>
       )}
       {name === 'play' && <Path d="M8 5.5 18 12 8 18.5V5.5Z" {...p} fill={color} />}
+      {/* Zwei Balken statt zweier schmaler Rechtecke mit Rahmen: gefuellt
+          bleibt die Pause aus drei Metern erkennbar, ein Umriss nicht. */}
+      {name === 'pause' && <Path d="M8.5 5.5h2.6v13H8.5V5.5Zm4.4 0h2.6v13h-2.6V5.5Z" {...p} fill={color} />}
       {name === 'back' && (
         <>
           <Polyline points="10,7 5,12 10,17" {...p} />

@@ -47,10 +47,12 @@ import {
   setQuranFont,
   setQuranSukun,
   setReaderScale,
+  setHintergrund,
   setTheme,
   toggleReaderOption,
   useTvSettings,
 } from '@/lib/settings';
+import { HINTERGRUENDE, hintergrundNameKey } from '@/components/Hintergrund';
 import { THEMES } from '@/lib/theme';
 import type { Theme } from '@/lib/theme';
 import { useAllQuranFonts } from '@/lib/useQuranFont';
@@ -485,7 +487,7 @@ function AzanSection({ s }: { s: Styles }) {
  * anderes als „Papier" in einem hellen Wohnzimmer.
  */
 function DisplaySection({ s }: { s: Styles }) {
-  const { theme: aktiv } = useTvSettings();
+  const { theme: aktiv, hintergrund } = useTvSettings();
   const { t } = useTranslation();
   return (
     <>
@@ -510,6 +512,27 @@ function DisplaySection({ s }: { s: Styles }) {
               </View>
               <Text style={[s.cardLabel, active && s.activeText]} numberOfLines={1}>
                 {t(th.nameKey)}
+              </Text>
+            </FocusCard>
+          );
+        })}
+      </View>
+
+      {/* Der Hintergrund ist bewusst von der Farbwelt GETRENNT: er wirkt in
+          jedem Thema und soll sich nicht mit ihm aendern. Wer „Papier" mit
+          Muster will, soll das haben. */}
+      <Text style={s.section}>{t('settings.background.title')}</Text>
+      <Text style={s.hint}>{t('settings.background.hint')}</Text>
+      <View style={s.grid}>
+        {HINTERGRUENDE.map((hg) => {
+          const active = hg === hintergrund;
+          return (
+            <FocusCard
+              key={hg}
+              onPress={() => setHintergrund(hg)}
+              style={[s.themeCard, active && s.activeCard]}>
+              <Text style={[s.cardLabel, active && s.activeText]} numberOfLines={1}>
+                {t(hintergrundNameKey(hg))}
               </Text>
             </FocusCard>
           );

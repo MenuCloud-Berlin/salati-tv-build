@@ -60,6 +60,8 @@
     "kickerPodcast": "Podcast",
     "kickerRadio": "Quran Radio",
     "kickerRecitation": "Recitation",
+    "laeuftImHintergrund": "Playing in the background",
+    "pausiert": "Paused",
     "saveError": "Saving failed — check the connection.",
     "saveHint": "OK saves this surah for playback without internet",
     "savedHint": "Saved · OK removes the file again",
@@ -101,6 +103,8 @@
     "loadError": "Could not load the surah.",
     "pickerSubtitle": "Choose a surah · recitation with word highlighting & translation",
     "repeatOn": "Repeating this verse · ↻ stops repeating",
+    "sectionHint": "Long verse · ⏮ ⏭ turns the page, then moves on",
+    "sectionOf": "Part {n} / {total}",
     "verseOf": "Verse {n} / {total}"
   },
   "reciters": {
@@ -130,6 +134,14 @@
       "tathwib": "Adhan 3 includes the tathwib („prayer is better than sleep\") and therefore suits Fajr.",
       "title": "Call to prayer per prayer",
       "volume": "Volume"
+    },
+    "background": {
+      "title": "Background",
+      "hint": "Sits behind every area and works with any colour world.",
+      "ruhig": "Plain",
+      "schein": "Glow",
+      "verlauf": "Gradient",
+      "muster": "Pattern"
     },
     "current": "Current",
     "format12": "12-hour (2:30 PM)",

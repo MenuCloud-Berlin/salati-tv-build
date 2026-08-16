@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   BackHandler,
+  type LayoutChangeEvent,
   ScrollView,
   StyleSheet,
   Text,
@@ -22,8 +23,15 @@ import {
   TRANSLATION_RESOURCES,
   type ReaderVerse,
 } from '@/lib/quranText';
-import { useTvSettings } from '@/lib/settings';
+import { toggleReaderOption, useTvSettings } from '@/lib/settings';
 import type { Theme } from '@/lib/theme';
+import {
+  abschnittVonWort,
+  textAbschnitte,
+  textFaktor,
+  versLayout,
+  type Abschnitt,
+} from '@/lib/versSeiten';
 import { useQuranFont, type QuranFontResult } from '@/lib/useQuranFont';
 import { useTheme } from '@/lib/useTheme';
 import { useLatestRef } from '@/lib/useLatestRef';
@@ -268,12 +276,115 @@ function Reader({
     if (ziel >= 0 && ziel < list.length) setIdx(ziel);
   };
 
+  // Die Buehne misst sich selbst, statt aus der Bildschirmhoehe geschaetzt zu
+  // werden: zwischen Kopfzeile, Bedienleiste und Hinweiszeile bleibt je nach
+  // Sprache und Panel unterschiedlich viel uebrig, und um genau diesen Rest
+  // geht es bei der Frage, wie viel Vers auf den Schirm passt.
+  const [buehne, setBuehne] = useState({ w: 0, h: 0 });
+  const misstBuehne = useCallback((e: LayoutChangeEvent) => {
+    const { width: w, height: h } = e.nativeEvent.layout;
+    setBuehne((alt) => (Math.abs(alt.w - w) < 1 && Math.abs(alt.h - h) < 1 ? alt : { w, h }));
+  }, []);
+
   const s = useMemo(
     () => readerStyles(height, width, rtl, theme, readerScale),
     [height, width, rtl, theme, readerScale],
   );
   const meta = SURAHS.find((x) => x.n === surah);
   const activeWord = current ? activeWordIndex(current.segments, posMs) : -1;
+
+  // Wie viel Hoehe der Vers bekommt und wie viel seine Begleitzeilen. Ohne
+  // Umschrift und Uebersetzung gehoert die Buehne ganz dem Vers; mit beiden
+  // bekommt er die Haelfte. Feste Anteile statt `flex`, weil nur mit einer
+  // bekannten Hoehe gerechnet werden kann, wie viele Zeilen hineinpassen.
+  const zeigtTranslit = readerTranslit;
+  const zeigtUebersetzung = readerTranslation && !!current?.translation;
+  const zusatz = (zeigtTranslit ? 1 : 0) + (zeigtUebersetzung ? 1 : 0);
+  const arabAnteil = zusatz === 0 ? 1 : zusatz === 1 ? 0.62 : 0.5;
+  const arabH = buehne.h * arabAnteil;
+  const zusatzH = zusatz > 0 ? (buehne.h - arabH) / zusatz : 0;
+
+  const layout = useMemo(
+    () =>
+      versLayout({
+        woerter: current?.words.map((w) => w.ar) ?? [],
+        breite: buehne.w,
+        hoehe: arabH,
+        fontSize: s.arabischGroesse,
+        lineHeight: s.arabischZeile,
+      }),
+    [current, buehne.w, arabH, s.arabischGroesse, s.arabischZeile],
+  );
+  const abschnitte: Abschnitt[] = layout.abschnitte;
+
+  // Welcher Abschnitt zu sehen ist: normalerweise der, in dem die Rezitation
+  // gerade steht. Wer von Hand blaettert, uebernimmt — bis die Rezitation den
+  // Abschnitt von selbst wechselt, dann fuehrt wieder sie.
+  const autoAbschnitt = abschnittVonWort(abschnitte, activeWord);
+  const [manuell, setManuell] = useState<number | null>(null);
+  const [letzterAuto, setLetzterAuto] = useState(autoAbschnitt);
+  if (letzterAuto !== autoAbschnitt) {
+    setLetzterAuto(autoAbschnitt);
+    setManuell(null);
+  }
+  const abschnittIdx = Math.min(manuell ?? autoAbschnitt, abschnitte.length - 1);
+  const sichtbareWorte = abschnitte[abschnittIdx] ?? [];
+
+  // Blaettern statt Verswechsel, solange der Vers noch Abschnitte hat. Damit
+  // erreicht die Fernbedienung jedes Wort auch dann, wenn der Text ohne
+  // Zeitstempel kommt (mitgeliefertes Paket) und von selbst nichts blaettert.
+  const weiter = (delta: number) => {
+    const ziel = abschnittIdx + delta;
+    if (ziel >= 0 && ziel < abschnitte.length) {
+      setManuell(ziel);
+      return;
+    }
+    springe(delta);
+  };
+
+  // Wer von Hand blaettert, nimmt die Rezitation mit: sonst liefe der markierte
+  // Wortlaut in einem Abschnitt weiter, den man gerade nicht sieht — und
+  // schaltete den Blick eine Sekunde spaeter wieder dorthin zurueck.
+  const abschnitteRef = useLatestRef(abschnitte);
+  const segmenteRef = useLatestRef(current?.segments);
+  useEffect(() => {
+    if (manuell === null) return;
+    const erstes = abschnitteRef.current[manuell]?.[0];
+    if (erstes === undefined) return;
+    const seg = segmenteRef.current?.find((sg) => sg[0] === erstes);
+    if (!seg) return; // Text ohne Zeitstempel (mitgeliefertes Paket)
+    try {
+      // `seekBy` statt `currentTime = …`: eine Zuweisung an den Spieler gilt
+      // als Aenderung eines Hook-Ergebnisses (react-hooks/immutability), der
+      // Sprung selbst ist eine Methode und damit erlaubt.
+      player.seekBy(seg[2] / 1000 - (player.currentTime ?? 0));
+    } catch {
+      /* ignore */
+    }
+  }, [manuell, player, abschnitteRef, segmenteRef]);
+
+  const translitText = zeigtTranslit
+    ? sichtbareWorte.map((i) => current?.words[i]?.translit ?? '').join(' ').trim()
+    : '';
+  // Die Uebersetzung wird der Laenge nach auf dieselbe Zahl Abschnitte verteilt
+  // (s. lib/versSeiten.ts) — ungefaehr passend statt abgeschnitten.
+  const uebersetzungText = zeigtUebersetzung
+    ? (textAbschnitte(current?.translation ?? '', abschnitte.length)[abschnittIdx] ?? '')
+    : '';
+  const translitFaktor = textFaktor({
+    text: translitText,
+    breite: buehne.w,
+    hoehe: zusatzH,
+    fontSize: s.translitGroesse,
+    lineHeight: s.translitGroesse * 1.35,
+  });
+  const uebersetzungFaktor = textFaktor({
+    text: uebersetzungText,
+    breite: buehne.w,
+    hoehe: zusatzH,
+    fontSize: s.uebersetzungGroesse,
+    lineHeight: s.uebersetzungZeile,
+  });
 
   // Audit 2026-07-28: Fehler- und Ladezustand des Lesers hatten KEIN
   // fokussierbares Element — auf Android TV fand die Fernbedienung dort keinen
@@ -299,20 +410,52 @@ function Reader({
         <Text style={s.surahName} numberOfLines={1}>
           {surah}. {meta?.en ?? ''} · <Text style={arab.style}>{arab.text(meta?.ar ?? '')}</Text>
         </Text>
-        <Text style={s.verseNo}>{t('reader.verseOf', { n: current.n, total: verses.length })}</Text>
+        <Text style={s.verseNo}>
+          {t('reader.verseOf', { n: current.n, total: verses.length })}
+          {abschnitte.length > 1
+            ? ` · ${t('reader.sectionOf', { n: abschnittIdx + 1, total: abschnitte.length })}`
+            : ''}
+        </Text>
       </View>
 
-      <View style={s.stage}>
-        <ArabicVerse verse={current} activeWord={activeWord} arab={arab} styles={s} />
-        {readerTranslit ? (
-          <Text style={s.translit} numberOfLines={3}>
-            {current.words.map((w) => w.translit).join(' ')}
-          </Text>
+      <View testID="reader-buehne" style={s.stage} onLayout={misstBuehne}>
+        <View style={[s.arabBox, { height: arabH || undefined }]}>
+          <ArabicVerse
+            verse={current}
+            woerter={sichtbareWorte}
+            activeWord={activeWord}
+            arab={arab}
+            styles={s}
+            faktor={layout.faktor}
+          />
+        </View>
+        {zeigtTranslit ? (
+          <View style={[s.zusatzBox, { height: zusatzH || undefined }]}>
+            <Text
+              style={[
+                s.translit,
+                {
+                  fontSize: s.translitGroesse * translitFaktor,
+                  lineHeight: s.translitGroesse * 1.35 * translitFaktor,
+                },
+              ]}>
+              {translitText}
+            </Text>
+          </View>
         ) : null}
-        {readerTranslation && current.translation ? (
-          <Text style={s.translation} numberOfLines={4}>
-            {current.translation}
-          </Text>
+        {zeigtUebersetzung ? (
+          <View style={[s.zusatzBox, { height: zusatzH || undefined }]}>
+            <Text
+              style={[
+                s.translation,
+                {
+                  fontSize: s.uebersetzungGroesse * uebersetzungFaktor,
+                  lineHeight: s.uebersetzungZeile * uebersetzungFaktor,
+                },
+              ]}>
+              {uebersetzungText}
+            </Text>
+          </View>
         ) : null}
       </View>
 
@@ -321,13 +464,13 @@ function Reader({
           Wiederholen. Der Initialfokus liegt auf Play/Pause, weil das die
           Taste ist, die man im Sitzen zuerst sucht. */}
       <View style={s.controls}>
-        <FocusCard onPress={() => springe(-1)} style={s.ctrl}>
+        <FocusCard onPress={() => weiter(-1)} style={s.ctrl}>
           <Text style={s.ctrlGlyph}>⏮</Text>
         </FocusCard>
         <FocusCard hasTVPreferredFocus onPress={toggle} style={s.ctrlWide}>
           <Text style={s.ctrlGlyph}>{playing ? '❚❚' : '▶'}</Text>
         </FocusCard>
-        <FocusCard onPress={() => springe(1)} style={s.ctrl}>
+        <FocusCard onPress={() => weiter(1)} style={s.ctrl}>
           <Text style={s.ctrlGlyph}>⏭</Text>
         </FocusCard>
         <FocusCard
@@ -335,16 +478,42 @@ function Reader({
           style={[s.ctrl, wiederholen && s.ctrlActive]}>
           <Text style={[s.ctrlGlyph, wiederholen && s.ctrlActiveText]}>↻</Text>
         </FocusCard>
+
+        {/* Umschrift und Uebersetzung sind auch in den Einstellungen zu finden.
+            Hier stehen sie zusaetzlich, weil sich beim LESEN entscheidet, ob man
+            sie braucht — und der Weg dorthin sonst durch zwei Bildschirme und
+            zurueck fuehrt, mit verlorener Sure am Ende. Beschriftet statt
+            als Zeichen: „Aa" versteht auf drei Meter Abstand niemand. */}
+        <FocusCard
+          onPress={() => toggleReaderOption('readerTranslit')}
+          style={[s.ctrlPille, readerTranslit && s.ctrlActive]}>
+          <Text
+            style={[s.ctrlLabel, readerTranslit && s.ctrlActiveText]}
+            numberOfLines={1}>
+            {t('settings.readerTranslit')}
+          </Text>
+        </FocusCard>
+        <FocusCard
+          onPress={() => toggleReaderOption('readerTranslation')}
+          style={[s.ctrlPille, readerTranslation && s.ctrlActive]}>
+          <Text
+            style={[s.ctrlLabel, readerTranslation && s.ctrlActiveText]}
+            numberOfLines={1}>
+            {t('settings.readerTranslation')}
+          </Text>
+        </FocusCard>
       </View>
 
-      <Text style={s.hint}>
+      <Text style={s.hint} numberOfLines={1}>
         {quelle === 'paket'
           ? t('common.offlineReaderPaket')
           : quelle === 'ablage'
             ? t('common.offlineReader')
             : wiederholen
               ? t('reader.repeatOn')
-              : t('reader.controlHint')}
+              : abschnitte.length > 1
+                ? t('reader.sectionHint')
+                : t('reader.controlHint')}
       </Text>
     </View>
   );
@@ -362,20 +531,29 @@ function Reader({
  */
 function ArabicVerse({
   verse,
+  woerter,
   activeWord,
   arab,
   styles,
+  faktor,
 }: {
   verse: ReaderVerse;
+  /** Indizes der Woerter, die dieser Abschnitt zeigt. Leer = alle. */
+  woerter: readonly number[];
   activeWord: number;
   arab: QuranFontResult;
   styles: ReturnType<typeof readerStyles>;
+  faktor: number;
 }) {
+  const idx = woerter.length > 0 ? woerter : verse.words.map((_, i) => i);
+  const groesse = { fontSize: styles.arabischGroesse * faktor, lineHeight: styles.arabischZeile * faktor };
   return (
     <View style={styles.arabicRow}>
-      {verse.words.map((w, wi) => (
-        <Text key={wi} style={[styles.arabic, arab.style, wi === activeWord && styles.arabicActive]}>
-          {arab.text(w.ar)}{' '}
+      {idx.map((wi) => (
+        <Text
+          key={wi}
+          style={[styles.arabic, arab.style, groesse, wi === activeWord && styles.arabicActive]}>
+          {arab.text(verse.words[wi]?.ar ?? '')}{' '}
         </Text>
       ))}
     </View>
@@ -432,23 +610,45 @@ function readerStyles(h: number, w: number, rtl: boolean, theme: Theme, scale: n
   const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
   const { fontSize: arabSize, lineHeight: arabLine } = readerVerseMetrics(h, scale);
   const ctrl = clamp(h * 0.09, 50, 92);
-  return StyleSheet.create({
-    root: { flex: 1, backgroundColor: theme.bg, overflow: 'hidden', paddingHorizontal: clamp(w * 0.06, 40, 130), paddingVertical: clamp(h * 0.04, 20, 52) },
-    header: { flexDirection: rtl ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' },
-    surahName: { color: theme.accent, fontSize: clamp(h * 0.038, 18, 30), fontWeight: '700', flexShrink: 1 },
-    verseNo: { color: theme.textMuted, fontSize: clamp(h * 0.032, 15, 26) },
-    stage: { flex: 1, justifyContent: 'center', paddingVertical: clamp(h * 0.02, 12, 30) },
-    arabicRow: { flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'flex-end' },
-    arabic: { color: theme.text, fontSize: arabSize, lineHeight: arabLine, fontWeight: '500' },
-    arabicActive: { color: theme.accent },
-    translit: { color: theme.accent, opacity: 0.85, fontSize: clamp(h * 0.036 * scale, 16, 40), textAlign: 'center', marginTop: clamp(h * 0.025, 14, 32), letterSpacing: 0.5 },
-    translation: { color: theme.text, opacity: 0.9, fontSize: clamp(h * 0.038 * scale, 16, 42), textAlign: 'center', marginTop: clamp(h * 0.02, 12, 26), lineHeight: clamp(h * 0.052 * scale, 24, 60) },
-    controls: { flexDirection: rtl ? 'row-reverse' : 'row', justifyContent: 'center', alignItems: 'center', gap: clamp(w * 0.014, 12, 24) },
-    ctrl: { width: ctrl, height: ctrl, borderRadius: ctrl / 2, alignItems: 'center', justifyContent: 'center' },
-    ctrlWide: { width: ctrl * 1.6, height: ctrl, borderRadius: ctrl / 2, alignItems: 'center', justifyContent: 'center' },
-    ctrlActive: { borderColor: theme.accent, borderWidth: 2, backgroundColor: theme.cardActive },
-    ctrlGlyph: { color: theme.text, fontSize: clamp(ctrl * 0.36, 18, 34), fontWeight: '700' },
-    ctrlActiveText: { color: theme.accent },
-    hint: { color: theme.textFaint, fontSize: clamp(h * 0.028, 13, 22), textAlign: 'center', marginTop: clamp(h * 0.018, 8, 18) },
-  });
+  const translitSize = clamp(h * 0.036 * scale, 16, 40);
+  const uebersetzungSize = clamp(h * 0.038 * scale, 16, 42);
+  const uebersetzungLine = clamp(h * 0.052 * scale, 24, 60);
+  return Object.assign(
+    StyleSheet.create({
+      root: { flex: 1, backgroundColor: theme.bg, overflow: 'hidden', paddingHorizontal: clamp(w * 0.06, 40, 130), paddingVertical: clamp(h * 0.04, 20, 52) },
+      header: { flexDirection: rtl ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' },
+      surahName: { color: theme.accent, fontSize: clamp(h * 0.038, 18, 30), fontWeight: '700', flexShrink: 1 },
+      verseNo: { color: theme.textMuted, fontSize: clamp(h * 0.032, 15, 26), flexShrink: 0 },
+      // `overflow: 'hidden'` ist hier kein Zierrat, sondern die Zusicherung: was
+      // die Rechnung wider Erwarten doch nicht fasst, bleibt in der Buehne und
+      // legt sich NICHT ueber die Bedienleiste.
+      stage: { flex: 1, justifyContent: 'center', overflow: 'hidden', paddingVertical: clamp(h * 0.02, 12, 30) },
+      arabBox: { justifyContent: 'center', overflow: 'hidden' },
+      zusatzBox: { justifyContent: 'center', overflow: 'hidden' },
+      arabicRow: { flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'flex-end' },
+      arabic: { color: theme.text, fontSize: arabSize, lineHeight: arabLine, fontWeight: '500' },
+      arabicActive: { color: theme.accent },
+      translit: { color: theme.accent, opacity: 0.85, fontSize: translitSize, textAlign: 'center', letterSpacing: 0.5 },
+      translation: { color: theme.text, opacity: 0.9, fontSize: uebersetzungSize, textAlign: 'center', lineHeight: uebersetzungLine },
+      controls: { flexDirection: rtl ? 'row-reverse' : 'row', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: clamp(w * 0.012, 10, 20) },
+      ctrl: { width: ctrl, height: ctrl, borderRadius: ctrl / 2, alignItems: 'center', justifyContent: 'center' },
+      ctrlWide: { width: ctrl * 1.6, height: ctrl, borderRadius: ctrl / 2, alignItems: 'center', justifyContent: 'center' },
+      ctrlPille: { height: ctrl, borderRadius: ctrl / 2, paddingHorizontal: clamp(w * 0.016, 16, 30), maxWidth: w * 0.22, alignItems: 'center', justifyContent: 'center' },
+      ctrlActive: { borderColor: theme.accent, borderWidth: 2, backgroundColor: theme.cardActive },
+      ctrlGlyph: { color: theme.text, fontSize: clamp(ctrl * 0.36, 18, 34), fontWeight: '700' },
+      ctrlLabel: { color: theme.textMuted, fontSize: clamp(ctrl * 0.26, 13, 24), fontWeight: '600' },
+      ctrlActiveText: { color: theme.accent },
+      hint: { color: theme.textFaint, fontSize: clamp(h * 0.028, 13, 22), textAlign: 'center', marginTop: clamp(h * 0.018, 8, 18) },
+    }),
+    // Die Rohwerte begleiten die Stile: der Leser rechnet mit ihnen (wie viele
+    // Zeilen passen, wie stark muss die Uebersetzung schrumpfen) und kann sie
+    // aus einem fertigen StyleSheet nicht mehr auslesen.
+    {
+      arabischGroesse: arabSize,
+      arabischZeile: arabLine,
+      translitGroesse: translitSize,
+      uebersetzungGroesse: uebersetzungSize,
+      uebersetzungZeile: uebersetzungLine,
+    },
+  );
 }

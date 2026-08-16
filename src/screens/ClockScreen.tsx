@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import { AmbientGlow } from '@/components/AmbientGlow';
+import { HintergrundStreifen } from '@/components/HintergrundStreifen';
 
 import {
   countdownUnits,
@@ -163,6 +164,9 @@ export function ClockScreen({ location: override }: { location?: TvLocation } = 
           {andereZone ? t('clock.localTime', { city: locationLabel(location, locale) }) : t('clock.openMenu')}
         </Text>
       </View>
+      {/* Laeuft eine Rezitation im Hintergrund, steht sie hier — sonst
+          waere es Ton aus dem Nichts (s. HintergrundStreifen). */}
+      <HintergrundStreifen />
     </View>
   );
 }

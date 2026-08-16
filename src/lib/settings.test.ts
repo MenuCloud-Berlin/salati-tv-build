@@ -101,6 +101,7 @@ describe('setLocation / setIs24h', () => {
       // still herausfaellt, verliert beim naechsten Start die Nutzerwahl, und
       // genau das soll dieser Test bemerken.
       theme: 'mitternacht',
+      hintergrund: 'ruhig',
       quranFont: 'kfgqpc',
       quranSukun: 'madina',
       readerScale: 1,

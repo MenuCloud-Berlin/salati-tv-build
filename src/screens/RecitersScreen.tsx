@@ -72,6 +72,7 @@ export function RecitersScreen() {
     const netzUrl = surahAudioUrl(stage.reciter.server, stage.surah);
     return (
       <AudioNowPlaying
+        quelle="reciters"
         // Gespeicherte Datei schlaegt das Netz — sonst laedt der Fernseher
         // dieselbe Sure jedes Mal neu, obwohl sie auf der Platte liegt.
         uri={abspielAdresse(stage.reciter.id, stage.surah, netzUrl)}
