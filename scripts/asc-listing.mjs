@@ -1,19 +1,21 @@
 #!/usr/bin/env node
 // Traegt die Store-Seite von Salati TV bei Apple ein: Auftritt (Name,
 // Untertitel, Datenschutz, Kategorie) und Versionstexte (Beschreibung,
-// Stichwoerter, Werbetext, Adressen) in allen Sprachen aus store/appstore/.
+// Stichwoerter, Werbetext, Adressen) in allen Sprachen aus store/texte/.
 //
 // Wiederholbar: was existiert, wird geaendert statt neu angelegt. Am Ende wird
 // alles von Apple ZURUECKGELESEN — nicht dem eigenen Protokoll geglaubt.
+//
+// Texte kommen aus store/texte/ (s. scripts/lib/store-texte.mjs).
 //
 // Usage: node scripts/asc-listing.mjs [--pruefen]
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { asc, APP_ID } from './lib/asc.mjs';
+import { texteFuer } from './lib/store-texte.mjs';
 
 const HIER = path.dirname(fileURLToPath(import.meta.url));
-const TEXTE = path.join(HIER, '..', 'store', 'appstore');
 const NUR_PRUEFEN = process.argv.includes('--pruefen');
 const KATEGORIE = 'LIFESTYLE'; // wie die Handy-App
 const COPYRIGHT = '© 2026 Domenic Moran';
@@ -23,10 +25,10 @@ const version = /version: '([^']+)'/.exec(
 )?.[1];
 if (!version) throw new Error('Versionsnummer nicht aus app.config.js lesbar');
 
-const sprachen = fs
-  .readdirSync(TEXTE)
-  .filter((f) => f.endsWith('.json'))
-  .map((f) => JSON.parse(fs.readFileSync(path.join(TEXTE, f), 'utf8')));
+// Dieselbe Quelle wie der Play-Eintrag; `{{GERAET}}` wird hier zu „Apple TV"
+// aufgeloest. Apple duldet in der Beschreibung keinen Verweis auf fremde
+// Plattformen (Richtlinie 2.3.10).
+const sprachen = texteFuer('apple');
 
 // ── Version (tvOS) ──────────────────────────────────────────────────────────
 const versionen = await asc(`/apps/${APP_ID}/appStoreVersions?filter[platform]=TV_OS&limit=10`);

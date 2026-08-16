@@ -1,10 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { Image } from 'expo-image';
-import { useVideoPlayer } from 'expo-video';
+
 
 import { AmbientGlow } from '@/components/AmbientGlow';
 import { useAzanLauf } from '@/lib/azanRuf';
+import {
+  abspielen,
+  pausieren,
+  umschalten,
+  useHintergrundAudio,
+  type LaufendesStueck,
+} from '@/lib/hintergrundAudio';
 import {
   istGespeichert,
   offlineAudioMoeglich,
@@ -17,11 +24,16 @@ import { useTranslation } from '@/lib/i18n';
 import type { Theme } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
-// Vollbild-Audio-Player für Rezitatoren & Radio. expo-video dient hier als
-// reine Audio-Engine (kein VideoView gemountet → nur Ton, läuft im nativen
-// ExoPlayer weiter). Eigene 10-Fuß-Steuerung: eine große fokussierte Play/Pause-
-// Karte, Titel/Untertitel groß, ruhiger Verlaufs-Hintergrund. Zurück steuert der
+// Vollbild-Ansicht der laufenden Wiedergabe (Rezitatoren, Radio, Podcasts).
+// Eigene 10-Fuß-Steuerung: eine große fokussierte Play/Pause-Karte,
+// Titel/Untertitel groß, ruhiger Verlaufs-Hintergrund. Zurück steuert der
 // aufrufende Screen (Menu/Back-Taste).
+//
+// Der SPIELER selbst liegt seit 1.9.0 nicht mehr hier, sondern in
+// lib/hintergrundAudio.ts. Vorher haing er per `useVideoPlayer` an diesem
+// Baustein — und damit an der Lebensdauer des Bildschirms: wer zur Gebetsuhr
+// wechselte, brach die Rezitation mitten im Vers ab. Diese Ansicht ist jetzt
+// nur noch die Oberfläche zu einem Ton, der unabhängig von ihr läuft.
 //
 // Audit 2026-07-28 (T13): Kicker und Hinweiszeile waren fest deutsch. Der
 // Aufrufer uebergibt jetzt einen Uebersetzungs-Schluessel statt fertigem Text.
@@ -33,6 +45,7 @@ export function AudioNowPlaying({
   coverUrl,
   kickerKey,
   speicherbar,
+  quelle,
 }: {
   uri: string;
   title: string;
@@ -47,26 +60,22 @@ export function AudioNowPlaying({
    * schon als Datei bereit.
    */
   speicherbar?: { reciterId: string; reciterName: string; surah: number; netzUrl: string };
+  /** Woher die Wiedergabe kommt — der Hinweis-Streifen auf anderen
+   *  Bildschirmen fuehrt damit zurueck. */
+  quelle: LaufendesStueck['quelle'];
 }) {
-  const player = useVideoPlayer(uri, (p) => {
-    p.loop = loop;
-    p.play();
-  });
-  const [playing, setPlaying] = useState(true);
-  const [status, setStatus] = useState<string>('loading');
+  const { spielt: playing, status } = useHintergrundAudio();
   const { width, height } = useWindowDimensions();
   const { t, rtl } = useTranslation();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(width, height, rtl, theme), [width, height, rtl, theme]);
 
+  // Startet die Wiedergabe, sobald sich die Quelle aendert. Laeuft dieselbe
+  // Adresse schon, setzt `abspielen` nur die Beschriftung nach und laesst den
+  // Ton weiterlaufen — sonst begaenne die Sure bei jedem Betreten von vorn.
   useEffect(() => {
-    const s1 = player.addListener('playingChange', (e) => setPlaying(e.isPlaying));
-    const s2 = player.addListener('statusChange', (e) => setStatus(e.status));
-    return () => {
-      s1.remove();
-      s2.remove();
-    };
-  }, [player]);
+    abspielen({ uri, title, subtitle, kickerKey, coverUrl, loop, quelle });
+  }, [uri, title, subtitle, kickerKey, coverUrl, loop, quelle]);
 
   // Setzt der Gebetsruf ein, verstummt die laufende Rezitation. Zwei Stimmen
   // gleichzeitig aus demselben Fernseher waeren fuer beide respektlos. Danach
@@ -75,13 +84,10 @@ export function AudioNowPlaying({
   // den das Pausieren vermeiden soll.
   const rufLaeuft = useAzanLauf() !== null;
   useEffect(() => {
-    if (rufLaeuft && player.playing) player.pause();
-  }, [rufLaeuft, player]);
+    if (rufLaeuft) pausieren();
+  }, [rufLaeuft]);
 
-  const toggle = () => {
-    if (player.playing) player.pause();
-    else player.play();
-  };
+  const toggle = umschalten;
 
   const kicker = t(kickerKey ?? (loop ? 'player.kickerRadio' : 'player.kickerRecitation'));
 

@@ -16,6 +16,7 @@ import {
   type SukunStil,
 } from '@/lib/quranFonts';
 import { DEFAULT_THEME_ID, isThemeId, type ThemeId } from '@/lib/theme';
+import { istHintergrundId, type HintergrundId } from '@/components/Hintergrund';
 import {
   clampOffset,
   DEFAULT_CALC_EXTRAS,
@@ -53,6 +54,8 @@ export interface TvSettings {
   offsets: PrayerTimeOffsets;
   /** Farbwelt der Oberflaeche (s. lib/theme.ts). */
   theme: ThemeId;
+  /** Was hinter allen Bildschirmen liegt (s. components/Hintergrund.tsx). */
+  hintergrund: HintergrundId;
   /** Koran-Schrift des Lesers (Katalog wie in der Handy-App). */
   quranFont: QuranFontId;
   /** Sukun-Zeichen der KFGQPC-Schrift: Madina-Haken oder Kreis. */
@@ -113,6 +116,9 @@ let state: TvSettings = {
   highLatitude: DEFAULT_CALC_EXTRAS.highLatitude,
   offsets: NO_PRAYER_TIME_OFFSETS,
   theme: DEFAULT_THEME_ID,
+  // Voreinstellung bleibt die ruhige Flaeche: wer den Fernseher als Uhr
+  // laufen laesst, soll nicht ungefragt ein Muster bekommen.
+  hintergrund: 'ruhig',
   quranFont: DEFAULT_QURAN_FONT,
   quranSukun: 'madina',
   readerScale: DEFAULT_READER_SCALE,
@@ -201,6 +207,7 @@ function persist() {
       highLatitude: state.highLatitude,
       offsets: state.offsets,
       theme: state.theme,
+      hintergrund: state.hintergrund,
       quranFont: state.quranFont,
       quranSukun: state.quranSukun,
       readerScale: state.readerScale,
@@ -248,6 +255,7 @@ async function hydrate() {
         // (aeltere Installation, umbenanntes Thema) faellt auf den Standard
         // zurueck, statt `undefined` in jede Farbe des Baums zu tragen.
         theme: isThemeId(parsed.theme) ? parsed.theme : DEFAULT_THEME_ID,
+        hintergrund: istHintergrundId(parsed.hintergrund) ? parsed.hintergrund : 'ruhig',
         quranFont: isQuranFontId(parsed.quranFont) ? parsed.quranFont : DEFAULT_QURAN_FONT,
         quranSukun: parsed.quranSukun === 'kreis' ? 'kreis' : 'madina',
         readerScale: isReaderScale(parsed.readerScale) ? parsed.readerScale : DEFAULT_READER_SCALE,
@@ -307,6 +315,12 @@ export function resetOffsets() {
 
 export function setTheme(theme: ThemeId) {
   state = { ...state, theme };
+  persist();
+  emit();
+}
+
+export function setHintergrund(hintergrund: HintergrundId) {
+  state = { ...state, hintergrund };
   persist();
   emit();
 }

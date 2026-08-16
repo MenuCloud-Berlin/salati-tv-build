@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import { FocusCard } from '@/components/FocusCard';
+import { HintergrundStreifen } from '@/components/HintergrundStreifen';
 import { Icon, type IconName } from '@/components/Icon';
 import { useTranslation } from '@/lib/i18n';
 import type { Screen } from '@/lib/nav';
@@ -112,9 +113,18 @@ export function HomeScreen({ navigate }: { navigate: (s: Screen) => void }) {
   const next = useMemo(() => nextPrayer(location, jetzt, extras), [location, extras, jetzt]);
   const units = countdownUnits(t);
 
+  // Wie weit eine fokussierte Kachel ueber ihre Flaeche hinauswaechst.
+  // FocusCard skaliert auf 1,05 — die Kachel wird also um 5 % breiter und
+  // hoeher, je zur Haelfte nach jeder Seite. Der ScrollView schneidet seine
+  // Kinder an seinen Grenzen ab, und genau deshalb fehlte bei den Kacheln am
+  // RAND ein Stueck des goldenen Rahmens (Nutzerbefund: "verdeckte Raender").
+  // Bei den inneren Kacheln faellt es nicht auf — daher "manchmal".
+  const ueberstandH = Math.ceil(tileW * 0.025) + 2;
+  const ueberstandV = Math.ceil(tileH * 0.025) + 2;
+
   const s = useMemo(
-    () => makeStyles({ padH, padV, gap, tileW, tileH, headerH, height, rtl, theme }),
-    [padH, padV, gap, tileW, tileH, headerH, height, rtl, theme],
+    () => makeStyles({ padH, padV, gap, tileW, tileH, headerH, height, rtl, theme, ueberstandH, ueberstandV }),
+    [padH, padV, gap, tileW, tileH, headerH, height, rtl, theme, ueberstandH, ueberstandV],
   );
 
   // Bewusst nur EIN Element mit `hasTVPreferredFocus`: zwei Anker lassen den
@@ -145,7 +155,11 @@ export function HomeScreen({ navigate }: { navigate: (s: Screen) => void }) {
           </Text>
         </View>
       </View>
-      <ScrollView contentContainerStyle={s.grid} showsVerticalScrollIndicator={false}>
+      {/* `scroll` zieht die Grenzen des ScrollViews um den Ueberstand nach
+          aussen, `grid` schiebt den Inhalt um denselben Betrag zurueck. Netto
+          steht damit jede Kachel exakt dort wie vorher — nur wird der
+          Fokusrahmen nicht mehr abgeschnitten. */}
+      <ScrollView style={s.scroll} contentContainerStyle={s.grid} showsVerticalScrollIndicator={false}>
         {TILES.map((tile) => (
           <FocusCard
             key={tile.screen}
@@ -165,6 +179,7 @@ export function HomeScreen({ navigate }: { navigate: (s: Screen) => void }) {
           </FocusCard>
         ))}
       </ScrollView>
+      <HintergrundStreifen />
     </View>
   );
 }
@@ -179,6 +194,8 @@ function makeStyles(o: {
   height: number;
   rtl: boolean;
   theme: Theme;
+  ueberstandH: number;
+  ueberstandV: number;
 }) {
   const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
   const align = o.rtl ? ('right' as const) : ('left' as const);
@@ -207,11 +224,22 @@ function makeStyles(o: {
     nextLeft: { color: th.accent, fontSize: clamp(o.height * 0.03, 14, 26), fontWeight: '600', marginTop: 2 },
     // Im RTL-Layout fuellt das Raster von rechts nach links — sonst begaenne
     // die erste Kachel (und damit der Initialfokus) auf der „falschen" Seite.
+    // Negativer Rand + gleich grosser Innenabstand: die Schnittkante wandert
+    // nach aussen, der Inhalt bleibt stehen. Der negative Rand ist immer
+    // kleiner als der Aussenabstand der Wurzel (padH >= 28, Ueberstand <= 10),
+    // laeuft also nie ueber den Bildschirmrand hinaus.
+    scroll: {
+      marginHorizontal: -o.ueberstandH,
+      marginTop: -o.ueberstandV,
+      marginBottom: -o.ueberstandV,
+    },
     grid: {
       flexDirection: o.rtl ? 'row-reverse' : 'row',
       flexWrap: 'wrap',
       gap: o.gap,
-      paddingBottom: o.padV * 0.5,
+      paddingHorizontal: o.ueberstandH,
+      paddingTop: o.ueberstandV,
+      paddingBottom: o.padV * 0.5 + o.ueberstandV,
     },
     tile: {
       width: o.tileW,

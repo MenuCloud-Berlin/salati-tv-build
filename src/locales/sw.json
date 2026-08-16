@@ -60,6 +60,8 @@
     "kickerPodcast": "Podikasti",
     "kickerRadio": "Redio ya Qur'an",
     "kickerRecitation": "Kisomo",
+    "laeuftImHintergrund": "Inacheza chinichini",
+    "pausiert": "Imesimamishwa",
     "saveError": "Kuhifadhi kumeshindikana — angalia muunganisho.",
     "saveHint": "OK huhifadhi sura hii ili icheze bila intaneti",
     "savedHint": "Imehifadhiwa · OK huifuta faili",
@@ -101,6 +103,8 @@
     "loadError": "Sura haikuweza kupakiwa.",
     "pickerSubtitle": "Chagua sura · kisomo chenye kuangazia neno na tafsiri",
     "repeatOn": "Aya inarudiwa · ↻ husitisha kurudia",
+    "sectionHint": "Aya ndefu · ⏮ ⏭ hupindua ukurasa ndani ya aya, kisha inayofuata",
+    "sectionOf": "Sehemu {n} / {total}",
     "verseOf": "Aya {n} / {total}"
   },
   "reciters": {
@@ -130,6 +134,14 @@
       "tathwib": "Adhana 3 ina tathwib („swala ni bora kuliko usingizi\"), kwa hivyo inafaa Alfajiri.",
       "title": "Adhana kwa kila swala",
       "volume": "Sauti"
+    },
+    "background": {
+      "title": "Mandharinyuma",
+      "hint": "Iko nyuma ya sehemu zote na inafaa kwa kila rangi.",
+      "ruhig": "Tulivu",
+      "schein": "Mwangaza",
+      "verlauf": "Mpito",
+      "muster": "Muundo"
     },
     "current": "Sasa",
     "format12": "Saa 12 (2:30 PM)",

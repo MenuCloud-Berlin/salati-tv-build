@@ -16,6 +16,7 @@ import { act, fireEvent, render } from '@testing-library/react-native';
 import { BackHandler } from 'react-native';
 
 import { AudioNowPlaying } from '@/components/AudioNowPlaying';
+import { zuruecksetzenFuerTest } from '@/lib/hintergrundAudio';
 import { setLanguage } from '@/lib/settings';
 import { PodcastsScreen } from '@/screens/PodcastsScreen';
 import { RecitersScreen } from '@/screens/RecitersScreen';
@@ -27,11 +28,16 @@ const mockPause = jest.fn();
 const mockState = { playing: false };
 const mockListeners = new Map<string, (e: unknown) => void>();
 
-jest.mock('expo-video', () => ({
-  useVideoPlayer: (_src: unknown, setup?: (p: unknown) => void) => {
+// Seit 1.9.0 erzeugt lib/hintergrundAudio.ts den Spieler per
+// `createVideoPlayer` — nicht mehr der Baustein per `useVideoPlayer`. Die
+// Attrappe liefert deshalb beides; `useVideoPlayer` bleibt fuer den
+// Video-Bildschirm.
+jest.mock('expo-video', () => {
+  const bauen = (setup?: (p: unknown) => void) => {
     const player = {
       play: mockPlay,
       pause: mockPause,
+      release: jest.fn(),
       replace: jest.fn(),
       addListener: (ev: string, cb: (e: unknown) => void) => {
         mockListeners.set(ev, cb);
@@ -45,9 +51,13 @@ jest.mock('expo-video', () => ({
     };
     setup?.(player);
     return player;
-  },
-  VideoView: 'VideoView',
-}));
+  };
+  return {
+    createVideoPlayer: () => bauen(),
+    useVideoPlayer: (_src: unknown, setup?: (p: unknown) => void) => bauen(setup),
+    VideoView: 'VideoView',
+  };
+});
 jest.mock('expo-image', () => ({ Image: 'Image' }));
 
 const mockReciters = [
@@ -175,8 +185,16 @@ describe('Podcasts: Wiedergabe und Rueckweg', () => {
 });
 
 describe('Audio-Wiedergabe (Rezitation/Radio/Podcast)', () => {
+  // Der Spieler liegt seit 1.9.0 NEBEN dem Baum und ueberlebt das Aushaengen —
+  // genau das ist der Sinn. Zwischen den Tests muss er deshalb von Hand
+  // zurueckgesetzt werden, sonst haelt er die Quelle des vorigen Falls fest
+  // und `abspielen` startet gar nicht neu.
+  beforeEach(() => {
+    zuruecksetzenFuerTest();
+  });
+
   it('startet von selbst und schaltet mit OK auf Pause', async () => {
-    const r = await render(<AudioNowPlaying uri="https://a/1.mp3" title="Titel" subtitle="Unter" />);
+    const r = await render(<AudioNowPlaying quelle="reciters" uri="https://a/1.mp3" title="Titel" subtitle="Unter" />);
     expect(mockPlay).toHaveBeenCalled();
     // Solange der Player laedt, steht dort ein Ladekringel und kein Symbol.
     mockState.playing = true;
@@ -189,7 +207,7 @@ describe('Audio-Wiedergabe (Rezitation/Radio/Podcast)', () => {
   });
 
   it('meldet einen Abspielfehler im Klartext statt still stehenzubleiben', async () => {
-    const r = await render(<AudioNowPlaying uri="https://a/1.mp3" title="Titel" />);
+    const r = await render(<AudioNowPlaying quelle="reciters" uri="https://a/1.mp3" title="Titel" />);
     await act(async () => {
       mockListeners.get('statusChange')?.({ status: 'error' });
     });
@@ -197,9 +215,9 @@ describe('Audio-Wiedergabe (Rezitation/Radio/Podcast)', () => {
   });
 
   it('zeigt den Kicker der jeweiligen Quelle', async () => {
-    const radio = await render(<AudioNowPlaying uri="u" title="T" loop />);
+    const radio = await render(<AudioNowPlaying quelle="radio" uri="u" title="T" loop />);
     expect(radio.getByText('Koran-Radio')).toBeTruthy();
-    const rezitation = await render(<AudioNowPlaying uri="u" title="T" />);
+    const rezitation = await render(<AudioNowPlaying quelle="reciters" uri="u" title="T" />);
     expect(rezitation.getByText('Rezitation')).toBeTruthy();
   });
 });

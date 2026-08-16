@@ -9,7 +9,8 @@
     "prebuild": "EXPO_TV=1 expo prebuild --platform android",
     "typecheck": "tsc --noEmit",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "pruefe-store": "node scripts/pruefe-store-texte.mjs"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",

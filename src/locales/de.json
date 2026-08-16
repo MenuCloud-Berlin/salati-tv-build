@@ -60,6 +60,8 @@
     "kickerPodcast": "Podcast",
     "kickerRadio": "Koran-Radio",
     "kickerRecitation": "Rezitation",
+    "laeuftImHintergrund": "Läuft im Hintergrund",
+    "pausiert": "Pausiert",
     "saveError": "Speichern fehlgeschlagen — Verbindung prüfen.",
     "saveHint": "OK speichert diese Sure für die Wiedergabe ohne Internet",
     "savedHint": "Gespeichert · OK löscht die Datei wieder",
@@ -101,6 +103,8 @@
     "loadError": "Sure konnte nicht geladen werden.",
     "pickerSubtitle": "Sure wählen · Rezitation mit Wort-Markierung & Übersetzung",
     "repeatOn": "Vers wird wiederholt · ↻ beendet die Wiederholung",
+    "sectionHint": "Langer Vers · ⏮ ⏭ blättert im Vers, am Ende zum nächsten",
+    "sectionOf": "Abschnitt {n} / {total}",
     "verseOf": "Vers {n} / {total}"
   },
   "reciters": {
@@ -130,6 +134,14 @@
       "tathwib": "Adhan 3 trägt das Tathwib („Das Gebet ist besser als der Schlaf\") und passt damit zu Fadschr.",
       "title": "Gebetsruf je Gebet",
       "volume": "Lautstärke"
+    },
+    "background": {
+      "title": "Hintergrund",
+      "hint": "Liegt hinter allen Bereichen und wirkt in jeder Farbwelt.",
+      "ruhig": "Ruhig",
+      "schein": "Lichtschein",
+      "verlauf": "Verlauf",
+      "muster": "Muster"
     },
     "current": "Aktuell",
     "format12": "12-Stunden (2:30 PM)",

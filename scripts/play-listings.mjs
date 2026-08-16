@@ -1,56 +1,34 @@
 #!/usr/bin/env node
-// Schreibt die Salati-TV-Store-Texte aus store/listing/*.md in die Play Console.
-// Nur Texte — Grafiken bleiben unangetastet (die liegen bereits im Eintrag und
-// werden von scripts/play-upload.mjs gepflegt).
+// Schreibt die Salati-TV-Store-Texte in die Play Console. Nur Texte, die
+// Grafiken bleiben unangetastet (die pflegt scripts/play-screenshots.mjs).
+//
+// Die Texte kommen aus store/texte/ — derselben Quelle wie die App-Store-Seite
+// (scripts/lib/store-texte.mjs). Bis zum 2026-08-11 lagen sie getrennt in
+// store/listing/*.md, und genau das ging schief: die Play-Beschreibung war vier
+// Versionen alt, waehrend die Handy- und App-Store-Texte gepflegt wurden.
 //
 // Usage:
 //   node scripts/play-listings.mjs --dry
 //   node scripts/play-listings.mjs
 import fs from 'fs';
-import path from 'path';
 import { createRequire } from 'module';
+import { texteFuer } from './lib/store-texte.mjs';
 
 const require = createRequire('C:/Users/domen/Documents/MenuCloud/scripts/');
 const jwt = require('jsonwebtoken');
 
 const PACKAGE = 'de.salatibox.tv';
 const SA_PATH = 'C:/Users/domen/Documents/menucloud-mobile-build/play-service-account.json';
-const DIR = path.join(path.dirname(new URL(import.meta.url).pathname.replace(/^\//, '')), '..', 'store', 'listing');
 const DRY = process.argv.includes('--dry');
-// de-DE fehlte im Eintrag komplett, obwohl die App deutschsprachig startet —
-// ein Store-Eintrag nur auf Englisch kostet Sichtbarkeit im Hauptmarkt.
-const LOCALES = { de: 'de-DE', en: 'en-US', tr: 'tr-TR', ar: 'ar' };
-
-/** Parst title/short/full aus einer store/listing/*.md (Muster: apps/mobile). */
-function parseListing(rohMd) {
-  const md = rohMd.replace(/\r\n/g, '\n');
-  const title = /^#\s+(.+)$/m.exec(md)?.[1]?.trim();
-  const sections = md.split(/^##\s+/m);
-  let short = null;
-  let full = null;
-  for (const sec of sections) {
-    const [head, ...rest] = sec.split('\n');
-    const body = rest.join('\n').replace(/\(\d+\/\d+ Zeichen\)/g, '').replace(/^\([^)]*\)$/gm, '').trim();
-    const h = head.trim().toLowerCase();
-    if (/kurz|short|kısa|القصير|corta|courte/.test(h)) short = body.split('\n\n')[0].trim();
-    if (/vollständige|full description|tam açıklama|الوصف الكامل|completa|complète/.test(h)) full = body.trim();
-  }
-  return { title, short, full };
-}
 
 const parsed = {};
-let fehler = false;
-for (const [lang, locale] of Object.entries(LOCALES)) {
-  const { title, short, full } = parseListing(fs.readFileSync(path.join(DIR, `${lang}.md`), 'utf8'));
-  if (!title || !short || !full) { console.error(`${lang}: parse-Fehler`); fehler = true; continue; }
-  if (title.length > 30 || short.length > 80 || full.length > 4000) {
-    console.error(`${lang}: zu lang — Titel ${title.length}/30, Kurz ${short.length}/80, Voll ${full.length}/4000`);
-    fehler = true;
-  }
-  console.log(`${locale.padEnd(6)} Titel ${title.length}/30  Kurz ${short.length}/80  Voll ${full.length}/4000`);
-  parsed[locale] = { title, short, full };
+for (const t of texteFuer('play')) {
+  // Laengen prueft `texteFuer` bereits und bricht sonst ab; hier nur der Beleg.
+  console.log(
+    `${t.playLocale.padEnd(6)} Titel ${t.titelPlay.length}/30  Kurz ${t.kurz.length}/80  Voll ${t.description.length}/4000`,
+  );
+  parsed[t.playLocale] = { title: t.titelPlay, short: t.kurz, full: t.description };
 }
-if (fehler) process.exit(1);
 if (DRY) process.exit(0);
 
 const sa = JSON.parse(fs.readFileSync(SA_PATH, 'utf8'));

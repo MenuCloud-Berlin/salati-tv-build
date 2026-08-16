@@ -60,6 +60,8 @@
     "kickerPodcast": "Podcast",
     "kickerRadio": "Kur'an Radyosu",
     "kickerRecitation": "Tilavet",
+    "laeuftImHintergrund": "Arka planda çalıyor",
+    "pausiert": "Duraklatıldı",
     "saveError": "Kaydetme başarısız — bağlantıyı kontrol edin.",
     "saveHint": "OK bu sureyi internetsiz dinlemek için kaydeder",
     "savedHint": "Kaydedildi · OK dosyayı yeniden siler",
@@ -101,6 +103,8 @@
     "loadError": "Sure yüklenemedi.",
     "pickerSubtitle": "Sure seç · kelime vurgulu tilavet ve meal",
     "repeatOn": "Ayet tekrarlanıyor · ↻ tekrarı bitirir",
+    "sectionHint": "Uzun ayet · ⏮ ⏭ ayet içinde sayfa çevirir, sonunda sonrakine geçer",
+    "sectionOf": "Bölüm {n} / {total}",
     "verseOf": "Ayet {n} / {total}"
   },
   "reciters": {
@@ -130,6 +134,14 @@
       "tathwib": "Ezan 3 tesvib („namaz uykudan hayırlıdır\") içerir, bu yüzden sabah vaktine uygundur.",
       "title": "Her vakit için ezan",
       "volume": "Ses düzeyi"
+    },
+    "background": {
+      "title": "Arka plan",
+      "hint": "Tüm bölümlerin arkasında durur ve her renk dünyasında çalışır.",
+      "ruhig": "Sade",
+      "schein": "Işıltı",
+      "verlauf": "Geçiş",
+      "muster": "Desen"
     },
     "current": "Şu an",
     "format12": "12 saat (2:30 PM)",

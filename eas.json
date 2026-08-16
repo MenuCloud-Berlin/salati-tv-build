@@ -1,7 +1,7 @@
 {
   "cli": {
     "version": ">= 16.0.0",
-    "appVersionSource": "remote"
+    "appVersionSource": "local"
   },
   "build": {
     "preview": {
@@ -16,7 +16,6 @@
       }
     },
     "production": {
-      "autoIncrement": true,
       "channel": "production",
       "android": {
         "credentialsSource": "remote"
@@ -28,7 +27,6 @@
       }
     },
     "production-apk": {
-      "autoIncrement": true,
       "android": {
         "buildType": "apk",
         "credentialsSource": "remote"
@@ -40,7 +38,6 @@
       }
     },
     "aab": {
-      "autoIncrement": true,
       "android": {
         "buildType": "app-bundle"
       },

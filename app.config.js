@@ -48,7 +48,7 @@ module.exports = {
   // vollflaechig, der Vordergrund der adaptiven Ikone separat (damit die
   // 72-dp-Maske die Zacken nicht abschneidet), das Banner mit Goldschimmer
   // und dem App-Namen.
-  version: '1.8.1',
+  version: '1.9.0',
   scheme: 'salatitv',
   orientation: 'landscape',
   icon: './assets/icon.png',
@@ -61,7 +61,7 @@ module.exports = {
     // (EAS-Builds mit remote autoIncrement); 3 waere abgelehnt worden.
     // 8 = 1.4.0; 7 liegt als 1.3.0 im Produktions-Track. 9 = 1.5.0, 10 = 1.6.0,
     // 11 = 1.7.0, 12 = 1.8.0 (von Play abgelehnt, siehe oben).
-    versionCode: 13,
+    versionCode: 14,
     // Der Vordergrund darf NICHT icon.png sein: das ist seit 1.8.1 vollflaechig,
     // und die Maske zeigt vom 108-dp-Vordergrund nur die mittleren 72 dp — die
     // Zacken waeren abgeschnitten.

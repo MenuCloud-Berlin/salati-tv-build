@@ -81,7 +81,11 @@ export function VideosScreen() {
       {sections.map((sec, si) => (
         <View key={sec.key} style={styles.section}>
           <Text style={styles.sectionTitle}>{sec.title}</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.rowScroll}
+            contentContainerStyle={styles.row}>
             {sec.items.map((v, i) => (
               <FocusCard
                 key={v.video_url}

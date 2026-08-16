@@ -54,6 +54,13 @@ export function makeRowStyles(
   // RN-Standard-Zeilenabstand von rund 1,3.
   const textBlock = 2 * titleFont * 1.3 + 4 + metaLines * metaFont * 1.3;
   const mediaH = Math.floor(cardH - pad * 2 - pad * 0.7 - textBlock);
+  // Wie weit eine fokussierte Karte ueber ihre Flaeche hinauswaechst: FocusCard
+  // skaliert auf 1,05, also 2,5 % je Seite, plus der 2 dp Rahmen. Ein
+  // ScrollView schneidet seine Kinder an seinen Grenzen ab — ohne diesen
+  // Ausgleich fehlte bei der ERSTEN Karte jeder Reihe links ein Stueck des
+  // goldenen Rahmens, und oben/unten bei allen (Nutzerbefund an der Menue-
+  // Ansicht, dieselbe Ursache).
+  const ueberstand = Math.ceil(Math.max(cardW, cardH) * 0.025) + 2;
   return StyleSheet.create({
     root: { flex: 1, backgroundColor: theme.bg },
     content: { paddingHorizontal: padH, paddingVertical: padV },
@@ -73,16 +80,24 @@ export function makeRowStyles(
       marginBottom: clamp(h * 0.018, 8, 16),
       textAlign: align,
     },
+    // Negativer Rand + gleich grosser Innenabstand: die Schnittkante wandert
+    // nach aussen, die Karten bleiben stehen.
+    rowScroll: { marginHorizontal: -ueberstand, marginVertical: -ueberstand },
     row: {
       gap: clamp(w * 0.014, 12, 22),
-      paddingRight: padH,
+      paddingRight: padH + ueberstand,
+      paddingLeft: ueberstand,
+      paddingVertical: ueberstand,
       flexDirection: rtl ? 'row-reverse' : 'row',
     },
+    gridScroll: { marginHorizontal: -ueberstand, marginVertical: -ueberstand },
     grid: {
       flexDirection: rtl ? 'row-reverse' : 'row',
       flexWrap: 'wrap',
       gap: clamp(w * 0.014, 12, 22),
-      paddingBottom: padV,
+      paddingHorizontal: ueberstand,
+      paddingTop: ueberstand,
+      paddingBottom: padV + ueberstand,
     },
     card: { width: cardW, height: cardH, padding: pad },
     thumb: {

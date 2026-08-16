@@ -20,6 +20,7 @@ import {
   setQuranFont,
   setReaderOptions,
   setReaderScale,
+  tvSettingsState,
 } from '@/lib/settings';
 import { adaptQuranText, quranFontDef } from '@/lib/quranFonts';
 
@@ -62,9 +63,27 @@ const mockVerses = [
   },
 ];
 
+// Der lange Vers: 90 Woerter mit Zeitstempeln, wie ihn Sure 2, Vers 282
+// liefert. Er liegt in einer EIGENEN Sure, damit die Tests der Vers-Bedienung
+// oben weiterhin genau zwei Verse vor sich haben.
+const LANGE_WOERTER = Array.from({ length: 90 }, (_, i) => ({
+  ar: 'الَّذِينَ',
+  translit: `wort${i}`,
+}));
+const mockLangeSure = [
+  {
+    n: 282,
+    words: LANGE_WOERTER,
+    // [wortIdx, wortNr, vonMs, bisMs] — eine Sekunde je Wort.
+    segments: LANGE_WOERTER.map((_, i) => [i, i + 1, i * 1000, (i + 1) * 1000]),
+    translation: Array.from({ length: 300 }, (_, i) => `satzteil${i}`).join(' '),
+    audioUrl: 'https://a/282.mp3',
+  },
+];
+
 jest.mock('@/lib/quranText', () => ({
   ...jest.requireActual('@/lib/quranText'),
-  fetchSurahReader: jest.fn(async () => mockVerses),
+  fetchSurahReader: jest.fn(async (surah: number) => (surah === 2 ? mockLangeSure : mockVerses)),
 }));
 
 /** Öffnet den Leser: aus der Suren-Auswahl heraus Sure 1 wählen. */
@@ -192,6 +211,89 @@ describe('Leser', () => {
     expect(r.queryByText(/wiederholt/)).toBeNull();
     await fireEvent.press(r.getByText('↻'));
     expect(r.getByText(/wiederholt/)).toBeTruthy();
+  });
+
+  it('teilt einen langen Vers in Abschnitte, statt ihn über den Rand laufen zu lassen', async () => {
+    // Der Nutzerbefund vom 2026-08-16: „bei langen Versen ist der Text viel zu
+    // viel für den Bildschirm". Bis 1.9.0 lag der ganze Vers in einer Flaeche
+    // ohne Hoehenbegrenzung — er schob Umschrift und Übersetzung auf die
+    // Bedienleiste und wurde oben und unten abgeschnitten.
+    const r = await render(<QuranReaderScreen />);
+    await fireEvent.press(r.getByText('Al-Baqara'));
+
+    // Ohne Messung weiss der Leser nicht, wie viel Platz er hat: er zeigt dann
+    // alles in einem Stueck. Genau das ist der Zustand vor `onLayout`.
+    expect(r.queryByText(/Abschnitt/)).toBeNull();
+
+    // Jetzt die Buehne messen, wie es das echte Bild tut: 1660 × 640.
+    await fireEvent(r.getByTestId('reader-buehne'), 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 1660, height: 640 } },
+    });
+
+    expect(r.getByText(/Abschnitt 1 \/ \d+/)).toBeTruthy();
+    // Das erste Wort steht am Bildschirm, das letzte NICHT — es gehoert in
+    // einen spaeteren Abschnitt. Geprueft an der Umschriftzeile: sie traegt
+    // genau die Woerter des sichtbaren Abschnitts.
+    expect(r.getByText(/^wort0 /)).toBeTruthy();
+    expect(r.queryByText(/wort89/)).toBeNull();
+  });
+
+  it('blättert mit ⏭ erst durch den langen Vers und dann zum nächsten', async () => {
+    const r = await render(<QuranReaderScreen />);
+    await fireEvent.press(r.getByText('Al-Baqara'));
+    await fireEvent(r.getByTestId('reader-buehne'), 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 1660, height: 640 } },
+    });
+
+    const erster = r.getByText(/Abschnitt 1 \/ (\d+)/).props.children.join('');
+    const gesamt = Number(/Abschnitt 1 \/ (\d+)/.exec(erster)![1]);
+    expect(gesamt).toBeGreaterThan(1);
+
+    // Ohne diese Bedienung waere der Rest eines Verses ohne Zeitstempel (der
+    // mitgelieferte Text hat keine) fuer immer unsichtbar.
+    await fireEvent.press(r.getByText('⏭'));
+    expect(r.getByText(new RegExp(`Abschnitt 2 / ${gesamt}`))).toBeTruthy();
+
+    await fireEvent.press(r.getByText('⏮'));
+    expect(r.getByText(new RegExp(`Abschnitt 1 / ${gesamt}`))).toBeTruthy();
+  });
+
+  it('kürzt die Übersetzung eines langen Verses nicht weg, sondern verteilt sie mit', async () => {
+    const r = await render(<QuranReaderScreen />);
+    await fireEvent.press(r.getByText('Al-Baqara'));
+    await fireEvent(r.getByTestId('reader-buehne'), 'layout', {
+      nativeEvent: { layout: { x: 0, y: 0, width: 1660, height: 640 } },
+    });
+
+    // Der erste Abschnitt zeigt den Anfang der Übersetzung ...
+    expect(r.getByText(/^satzteil0 /)).toBeTruthy();
+    // ... und der letzte Abschnitt das Ende. Vorher stand dort `numberOfLines={4}`
+    // und alles ab der fünften Zeile war weg — ohne jeden Hinweis darauf.
+    let sicherung = 0;
+    while (r.queryByText(/satzteil299/) === null && sicherung < 40) {
+      await fireEvent.press(r.getByText('⏭'));
+      sicherung += 1;
+    }
+    expect(r.getByText(/satzteil299/)).toBeTruthy();
+  });
+
+  it('schaltet Umschrift und Übersetzung am Lesebildschirm selbst um', async () => {
+    // Der Nutzerbefund: die Schalter gab es nur in den Einstellungen — zwei
+    // Bildschirme entfernt, und beim Zurueckkommen war die Sure weg.
+    const r = await oeffneLeser(<QuranReaderScreen />);
+    expect(r.getByText('kafaruu')).toBeTruthy();
+
+    await fireEvent.press(r.getByText('Umschrift'));
+    expect(r.queryByText('kafaruu')).toBeNull();
+    // Und wirklich gespeichert, nicht nur ausgeblendet.
+    expect(tvSettingsState().readerTranslit).toBe(false);
+
+    await fireEvent.press(r.getByText('Übersetzung'));
+    expect(r.queryByText('Die ungläubig sind')).toBeNull();
+    expect(tvSettingsState().readerTranslation).toBe(false);
+
+    await fireEvent.press(r.getByText('Umschrift'));
+    expect(r.getByText('kafaruu')).toBeTruthy();
   });
 
   it('vergrößert den Vers wirklich mit dem eingestellten Schriftgrad', () => {

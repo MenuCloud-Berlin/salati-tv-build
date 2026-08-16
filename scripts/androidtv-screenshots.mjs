@@ -36,6 +36,7 @@ const EMULATOR = ['C:/Android/emulator/emulator.exe', path.join(SDK, 'emulator',
 // Reihenfolge und Wartezeiten wie bei Apple TV (scripts/tvos-screenshots.sh);
 // hier ohne Kaltstart je Bild, weil kein Startargument noetig ist.
 const AUFNAHMEN = [
+  ['pairing', 7],
   ['clock', 6],
   ['home', 5],
   ['quran', 9],
@@ -54,6 +55,17 @@ const arg = (name, vorgabe) => {
 };
 const APK = arg('apk', null);
 const SPRACHEN = arg('sprachen', 'de en tr ar').split(/\s+/).filter(Boolean);
+// `--screens pairing` nimmt nur einzelne Bildschirme auf, ohne den ganzen Satz
+// neu zu machen: die Webseite zeigt einen anderen Ausschnitt als die Store-Seite.
+const NUR = arg('screens', '').split(/\s+/).filter(Boolean);
+
+// Ohne Auswahl der Store-Satz: acht Bildschirme, durchnummeriert ab 01. Der
+// Kopplungs-Bildschirm bleibt draussen, weil Play nur acht TV-Bilder nimmt und
+// er von den acht der schwaechste ist (ein QR-Code sagt im Store wenig).
+const gewaehlt = AUFNAHMEN.filter(([screen]) =>
+  NUR.length ? NUR.includes(screen) : screen !== 'pairing',
+);
+if (!gewaehlt.length) throw new Error(`Keine bekannten Bildschirme in --screens "${NUR.join(' ')}"`);
 
 const adb = (...args) =>
   execFileSync(ADB, ['-s', geraet, ...args], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
@@ -131,7 +143,7 @@ for (const sprache of SPRACHEN) {
   await schlaf(2);
 
   let nr = 0;
-  for (const [screen, warten] of AUFNAHMEN) {
+  for (const [screen, warten] of gewaehlt) {
     nr += 1;
     adb('shell', 'am', 'start', '-a', 'android.intent.action.VIEW', '-d', `salatitv://screen/${screen}`, PAKET);
     await schlaf(warten);

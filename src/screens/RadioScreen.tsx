@@ -57,7 +57,7 @@ export function RadioScreen() {
   }, [playing]);
 
   if (playing) {
-    return <AudioNowPlaying uri={playing.url} title={playing.name} loop subtitle="mp3quran.net" />;
+    return <AudioNowPlaying quelle="radio" uri={playing.url} title={playing.name} loop subtitle="mp3quran.net" />;
   }
 
   // Audit 2026-07-28: kein fokussierbares Element in Fehler-/Ladezustand.

@@ -14,6 +14,7 @@ import {
 import { useKeepAwake } from 'expo-keep-awake';
 import { StatusBar } from 'expo-status-bar';
 
+import { Hintergrund } from '@/components/Hintergrund';
 import { ClockScreen } from '@/screens/ClockScreen';
 import { HomeScreen } from '@/screens/HomeScreen';
 import { PairingScreen } from '@/screens/PairingScreen';
@@ -175,6 +176,10 @@ export default function App() {
   return (
     <View style={wurzel}>
       <StatusBar hidden />
+      {/* Liegt EINMAL hinter allen Bildschirmen. Vor der eingeblendeten
+          Flaeche, damit der Wechsel darueber laeuft und der Hintergrund
+          dabei stehen bleibt. */}
+      <Hintergrund />
       <Animated.View style={[styles.fill, { opacity: fade, transform: [{ translateY: rutsch }] }]}>
       {screen === 'clock' && (
         // Fokussierbar + Initialfokus: auf dem TV muss ein Element den Fokus

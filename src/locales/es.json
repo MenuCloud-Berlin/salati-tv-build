@@ -60,6 +60,8 @@
     "kickerPodcast": "Pódcast",
     "kickerRadio": "Radio del Corán",
     "kickerRecitation": "Recitación",
+    "laeuftImHintergrund": "Sonando de fondo",
+    "pausiert": "En pausa",
     "saveError": "No se pudo guardar — comprueba la conexión.",
     "saveHint": "OK guarda esta sura para escucharla sin internet",
     "savedHint": "Guardada · OK borra el archivo",
@@ -101,6 +103,8 @@
     "loadError": "No se pudo cargar la sura.",
     "pickerSubtitle": "Elige una sura · recitación con palabra resaltada y traducción",
     "repeatOn": "Repitiendo el versículo · ↻ detiene la repetición",
+    "sectionHint": "Aleya larga · ⏮ ⏭ pasa página dentro de la aleya y luego a la siguiente",
+    "sectionOf": "Parte {n} / {total}",
     "verseOf": "Versículo {n} / {total}"
   },
   "reciters": {
@@ -130,6 +134,14 @@
       "tathwib": "El adhan 3 incluye el tazwib («la oración es mejor que el sueño») y por eso corresponde al fajr.",
       "title": "Llamada por cada oración",
       "volume": "Volumen"
+    },
+    "background": {
+      "title": "Fondo",
+      "hint": "Está detrás de todas las áreas y funciona con cualquier paleta.",
+      "ruhig": "Liso",
+      "schein": "Resplandor",
+      "verlauf": "Degradado",
+      "muster": "Patrón"
     },
     "current": "Actual",
     "format12": "12 horas (2:30 PM)",

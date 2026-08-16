@@ -60,6 +60,8 @@
     "kickerPodcast": "Podcast",
     "kickerRadio": "Radio du Coran",
     "kickerRecitation": "Récitation",
+    "laeuftImHintergrund": "En cours en arrière-plan",
+    "pausiert": "En pause",
     "saveError": "Échec de l’enregistrement — vérifie la connexion.",
     "saveHint": "OK enregistre cette sourate pour l’écouter sans internet",
     "savedHint": "Enregistrée · OK supprime le fichier",
@@ -101,6 +103,8 @@
     "loadError": "Impossible de charger la sourate.",
     "pickerSubtitle": "Choisis une sourate · récitation avec mot surligné et traduction",
     "repeatOn": "Verset répété · ↻ arrête la répétition",
+    "sectionHint": "Verset long · ⏮ ⏭ tourne la page dans le verset, puis passe au suivant",
+    "sectionOf": "Partie {n} / {total}",
     "verseOf": "Verset {n} / {total}"
   },
   "reciters": {
@@ -130,6 +134,14 @@
       "tathwib": "L’adhan 3 comporte le tathwib (« la prière vaut mieux que le sommeil ») et convient donc au fajr.",
       "title": "Appel pour chaque prière",
       "volume": "Volume"
+    },
+    "background": {
+      "title": "Arrière-plan",
+      "hint": "Se place derrière toutes les sections et fonctionne avec chaque palette.",
+      "ruhig": "Sobre",
+      "schein": "Lueur",
+      "verlauf": "Dégradé",
+      "muster": "Motif"
     },
     "current": "Actuelle",
     "format12": "12 heures (2:30 PM)",
