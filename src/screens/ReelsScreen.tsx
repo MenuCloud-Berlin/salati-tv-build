@@ -90,7 +90,12 @@ export function ReelsScreen() {
                       Kleinzeile darunter: bis 1.9.0 stand sie allein dort, und
                       auf drei Meter Abstand sah die Reihe weiterhin nach fuenf
                       gleichen Karten aus (Fortsetzung des Befunds von unten). */}
-                  <Text style={styles.thumbNummer}>
+                  <Text
+                    style={styles.thumbNummer}
+                    numberOfLines={1}
+                    // "34.1" fuellt die Kachel schon fast; "114.12" waere breiter
+                    // als sie.
+                    adjustsFontSizeToFit>
                     {v.episode_no}.{v.index}
                   </Text>
                   <View style={styles.thumbSymbol}>
