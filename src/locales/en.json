@@ -121,6 +121,12 @@
     "asrEarlier": "Earlier (Shafi/Maliki/Hanbali - standard)",
     "asrLater": "Later (Hanafi)",
     "asrSchool": "Asr school",
+    "autoHide": {
+      "title": "On-screen controls",
+      "hint": "They disappear after this long without a keypress. Any key brings them back.",
+      "never": "Always visible",
+      "after": "After {n} seconds"
+    },
     "azan": {
       "allOff": "All off",
       "hint": "The call sounds only while Salati is on screen — the TV does not wake the app by itself. Press Back to end a call that is playing.",

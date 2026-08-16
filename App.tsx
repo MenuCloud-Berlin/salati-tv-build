@@ -15,6 +15,7 @@ import { useKeepAwake } from 'expo-keep-awake';
 import { StatusBar } from 'expo-status-bar';
 
 import { Hintergrund } from '@/components/Hintergrund';
+import { ausblendenNach, bedienungGesehen } from '@/lib/bedienungSichtbar';
 import { ClockScreen } from '@/screens/ClockScreen';
 import { HomeScreen } from '@/screens/HomeScreen';
 import { PairingScreen } from '@/screens/PairingScreen';
@@ -32,7 +33,7 @@ import { useTranslation } from '@/lib/i18n';
 import { isScreen, screenFromLaunchArgument, screenFromUrl, type Screen } from '@/lib/nav';
 import { onPairCommand, startPairing, stopPairing } from '@/lib/pairing';
 import { hydrateOfflineAudio, verwaisteEintraegeAufraeumen } from '@/lib/offlineAudio';
-import { applyRemoteSettings } from '@/lib/settings';
+import { applyRemoteSettings, useTvSettings } from '@/lib/settings';
 import { useTheme } from '@/lib/useTheme';
 import { useLatestRef } from '@/lib/useLatestRef';
 
@@ -54,6 +55,17 @@ export default function App() {
   );
   const screenRef = useLatestRef(screen);
   const theme = useTheme();
+  const { bedienungAusblenden } = useTvSettings();
+
+  // Die Wartezeit steht in den Einstellungen, gezaehlt wird sie neben dem Baum
+  // (lib/bedienungSichtbar.ts). Der Bildschirmwechsel gilt als Bedienung: wer
+  // gerade irgendwo hingegangen ist, soll dort die Hinweise sehen.
+  useEffect(() => {
+    ausblendenNach(bedienungAusblenden * 1000);
+  }, [bedienungAusblenden]);
+  useEffect(() => {
+    bedienungGesehen();
+  }, [screen]);
 
   // Sanfter Uebergang bei jedem Screen-Wechsel (ruhiger als der harte Swap):
   // Einblenden PLUS ein kurzer Weg von unten nach oben. Der reine Cross-Fade
@@ -98,6 +110,11 @@ export default function App() {
   // Fire-TV-Fernbedienung: Menu-Taste = zurück. Am Clock: jede Taste → Home.
   useTVEventHandler((evt) => {
     if (!evt) return;
+    // Jeder Tastendruck holt die Bedienhinweise zurueck und beginnt die
+    // Wartezeit von vorn (s. lib/bedienungSichtbar.ts). Bewusst HIER und nicht
+    // je Bildschirm: die Ereignisse kommen nur einmal an, die Antwort wird an
+    // vier Stellen gebraucht.
+    bedienungGesehen();
     const type = evt.eventType;
     if (type === 'menu') {
       goBack();

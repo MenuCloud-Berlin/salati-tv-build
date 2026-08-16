@@ -121,6 +121,12 @@
     "asrEarlier": "Früher (Shafi/Maliki/Hanbali - Standard)",
     "asrLater": "Später (Hanafi)",
     "asrSchool": "Asr-Schule",
+    "autoHide": {
+      "title": "Bedienhinweise",
+      "hint": "Verschwinden nach dieser Zeit ohne Tastendruck. Jede Taste holt sie zurück.",
+      "never": "Immer sichtbar",
+      "after": "Nach {n} Sekunden"
+    },
     "azan": {
       "allOff": "Alle aus",
       "hint": "Der Ruf erklingt nur, solange Salati auf dem Bildschirm ist — der Fernseher weckt die App nicht von selbst. Ein laufender Ruf endet mit der Zurück-Taste.",

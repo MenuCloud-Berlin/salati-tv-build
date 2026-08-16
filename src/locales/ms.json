@@ -121,6 +121,12 @@
     "asrEarlier": "Lebih awal (Syafi'i/Maliki/Hanbali - standard)",
     "asrLater": "Lebih lewat (Hanafi)",
     "asrSchool": "Mazhab Asar",
+    "autoHide": {
+      "title": "Panduan pada skrin",
+      "hint": "Hilang selepas tempoh ini tanpa tekanan butang. Mana-mana butang memaparkannya semula.",
+      "never": "Sentiasa kelihatan",
+      "after": "Selepas {n} saat"
+    },
     "azan": {
       "allOff": "Matikan semua",
       "hint": "Azan berkumandang hanya semasa Salati dipaparkan — televisyen tidak membuka aplikasi dengan sendirinya. Tekan Kembali untuk menghentikan azan yang sedang berbunyi.",

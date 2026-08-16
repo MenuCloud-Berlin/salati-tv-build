@@ -13,6 +13,7 @@ import { useVideoPlayer } from 'expo-video';
 import { AmbientGlow } from '@/components/AmbientGlow';
 import { FocusCard } from '@/components/FocusCard';
 import { fokusUeberstand } from '@/components/fokusUeberstand';
+import { useBedienungSichtbar } from '@/lib/bedienungSichtbar';
 import { StateView } from '@/components/StateView';
 import { SURAHS } from '@/data/surahs';
 import { useTranslation } from '@/lib/i18n';
@@ -160,6 +161,7 @@ function Reader({
   const theme = useTheme();
   const { readerScale, readerTranslit, readerTranslation, readerAutoAdvance } = useTvSettings();
   const arab = useQuranFont();
+  const bedienungSichtbar = useBedienungSichtbar();
   const [verses, setVerses] = useState<ReaderVerse[] | null>(null);
   const [quelle, setQuelle] = useState<'netz' | 'ablage' | 'paket'>('netz');
   const [error, setError] = useState(false);
@@ -480,7 +482,7 @@ function Reader({
           und es gab sonst nichts — kein Zurueck zum vorigen Vers, kein
           Wiederholen. Der Initialfokus liegt auf Play/Pause, weil das die
           Taste ist, die man im Sitzen zuerst sucht. */}
-      <View style={s.controls}>
+      <View style={[s.controls, !bedienungSichtbar && s.verborgen]}>
         <FocusCard onPress={() => weiter(-1)} style={s.ctrl}>
           <Text style={s.ctrlGlyph}>⏮</Text>
         </FocusCard>
@@ -521,7 +523,7 @@ function Reader({
         </FocusCard>
       </View>
 
-      <Text style={s.hint} numberOfLines={1}>
+      <Text style={[s.hint, !bedienungSichtbar && s.verborgen]} numberOfLines={1}>
         {quelle === 'paket'
           ? t('common.offlineReaderPaket')
           : quelle === 'ablage'
@@ -660,6 +662,7 @@ function readerStyles(h: number, w: number, rtl: boolean, theme: Theme, scale: n
       arabicActive: { color: theme.accent },
       translit: { color: theme.accent, opacity: 0.85, fontSize: translitSize, textAlign: 'center', letterSpacing: 0.5 },
       translation: { color: theme.text, opacity: 0.9, fontSize: uebersetzungSize, textAlign: 'center', lineHeight: uebersetzungLine },
+      verborgen: { opacity: 0 },
       controls: { flexDirection: rtl ? 'row-reverse' : 'row', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: clamp(w * 0.012, 10, 20) },
       ctrl: { width: ctrl, height: ctrl, borderRadius: ctrl / 2, alignItems: 'center', justifyContent: 'center' },
       ctrlWide: { width: ctrl * 1.6, height: ctrl, borderRadius: ctrl / 2, alignItems: 'center', justifyContent: 'center' },

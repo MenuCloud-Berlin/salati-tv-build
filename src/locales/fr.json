@@ -121,6 +121,12 @@
     "asrEarlier": "Tôt (Shafi/Maliki/Hanbali - standard)",
     "asrLater": "Tard (Hanafi)",
     "asrSchool": "École pour l'Asr",
+    "autoHide": {
+      "title": "Indications à l’écran",
+      "hint": "Elles disparaissent après ce délai sans appui. N’importe quelle touche les ramène.",
+      "never": "Toujours visibles",
+      "after": "Après {n} secondes"
+    },
     "azan": {
       "allOff": "Tout désactiver",
       "hint": "L’appel retentit uniquement lorsque Salati est affiché ; le téléviseur n’ouvre pas l’application de lui-même. La touche Retour arrête un appel en cours.",

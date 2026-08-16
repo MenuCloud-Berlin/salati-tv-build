@@ -102,6 +102,7 @@ describe('setLocation / setIs24h', () => {
       // genau das soll dieser Test bemerken.
       theme: 'mitternacht',
       hintergrund: 'ruhig',
+      bedienungAusblenden: 0,
       quranFont: 'kfgqpc',
       quranSukun: 'madina',
       readerScale: 1,

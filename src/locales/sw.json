@@ -121,6 +121,12 @@
     "asrEarlier": "Mapema zaidi (Shafi'i/Maliki/Hanbali - kawaida)",
     "asrLater": "Baadaye (Hanafi)",
     "asrSchool": "Madhehebu ya Asr",
+    "autoHide": {
+      "title": "Maelekezo skrinini",
+      "hint": "Hupotea baada ya muda huu bila kubonyeza kitufe. Kitufe chochote hurudisha.",
+      "never": "Yaonekane daima",
+      "after": "Baada ya sekunde {n}"
+    },
     "azan": {
       "allOff": "Zima zote",
       "hint": "Adhana husikika tu wakati Salati iko kwenye skrini — televisheni haifungui programu yenyewe. Bonyeza Rudi ili kusimamisha adhana inayoendelea.",

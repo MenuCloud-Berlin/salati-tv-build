@@ -121,6 +121,12 @@
     "asrEarlier": "Erken (Şafiî/Malikî/Hanbelî - standart)",
     "asrLater": "Geç (Hanefî)",
     "asrSchool": "İkindi mezhebi",
+    "autoHide": {
+      "title": "Ekran bilgileri",
+      "hint": "Tuşa basılmadan bu süre geçince kaybolur. Herhangi bir tuş geri getirir.",
+      "never": "Her zaman görünür",
+      "after": "{n} saniye sonra"
+    },
     "azan": {
       "allOff": "Hepsi kapalı",
       "hint": "Ezan yalnızca Salati ekrandayken okunur — televizyon uygulamayı kendiliğinden açmaz. Okunan ezanı Geri tuşu durdurur.",
