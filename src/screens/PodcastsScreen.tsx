@@ -98,7 +98,14 @@ export function PodcastsScreen() {
                 onPress={() => setPlaying(ep)}
                 style={styles.card}>
                 {ep.cover_url ? (
-                  <Image source={{ uri: ep.cover_url }} style={styles.cover} contentFit="cover" />
+                  <Image
+                    source={{ uri: ep.cover_url }}
+                    style={styles.cover}
+                    contentFit="cover"
+                    // Einblenden statt Sprung: das Cover kommt ueber das Netz und
+                    // trifft je Karte zu einem anderen Zeitpunkt ein.
+                    transition={200}
+                  />
                 ) : (
                   <View style={[styles.cover, styles.coverFallback]}>
                     <Icon name="headphones" size={rowIconSize(height)} color={theme.accent} />

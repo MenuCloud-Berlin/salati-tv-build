@@ -109,6 +109,12 @@ export function makeRowStyles(
       width: Math.min(cardW - pad * 2, mediaH),
       height: Math.min(cardW - pad * 2, mediaH),
       borderRadius: 12,
+      // Grundflaeche AUCH beim geladenen Bild: solange es unterwegs ist, stand
+      // dort sonst nichts — eine Karte mit Titel und Dauer, aber ohne Bild
+      // sieht nach einem Fehler aus (Bildschirmbefund 2026-08-16: von sechs
+      // sichtbaren Podcast-Karten hatten drei nach zehn Sekunden noch kein
+      // Cover).
+      backgroundColor: theme.accentSoft,
       marginBottom: pad * 0.7,
       // Mittig: das Cover ist quadratisch und von der HOEHE gedeckelt, die
       // Karte aber breiter — linksbuendig blieb rechts daneben ein leerer
@@ -117,7 +123,7 @@ export function makeRowStyles(
     },
     coverFallback: { backgroundColor: theme.accentSoft, alignItems: 'center', justifyContent: 'center' },
     /**
-     * Die Folgennummer als grosses, blasses Zeichen hinter dem Abspielsymbol.
+     * Die Folgennummer als grosses, blasses Zeichen in der Kachel.
      *
      * WARUM (Befund 2026-08-16 auf der Store-Seite): die Lernvideos haben keine
      * Vorschaubilder — der Index auf R2 fuehrt zu 95 Folgen kein einziges Bild.
@@ -129,13 +135,26 @@ export function makeRowStyles(
     thumbNummer: {
       position: 'absolute',
       color: theme.accent,
-      opacity: 0.22,
-      fontSize: Math.round(mediaH * 0.62),
+      opacity: 0.26,
+      fontSize: Math.round(mediaH * 0.6),
       fontWeight: '800',
       // Ziffern in einer sehr grossen Groesse tragen sonst oben und unten
       // Luft mit, die die Kachel aus der Mitte schiebt.
-      lineHeight: Math.round(mediaH * 0.72),
+      lineHeight: Math.round(mediaH * 0.7),
       includeFontPadding: false,
+    },
+    /**
+     * Das Abspielsymbol sitzt in der ECKE, nicht in der Mitte.
+     *
+     * Erste Fassung hatte beides mittig — die Ziffer lag hinter dem Dreieck,
+     * und „16" mit einem Dreieck im Bauch der 6 sieht nicht nach Gestaltung
+     * aus, sondern nach einem Zeichenfehler (Bildschirmbefund 2026-08-16).
+     * In der Ecke sagen beide ihre Sache, ohne sich zu stoeren.
+     */
+    thumbSymbol: {
+      position: 'absolute',
+      bottom: Math.round(pad * 0.5),
+      ...(rtl ? { left: Math.round(pad * 0.5) } : { right: Math.round(pad * 0.5) }),
     },
     cardTitle: {
       color: theme.text,

@@ -141,12 +141,33 @@ export function abschnittVonWort(abschnitte: readonly Abschnitt[], wortIndex: nu
 }
 
 /**
+ * Wie viele Zeilen ein Fliesstext bei dieser Groesse braucht.
+ *
+ * 0,5 em je Zeichen ist der Mittelwert lateinischer Fliesstexte — am Geraet
+ * nachgemessen: die Umschriftzeile von An-Nisaa 1 belegt 88 Zeichen auf 845 dp
+ * bei 19,4 dp Schriftgrad, also 0,495 em je Zeichen.
+ *
+ * Der Zuschlag von 12 % ist der VERSCHNITT am Wortumbruch: eine Zeile endet
+ * dort, wo das naechste Wort nicht mehr passt, im Mittel also vor dem rechten
+ * Rand. Ohne ihn rechnete die erste Fassung 2,0 Zeilen aus, wo das Bild drei
+ * setzte — und die dritte wurde unten abgeschnitten (Bildschirmbefund
+ * 2026-08-16, An-Nisaa 1).
+ */
+function zeilenBedarf(text: string, breite: number, fontSize: number): number {
+  return Math.max(1, Math.ceil((text.length * 0.5 * 1.12 * fontSize) / breite));
+}
+
+/** Stufen, in denen eine Begleitzeile kleiner wird. */
+const TEXT_FAKTOREN = [1, 0.94, 0.88, 0.8, 0.72, 0.64, 0.56] as const;
+
+/**
  * Faktor, mit dem eine Zeile lateinischer Schrift in ihre Flaeche passt.
  *
- * Warum eine Wurzel: die Zahl der Zeilen waechst mit dem Schriftgrad, die Hoehe
- * jeder Zeile ebenfalls — die belegte Hoehe waechst also mit dem QUADRAT. Wer
- * linear verkleinert, verkleinert doppelt so stark wie noetig und macht aus
- * einer Uebersetzung, die knapp nicht passt, eine Ameisenschrift.
+ * BEWUSST IN STUFEN statt in einem Zug: die Zahl der Zeilen ist eine ganze
+ * Zahl. Ein Schriftgrad, der rechnerisch „2,1 Zeilen" ergibt, setzt drei — und
+ * eine einmalige Verkleinerung um die Wurzel des Verhaeltnisses landet dann
+ * genau wieder bei drei. Die Stufen probieren, bis der Bedarf wirklich
+ * hineinpasst.
  */
 export function textFaktor(opts: {
   text: string;
@@ -157,13 +178,16 @@ export function textFaktor(opts: {
   minFaktor?: number;
 }): number {
   const { text, breite, hoehe, fontSize, lineHeight } = opts;
-  const min = opts.minFaktor ?? 0.62;
+  const min = opts.minFaktor ?? 0.56;
   if (!text || !(breite > 0) || !(hoehe > 0) || !(fontSize > 0) || !(lineHeight > 0)) return 1;
-  // 0,5 em je Zeichen ist der uebliche Mittelwert lateinischer Fliesstexte;
-  // arabische und indische Uebersetzungen liegen daneben, aber immer darunter.
-  const gebraucht = Math.ceil((text.length * 0.5 * fontSize) / breite) * lineHeight;
-  if (gebraucht <= hoehe) return 1;
-  return Math.max(min, Math.sqrt(hoehe / gebraucht));
+  let letzter = 1;
+  for (const f of TEXT_FAKTOREN) {
+    if (f < min) break;
+    letzter = f;
+    const zeilen = zeilenBedarf(text, breite, fontSize * f);
+    if (zeilen * lineHeight * f <= hoehe) return f;
+  }
+  return Math.max(min, letzter);
 }
 
 /**

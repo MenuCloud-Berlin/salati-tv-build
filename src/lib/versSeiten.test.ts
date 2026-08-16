@@ -138,14 +138,27 @@ describe('textFaktor', () => {
     const lang = 'Wort '.repeat(200);
     const f = textFaktor({ text: lang, ...box });
     expect(f).toBeLessThan(1);
-    expect(f).toBeGreaterThanOrEqual(0.62);
+    expect(f).toBeGreaterThanOrEqual(0.56);
   });
 
-  it('rechnet mit der Wurzel, nicht linear', () => {
-    // Vierfacher Platzbedarf → halber Schriftgrad, nicht ein Viertel.
-    const f = textFaktor({ text: 'x'.repeat(1000), breite: 500, hoehe: 60, fontSize: 30, lineHeight: 30, minFaktor: 0.01 });
-    const zeilen = Math.ceil((1000 * 0.5 * 30) / 500);
-    expect(f).toBeCloseTo(Math.sqrt(60 / (zeilen * 30)), 5);
+  it('verkleinert so weit, dass es WIRKLICH hineinpasst', () => {
+    // Der Fall, an dem die erste Fassung gescheitert ist (An-Nisaa 1,
+    // Bildschirmbefund 2026-08-16): sie rechnete den Faktor in EINEM Zug aus
+    // der Wurzel des Verhaeltnisses aus und landete wieder bei derselben
+    // Zeilenzahl — die letzte Zeile wurde unten abgeschnitten.
+    const faelle = [
+      { text: 'a'.repeat(175), breite: 845, hoehe: 69, fontSize: 19.4, lineHeight: 26.2 },
+      { text: 'b'.repeat(400), breite: 1200, hoehe: 120, fontSize: 30, lineHeight: 40 },
+      { text: 'c'.repeat(90), breite: 600, hoehe: 40, fontSize: 20, lineHeight: 26 },
+    ];
+    for (const fall of faelle) {
+      const f = textFaktor(fall);
+      const zeilen = Math.max(
+        1,
+        Math.ceil((fall.text.length * 0.5 * 1.12 * fall.fontSize * f) / fall.breite),
+      );
+      expect(zeilen * fall.lineHeight * f).toBeLessThanOrEqual(fall.hoehe);
+    }
   });
 });
 

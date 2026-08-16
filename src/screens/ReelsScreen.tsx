@@ -93,7 +93,9 @@ export function ReelsScreen() {
                   <Text style={styles.thumbNummer}>
                     {v.episode_no}.{v.index}
                   </Text>
-                  <Icon name="bolt" size={rowIconSize(height)} color={theme.accent} />
+                  <View style={styles.thumbSymbol}>
+                    <Icon name="bolt" size={Math.round(rowIconSize(height) * 0.62)} color={theme.accent} />
+                  </View>
                 </View>
                 <Text style={styles.cardTitle} numberOfLines={2}>
                   {v.title}
