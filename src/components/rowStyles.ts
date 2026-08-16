@@ -137,7 +137,18 @@ export function makeRowStyles(
       lineHeight: Math.round(mediaH * 0.72),
       includeFontPadding: false,
     },
-    cardTitle: { color: theme.text, fontSize: titleFont, fontWeight: '600', textAlign: align },
+    cardTitle: {
+      color: theme.text,
+      fontSize: titleFont,
+      lineHeight: Math.round(titleFont * 1.3),
+      fontWeight: '600',
+      textAlign: align,
+      // Zwei Zeilen sind RESERVIERT — genau so viel, wie `textBlock` oben
+      // einrechnet. Ein einzeiliger Titel zoege sonst seine Dauer-Zeile nach
+      // oben, und in einer Reihe staenden die Kleinzeilen auf verschiedenen
+      // Hoehen (derselbe Befund wie am Startbildschirm, 2026-08-16).
+      height: Math.round(titleFont * 1.3) * 2,
+    },
     cardMeta: {
       color: theme.textMuted,
       fontSize: metaFont,
