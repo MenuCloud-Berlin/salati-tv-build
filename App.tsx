@@ -30,7 +30,16 @@ import { VideosScreen } from '@/screens/VideosScreen';
 import { appleEinstellungen } from '@/lib/appleEinstellungen';
 import { azanLaeuft, azanStoppen, useAzanAusloeser, useAzanLauf } from '@/lib/azanRuf';
 import { useTranslation } from '@/lib/i18n';
-import { isScreen, screenFromLaunchArgument, screenFromUrl, type Screen } from '@/lib/nav';
+import {
+  isScreen,
+  screenFromLaunchArgument,
+  screenFromUrl,
+  settingsBereichFromLaunchArgument,
+  surahFromLaunchArgument,
+  surahFromUrl,
+  type Screen,
+  type SettingsBereich,
+} from '@/lib/nav';
 import { onPairCommand, startPairing, stopPairing } from '@/lib/pairing';
 import { hydrateOfflineAudio, verwaisteEintraegeAufraeumen } from '@/lib/offlineAudio';
 import { applyRemoteSettings, useTvSettings } from '@/lib/settings';
@@ -54,6 +63,15 @@ export default function App() {
     () => screenFromLaunchArgument(appleEinstellungen()) ?? 'clock',
   );
   const screenRef = useLatestRef(screen);
+  // Ziel INNERHALB eines Bildschirms — die Bildschirmfoto-Automatik kam sonst
+  // nur bis zur Auswahl (s. lib/nav.ts). Ein Startargument wird einmal beim
+  // ersten Rendern gelesen, ein Deep Link kann es spaeter nachziehen.
+  const [startSure, setStartSure] = useState<number | null>(() =>
+    surahFromLaunchArgument(appleEinstellungen()),
+  );
+  const [startBereich] = useState<SettingsBereich | null>(() =>
+    settingsBereichFromLaunchArgument(appleEinstellungen()),
+  );
   const theme = useTheme();
   const { bedienungAusblenden } = useTvSettings();
 
@@ -178,7 +196,9 @@ export default function App() {
   useEffect(() => {
     const anwenden = (url: string | null) => {
       const s = screenFromUrl(url);
-      if (s) setScreen(s);
+      if (!s) return;
+      setStartSure(surahFromUrl(url));
+      setScreen(s);
     };
     void Linking.getInitialURL().then(anwenden).catch(() => {});
     const sub = Linking.addEventListener('url', ({ url }) => anwenden(url));
@@ -215,11 +235,11 @@ export default function App() {
       {screen === 'home' && <HomeScreen navigate={navigate} />}
       {screen === 'videos' && <VideosScreen />}
       {screen === 'reciters' && <RecitersScreen />}
-      {screen === 'quran' && <QuranReaderScreen />}
+      {screen === 'quran' && <QuranReaderScreen startSurah={startSure} />}
       {screen === 'radio' && <RadioScreen />}
       {screen === 'reels' && <ReelsScreen />}
       {screen === 'podcasts' && <PodcastsScreen />}
-      {screen === 'settings' && <SettingsScreen />}
+      {screen === 'settings' && <SettingsScreen startBereich={startBereich} />}
       {screen === 'pairing' && <PairingScreen />}
       {screen === 'quiz' && <QuizScreen />}
       </Animated.View>

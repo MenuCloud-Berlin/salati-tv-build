@@ -33,18 +33,39 @@ const EMULATOR = ['C:/Android/emulator/emulator.exe', path.join(SDK, 'emulator',
   fs.existsSync(p),
 );
 
+// Tastencodes der Fernbedienung.
+const K = { hoch: 19, runter: 20, links: 21, rechts: 22, ok: 23 };
+
 // Reihenfolge und Wartezeiten wie bei Apple TV (scripts/tvos-screenshots.sh);
 // hier ohne Kaltstart je Bild, weil kein Startargument noetig ist.
+//
+// `tasten` fuehrt nach dem Deep Link noch ein Stueck weiter. Zwei Bilder
+// brauchen das (Befund 2026-08-16 beim Nachsehen der Store-Seite):
+//
+//   • „quran" zeigte die SURENLISTE. Die Unterschrift verspricht „Den Koran am
+//     Fernseher lesen" — eine Liste von Namen zeigt davon nichts. Jetzt wird
+//     eine Sure geoeffnet und die Rezitation angehalten, damit das Bild den
+//     Vers mit Umschrift und Uebersetzung zeigt.
+//   • „settings" zeigte die SPRACHWAHL, waehrend die Unterschrift von
+//     23 Berechnungsmethoden und Madhab sprach. Bild und Text sagten
+//     Verschiedenes. Jetzt oeffnet es den Bereich Gebetszeiten.
+//
+// Je Eintrag: [Bildschirm, Sekunden nach dem Deep Link, Tasten, Sekunden danach]
 const AUFNAHMEN = [
   ['pairing', 7],
   ['clock', 6],
   ['home', 5],
-  ['quran', 9],
+  // runter + 3x rechts = Sure 4 (An-Nisaa); ihr erster Vers ist lang genug,
+  // dass Vers, Umschrift und Uebersetzung zusammen zu sehen sind. Das zweite
+  // OK haelt die Rezitation an, sonst waere der Vers beim Ausloesen schon
+  // weitergelaufen.
+  ['quran', 6, [K.runter, K.rechts, K.rechts, K.rechts, K.ok], 13, [K.ok], 2],
   ['reciters', 9],
   ['radio', 9],
   ['videos', 9],
   ['quiz', 6],
-  ['settings', 5],
+  // 2x runter = Gebetszeiten, OK oeffnet den Bereich.
+  ['settings', 5, [K.runter, K.runter, K.ok], 3],
 ];
 
 const GEBIET = { de: 'de-DE', en: 'en-US', tr: 'tr-TR', ar: 'ar-SA' };
@@ -143,10 +164,25 @@ for (const sprache of SPRACHEN) {
   await schlaf(2);
 
   let nr = 0;
-  for (const [screen, warten] of gewaehlt) {
+  for (const [screen, warten, tasten1, warten1, tasten2, warten2] of gewaehlt) {
     nr += 1;
     adb('shell', 'am', 'start', '-a', 'android.intent.action.VIEW', '-d', `salatitv://screen/${screen}`, PAKET);
     await schlaf(warten);
+    // Weiter in den Bildschirm hinein, wo der Deep Link nur bis zur Auswahl
+    // fuehrt. Einzeln gesendet mit Pause: eine Folge in EINEM `input keyevent`
+    // kommt schneller, als die Oberflaeche den Fokus nachzieht, und ein Teil
+    // der Tastendruecke geht verloren (am Geraet gemessen).
+    for (const [folge, danach] of [
+      [tasten1, warten1],
+      [tasten2, warten2],
+    ]) {
+      if (!folge) continue;
+      for (const taste of folge) {
+        adb('shell', 'input', 'keyevent', String(taste));
+        await schlaf(0.5);
+      }
+      await schlaf(danach ?? 2);
+    }
     const roh = execFileSync(ADB, ['-s', geraet, 'exec-out', 'screencap', '-p'], { maxBuffer: 64 * 1024 * 1024 });
     const datei = path.join(ordner, `${String(nr).padStart(2, '0')}-${screen}.png`);
     fs.writeFileSync(datei, roh);

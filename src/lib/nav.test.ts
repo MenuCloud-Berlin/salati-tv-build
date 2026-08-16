@@ -10,7 +10,16 @@
 import fs from 'fs';
 import path from 'path';
 
-import { SCREENS, isScreen, screenFromLaunchArgument, screenFromUrl } from '@/lib/nav';
+import {
+  SCREENS,
+  SETTINGS_BEREICHE,
+  isScreen,
+  screenFromLaunchArgument,
+  screenFromUrl,
+  settingsBereichFromLaunchArgument,
+  surahFromLaunchArgument,
+  surahFromUrl,
+} from '@/lib/nav';
 
 const APP_TSX = path.join(__dirname, '..', '..', 'App.tsx');
 
@@ -89,5 +98,39 @@ describe('screenFromUrl', () => {
     ]) {
       expect(screenFromUrl(v as string | null | undefined)).toBeNull();
     }
+  });
+});
+
+describe('Ziele innerhalb eines Bildschirms', () => {
+  it('liest die Sure aus Startargument und Adresse', () => {
+    expect(surahFromLaunchArgument({ salatiSure: 4 })).toBe(4);
+    expect(surahFromLaunchArgument({ salatiSure: '114' })).toBe(114);
+    expect(surahFromUrl('salatitv://screen/quran/4')).toBe(4);
+    expect(surahFromUrl('salatitv://screen/quran/4/')).toBe(4);
+  });
+
+  it('verwirft, was keine Sure ist', () => {
+    // Ein Wert von aussen darf nie mehr bewirken, als ignoriert zu werden.
+    for (const wert of [0, 115, -3, 1.5, 'vier', null, undefined, {}]) {
+      expect(surahFromLaunchArgument({ salatiSure: wert })).toBeNull();
+    }
+    expect(surahFromUrl('salatitv://screen/quran')).toBeNull();
+    expect(surahFromUrl('salatitv://screen/home/4')).toBeNull();
+    expect(surahFromUrl(null)).toBeNull();
+  });
+
+  it('laesst die Adresse mit Sure weiterhin den Bildschirm treffen', () => {
+    // Ohne diese Erweiterung waere `salatitv://screen/quran/4` gar kein
+    // gueltiger Link mehr gewesen und der Fernseher haette nichts getan.
+    expect(screenFromUrl('salatitv://screen/quran/4')).toBe('quran');
+    expect(screenFromUrl('salatitv://screen/quran')).toBe('quran');
+  });
+
+  it('liest den Einstellungs-Bereich aus dem Startargument', () => {
+    for (const b of SETTINGS_BEREICHE) {
+      expect(settingsBereichFromLaunchArgument({ salatiBereich: b })).toBe(b);
+    }
+    expect(settingsBereichFromLaunchArgument({ salatiBereich: 'gibtsnicht' })).toBeNull();
+    expect(settingsBereichFromLaunchArgument(null)).toBeNull();
   });
 });
