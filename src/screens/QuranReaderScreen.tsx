@@ -568,14 +568,27 @@ function ArabicVerse({
   faktor: number;
 }) {
   const idx = woerter.length > 0 ? woerter : verse.words.map((_, i) => i);
-  const groesse = { fontSize: styles.arabischGroesse * faktor, lineHeight: styles.arabischZeile * faktor };
+  const fontSize = styles.arabischGroesse * faktor;
+  // Der Wortabstand ist ein RAND, kein Leerzeichen.
+  //
+  // Bis 1.9.0 stand hinter jedem Wort ein `{' '}`. Auf Android ergab das
+  // sichtbare Luecken, auf tvOS NICHT: dort verschluckt die Textzeile das
+  // abschliessende Leerzeichen, und der ganze Vers lief in einem Zug zusammen
+  // („يَـٰٓأَيُّهَاٱلنَّاسُٱتَّقُوا۟"). Aufgefallen erst am Bildschirmfoto fuer
+  // den App Store (2026-08-16). Ein Rand haengt an keiner Textregel und wirkt
+  // auf beiden Plattformen gleich.
+  const groesse = {
+    fontSize,
+    lineHeight: styles.arabischZeile * faktor,
+    marginHorizontal: fontSize * 0.09,
+  };
   return (
     <View style={styles.arabicRow}>
       {idx.map((wi) => (
         <Text
           key={wi}
           style={[styles.arabic, arab.style, groesse, wi === activeWord && styles.arabicActive]}>
-          {arab.text(verse.words[wi]?.ar ?? '')}{' '}
+          {arab.text(verse.words[wi]?.ar ?? '')}
         </Text>
       ))}
     </View>

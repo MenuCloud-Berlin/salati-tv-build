@@ -140,13 +140,13 @@ describe('Leser', () => {
     const erwartet = adaptQuranText(VERS_ARABISCH, quranFontDef('kfgqpc'), 'madina');
     // Die Umschreibung aendert den Text wirklich — sonst pruefte der Test nichts.
     expect(erwartet).not.toBe(VERS_ARABISCH);
-    expect(r.getByText(`${erwartet} `)).toBeTruthy();
+    expect(r.getByText(erwartet)).toBeTruthy();
   });
 
   it('lässt den Text unangetastet, wenn die Schrift die Unicode-Schreibweise erwartet', async () => {
     setQuranFont('amiri-quran');
     const r = await oeffneLeser(<QuranReaderScreen />);
-    expect(r.getByText(`${VERS_ARABISCH} `)).toBeTruthy();
+    expect(r.getByText(VERS_ARABISCH)).toBeTruthy();
   });
 
   // Bewusst zwei Tests statt eines mit zwei `render`-Aufrufen: die
@@ -168,7 +168,7 @@ describe('Leser', () => {
     // von Hand geschriebene Zeichenkette kann sich in der Reihenfolge der
     // Vokalzeichen unterscheiden, ohne dass man es sieht.
     const vers = adaptQuranText(VERS_ARABISCH, quranFontDef('kfgqpc'), 'madina');
-    expect(r.getByText(`${vers} `)).toBeTruthy();
+    expect(r.getByText(vers)).toBeTruthy();
   });
 
   it('bringt eine Vers-Bedienung mit genau einem Fokus-Anker mit', async () => {
@@ -332,4 +332,16 @@ describe('Startziel', () => {
     const r = await render(<QuranReaderScreen />);
     expect(r.getByText('Al-Faatiha')).toBeTruthy();
   });
+});
+
+it('haelt die Woerter mit einem RAND auseinander, nicht mit einem Leerzeichen', async () => {
+  // Auf tvOS verschluckt die Textzeile das abschliessende Leerzeichen — der
+  // ganze Vers lief dort in einem Zug zusammen, waehrend er auf Android
+  // Luecken hatte (Bildschirmfoto fuer den App Store, 2026-08-16). Ein Rand
+  // haengt an keiner Textregel.
+  const r = await render(<QuranReaderScreen startSurah={1} />);
+  const vers = adaptQuranText(VERS_ARABISCH, quranFontDef('kfgqpc'), 'madina');
+  const wort = r.getByText(vers);
+  const stil = Array.isArray(wort.props.style) ? Object.assign({}, ...wort.props.style.filter(Boolean)) : wort.props.style;
+  expect(stil.marginHorizontal).toBeGreaterThan(0);
 });
