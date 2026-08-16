@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import { FocusCard } from '@/components/FocusCard';
+import { fokusUeberstand } from '@/components/fokusUeberstand';
 import { HintergrundStreifen } from '@/components/HintergrundStreifen';
 import { Icon, type IconName } from '@/components/Icon';
 import { useTranslation } from '@/lib/i18n';
@@ -119,12 +120,10 @@ export function HomeScreen({ navigate }: { navigate: (s: Screen) => void }) {
   // Kinder an seinen Grenzen ab, und genau deshalb fehlte bei den Kacheln am
   // RAND ein Stueck des goldenen Rahmens (Nutzerbefund: "verdeckte Raender").
   // Bei den inneren Kacheln faellt es nicht auf — daher "manchmal".
-  const ueberstandH = Math.ceil(tileW * 0.025) + 2;
-  const ueberstandV = Math.ceil(tileH * 0.025) + 2;
 
   const s = useMemo(
-    () => makeStyles({ padH, padV, gap, tileW, tileH, headerH, height, rtl, theme, ueberstandH, ueberstandV }),
-    [padH, padV, gap, tileW, tileH, headerH, height, rtl, theme, ueberstandH, ueberstandV],
+    () => makeStyles({ padH, padV, gap, tileW, tileH, headerH, height, rtl, theme }),
+    [padH, padV, gap, tileW, tileH, headerH, height, rtl, theme],
   );
 
   // Bewusst nur EIN Element mit `hasTVPreferredFocus`: zwei Anker lassen den
@@ -194,9 +193,13 @@ function makeStyles(o: {
   height: number;
   rtl: boolean;
   theme: Theme;
-  ueberstandH: number;
-  ueberstandV: number;
 }) {
+  // Der Rahmen der fokussierten Kachel darf an der Scroll-Kante nicht
+  // abgeschnitten werden (s. components/fokusUeberstand.ts). Bewusst HIER und
+  // nicht im Komponentenkoerper: dort haelt der React-Compiler den Aufruf fuer
+  // eine Abhaengigkeit, die sich aendern koennte, und gibt die Memoisierung auf.
+  const ueberstandH = fokusUeberstand(o.tileW);
+  const ueberstandV = fokusUeberstand(o.tileH);
   const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
   const align = o.rtl ? ('right' as const) : ('left' as const);
   const th = o.theme;
@@ -229,17 +232,17 @@ function makeStyles(o: {
     // kleiner als der Aussenabstand der Wurzel (padH >= 28, Ueberstand <= 10),
     // laeuft also nie ueber den Bildschirmrand hinaus.
     scroll: {
-      marginHorizontal: -o.ueberstandH,
-      marginTop: -o.ueberstandV,
-      marginBottom: -o.ueberstandV,
+      marginHorizontal: -ueberstandH,
+      marginTop: -ueberstandV,
+      marginBottom: -ueberstandV,
     },
     grid: {
       flexDirection: o.rtl ? 'row-reverse' : 'row',
       flexWrap: 'wrap',
       gap: o.gap,
-      paddingHorizontal: o.ueberstandH,
-      paddingTop: o.ueberstandV,
-      paddingBottom: o.padV * 0.5 + o.ueberstandV,
+      paddingHorizontal: ueberstandH,
+      paddingTop: ueberstandV,
+      paddingBottom: o.padV * 0.5 + ueberstandV,
     },
     tile: {
       width: o.tileW,

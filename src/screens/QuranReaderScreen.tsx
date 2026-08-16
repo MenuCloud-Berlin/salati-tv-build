@@ -12,6 +12,7 @@ import { useVideoPlayer } from 'expo-video';
 
 import { AmbientGlow } from '@/components/AmbientGlow';
 import { FocusCard } from '@/components/FocusCard';
+import { fokusUeberstand } from '@/components/fokusUeberstand';
 import { StateView } from '@/components/StateView';
 import { SURAHS } from '@/data/surahs';
 import { useTranslation } from '@/lib/i18n';
@@ -23,6 +24,7 @@ import {
   TRANSLATION_RESOURCES,
   type ReaderVerse,
 } from '@/lib/quranText';
+import { pausieren as hintergrundPausieren } from '@/lib/hintergrundAudio';
 import { toggleReaderOption, useTvSettings } from '@/lib/settings';
 import type { Theme } from '@/lib/theme';
 import {
@@ -128,7 +130,7 @@ function SurahPicker({
         })}
       </View>
 
-      <ScrollView contentContainerStyle={s.grid} showsVerticalScrollIndicator={false}>
+      <ScrollView style={s.gridScroll} contentContainerStyle={s.grid} showsVerticalScrollIndicator={false}>
         {sichtbar.map((sur) => (
           <FocusCard key={sur.n} onPress={() => onPick(sur.n)} style={s.card}>
             <Text style={s.num}>{sur.n}</Text>
@@ -216,6 +218,13 @@ function Reader({
   const player = useVideoPlayer(null, (p) => {
     p.loop = false;
   });
+
+  // Der Leser bringt seine eigene Rezitation mit. Laeuft im Hintergrund noch
+  // eine (seit 1.9.0 ueberlebt sie den Bildschirmwechsel), wird sie angehalten
+  // — zwei Rezitationen uebereinander waeren unbrauchbar.
+  useEffect(() => {
+    hintergrundPausieren();
+  }, []);
 
   // Beim Verswechsel die passende Audio-Quelle laden und abspielen.
   useEffect(() => {
@@ -567,6 +576,10 @@ function ArabicVerse({
 
 function pickerStyles(h: number, padH: number, gap: number, cardW: number, rtl: boolean, theme: Theme) {
   const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+  const cardH = clamp(h * 0.2, 96, 140);
+  // Sonst fehlt der ersten und letzten Kachel jeder Reihe ein Stueck des
+  // goldenen Rahmens (s. components/fokusUeberstand.ts).
+  const ueber = fokusUeberstand(Math.max(cardW, cardH));
   return StyleSheet.create({
     root: { flex: 1, backgroundColor: theme.bg, paddingHorizontal: padH, paddingTop: clamp(h * 0.05, 24, 56), paddingBottom: 12 },
     title: { color: theme.accent, fontSize: clamp(h * 0.05, 26, 44), fontWeight: '800', letterSpacing: rtl ? 0 : 2, textAlign: rtl ? 'right' : 'left' },
@@ -581,8 +594,15 @@ function pickerStyles(h: number, padH: number, gap: number, cardW: number, rtl: 
     blockLabel: { color: theme.text, fontSize: clamp(h * 0.032, 15, 24), fontWeight: '700' },
     activeCard: { borderColor: theme.accent, borderWidth: 2, backgroundColor: theme.cardActive },
     activeText: { color: theme.accent },
-    grid: { flexDirection: rtl ? 'row-reverse' : 'row', flexWrap: 'wrap', gap, paddingVertical: clamp(h * 0.02, 10, 22) },
-    card: { width: cardW, height: clamp(h * 0.2, 96, 140), padding: clamp(h * 0.022, 12, 20), justifyContent: 'center' },
+    gridScroll: { marginHorizontal: -ueber, marginVertical: -ueber },
+    grid: {
+      flexDirection: rtl ? 'row-reverse' : 'row',
+      flexWrap: 'wrap',
+      gap,
+      paddingHorizontal: ueber,
+      paddingVertical: clamp(h * 0.02, 10, 22) + ueber,
+    },
+    card: { width: cardW, height: cardH, padding: clamp(h * 0.022, 12, 20), justifyContent: 'center' },
     num: { color: theme.accent, fontSize: clamp(h * 0.026, 14, 20), fontWeight: '700' },
     name: { color: theme.text, fontSize: clamp(h * 0.032, 16, 24), fontWeight: '600', marginTop: 2 },
     ar: { color: theme.textMuted, fontSize: clamp(h * 0.03, 15, 22), marginTop: 2, textAlign: 'right' },

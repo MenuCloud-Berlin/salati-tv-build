@@ -1,3 +1,4 @@
+import { fokusUeberstand } from '@/components/fokusUeberstand';
 import { makeRowStyles, rowIconSize } from '@/components/rowStyles';
 import { themeById } from '@/lib/theme';
 
@@ -72,5 +73,22 @@ describe('makeRowStyles', () => {
       expect(size).toBeGreaterThanOrEqual(24);
       expect(size).toBeLessThanOrEqual(52);
     }
+  });
+});
+
+describe('fokusUeberstand', () => {
+  it('deckt Skalierung UND Rahmen ab', () => {
+    // FocusCard waechst im Fokus auf 1,05 (2,5 % je Seite) und traegt 2 dp
+    // Rahmen. Weniger Ausgleich hiesse: der goldene Rahmen wird angeschnitten.
+    for (const mass of [96, 220, 330, 640]) {
+      expect(fokusUeberstand(mass)).toBeGreaterThanOrEqual(mass * 0.025 + 2);
+    }
+  });
+
+  it('bleibt auch ohne gemessene Karte positiv', () => {
+    // Vor dem ersten Layout ist die Kartengroesse 0 — ein Ausgleich von 0
+    // wuerde den Rahmen wieder abschneiden, sobald gemessen ist.
+    expect(fokusUeberstand(0)).toBeGreaterThan(0);
+    expect(fokusUeberstand(-5)).toBeGreaterThan(0);
   });
 });

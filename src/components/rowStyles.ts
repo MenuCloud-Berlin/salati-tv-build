@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 
+import { fokusUeberstand } from '@/components/fokusUeberstand';
 import type { Theme } from '@/lib/theme';
 
 /**
@@ -54,13 +55,8 @@ export function makeRowStyles(
   // RN-Standard-Zeilenabstand von rund 1,3.
   const textBlock = 2 * titleFont * 1.3 + 4 + metaLines * metaFont * 1.3;
   const mediaH = Math.floor(cardH - pad * 2 - pad * 0.7 - textBlock);
-  // Wie weit eine fokussierte Karte ueber ihre Flaeche hinauswaechst: FocusCard
-  // skaliert auf 1,05, also 2,5 % je Seite, plus der 2 dp Rahmen. Ein
-  // ScrollView schneidet seine Kinder an seinen Grenzen ab — ohne diesen
-  // Ausgleich fehlte bei der ERSTEN Karte jeder Reihe links ein Stueck des
-  // goldenen Rahmens, und oben/unten bei allen (Nutzerbefund an der Menue-
-  // Ansicht, dieselbe Ursache).
-  const ueberstand = Math.ceil(Math.max(cardW, cardH) * 0.025) + 2;
+  // Ausgleich fuer die im Fokus wachsende Karte (s. components/fokusUeberstand.ts).
+  const ueberstand = fokusUeberstand(Math.max(cardW, cardH));
   return StyleSheet.create({
     root: { flex: 1, backgroundColor: theme.bg },
     content: { paddingHorizontal: padH, paddingVertical: padV },

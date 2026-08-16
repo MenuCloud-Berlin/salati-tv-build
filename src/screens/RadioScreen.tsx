@@ -74,7 +74,10 @@ export function RadioScreen() {
       {/* Sender kommen aus der Ablage, die Streams selbst brauchen Netz — der
           Hinweis sagt genau das, statt eine leere Wiedergabe zu erklaeren. */}
       {kamAusAblage('radios') ? <Text style={styles.offline}>{t('common.offlineStreams')}</Text> : null}
-      <ScrollView contentContainerStyle={styles.grid} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.gridScroll}
+        contentContainerStyle={styles.grid}
+        showsVerticalScrollIndicator={false}>
         {stations.map((s, i) => (
           <FocusCard
             key={s.id}
@@ -109,6 +112,7 @@ function makeStyles(w: number, h: number, rtl: boolean, theme: Theme) {
   return StyleSheet.create({
     root: { flex: 1, backgroundColor: theme.bg, paddingHorizontal: padH, paddingVertical: clamp(h * 0.05, 20, 48) },
     title: base.title,
+    gridScroll: base.gridScroll,
     grid: base.grid,
     card: {
       width: cardW,
