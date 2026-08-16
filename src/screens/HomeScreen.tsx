@@ -206,7 +206,7 @@ function makeStyles(o: {
   const hintFont = clamp(o.tileH * 0.095, 13, 20);
   const hintZeile = Math.round(hintFont * 1.3);
   return StyleSheet.create({
-    root: { flex: 1, backgroundColor: th.bg, paddingHorizontal: o.padH, paddingTop: o.padV, paddingBottom: o.padV },
+    root: { flex: 1, paddingHorizontal: o.padH, paddingTop: o.padV, paddingBottom: o.padV },
     header: {
       height: o.headerH,
       flexDirection: o.rtl ? 'row-reverse' : 'row',

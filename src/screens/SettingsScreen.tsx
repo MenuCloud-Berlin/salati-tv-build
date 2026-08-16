@@ -782,7 +782,6 @@ function makeStyles(w: number, h: number, rtl: boolean, theme: Theme) {
   return StyleSheet.create({
     root: {
       flex: 1,
-      backgroundColor: theme.bg,
       flexDirection: rtl ? 'row-reverse' : 'row',
       paddingHorizontal: padH,
       paddingVertical: clamp(h * 0.045, 18, 44),

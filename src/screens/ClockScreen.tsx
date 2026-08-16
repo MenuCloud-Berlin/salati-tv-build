@@ -235,7 +235,6 @@ function makeStyles(h: number, w: number, rtl: boolean, theme: Theme) {
   return StyleSheet.create({
     root: {
       flex: 1,
-      backgroundColor: theme.bg,
       paddingHorizontal: padH,
       paddingVertical: padV,
       justifyContent: 'space-between',

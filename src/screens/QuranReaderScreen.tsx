@@ -589,7 +589,7 @@ function pickerStyles(h: number, padH: number, gap: number, cardW: number, rtl: 
   // goldenen Rahmens (s. components/fokusUeberstand.ts).
   const ueber = fokusUeberstand(Math.max(cardW, cardH));
   return StyleSheet.create({
-    root: { flex: 1, backgroundColor: theme.bg, paddingHorizontal: padH, paddingTop: clamp(h * 0.05, 24, 56), paddingBottom: 12 },
+    root: { flex: 1, paddingHorizontal: padH, paddingTop: clamp(h * 0.05, 24, 56), paddingBottom: 12 },
     title: { color: theme.accent, fontSize: clamp(h * 0.05, 26, 44), fontWeight: '800', letterSpacing: rtl ? 0 : 2, textAlign: rtl ? 'right' : 'left' },
     sub: { color: theme.textMuted, fontSize: clamp(h * 0.03, 15, 24), marginTop: 4, marginBottom: 10, textAlign: rtl ? 'right' : 'left' },
     blockRow: { flexDirection: rtl ? 'row-reverse' : 'row', gap, marginBottom: clamp(h * 0.022, 10, 20) },
@@ -650,7 +650,7 @@ function readerStyles(h: number, w: number, rtl: boolean, theme: Theme, scale: n
   const uebersetzungLine = clamp(h * 0.052 * scale, 24, 60);
   return Object.assign(
     StyleSheet.create({
-      root: { flex: 1, backgroundColor: theme.bg, overflow: 'hidden', paddingHorizontal: clamp(w * 0.06, 40, 130), paddingVertical: clamp(h * 0.04, 20, 52) },
+      root: { flex: 1, overflow: 'hidden', paddingHorizontal: clamp(w * 0.06, 40, 130), paddingVertical: clamp(h * 0.04, 20, 52) },
       header: { flexDirection: rtl ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' },
       surahName: { color: theme.accent, fontSize: clamp(h * 0.038, 18, 30), fontWeight: '700', flexShrink: 1 },
       verseNo: { color: theme.textMuted, fontSize: clamp(h * 0.032, 15, 26), flexShrink: 0 },

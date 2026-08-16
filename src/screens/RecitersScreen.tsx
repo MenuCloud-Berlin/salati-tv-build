@@ -198,7 +198,7 @@ function makeStyles(h: number, w: number, rtl: boolean, theme: Theme) {
   const ueber = fokusUeberstand(Math.max(reciterW, cardH));
 
   return StyleSheet.create({
-    root: { flex: 1, backgroundColor: theme.bg, paddingHorizontal: padH, paddingTop: padV, paddingBottom: padV * 0.4 },
+    root: { flex: 1, paddingHorizontal: padH, paddingTop: padV, paddingBottom: padV * 0.4 },
     title: { color: theme.accent, fontSize: clamp(h * 0.05, 26, 44), fontWeight: '800', letterSpacing: rtl ? 0 : 2, textAlign: rtl ? 'right' : 'left' },
     subtitle: { color: theme.textMuted, fontSize: clamp(h * 0.032, 16, 26), marginTop: 4, marginBottom: 8, textAlign: rtl ? 'right' : 'left' },
     gridScroll: { marginHorizontal: -ueber, marginVertical: -ueber },

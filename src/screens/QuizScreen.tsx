@@ -179,13 +179,12 @@ function makeStyles(h: number, w: number, rtl: boolean, theme: Theme) {
     // leer und das Bild kippte nach oben (Bildschirmbefund 2026-08-16).
     root: {
       flex: 1,
-      backgroundColor: theme.bg,
       paddingHorizontal: padH,
       paddingVertical: padV,
       justifyContent: 'center',
       gap: clamp(h * 0.02, 10, 24),
     },
-    center: { flex: 1, backgroundColor: theme.bg, alignItems: 'center', justifyContent: 'center', gap: 16 },
+    center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
     head: { flexDirection: rtl ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' },
     counter: { color: theme.textMuted, fontSize: clamp(h * 0.038, 16, 26) },
     score: { color: theme.accent, fontSize: clamp(h * 0.042, 18, 28), fontWeight: '700' },
