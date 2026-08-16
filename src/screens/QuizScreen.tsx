@@ -174,7 +174,17 @@ function makeStyles(h: number, w: number, rtl: boolean, theme: Theme) {
   const padH = clamp(w * 0.06, 32, 100);
   const align = rtl ? ('right' as const) : ('left' as const);
   return StyleSheet.create({
-    root: { flex: 1, backgroundColor: theme.bg, paddingHorizontal: padH, paddingVertical: padV },
+    // `justifyContent: 'center'` statt oben buendig: Frage und vier
+    // Antworten fuellen nur zwei Drittel der Hoehe, das letzte Drittel blieb
+    // leer und das Bild kippte nach oben (Bildschirmbefund 2026-08-16).
+    root: {
+      flex: 1,
+      backgroundColor: theme.bg,
+      paddingHorizontal: padH,
+      paddingVertical: padV,
+      justifyContent: 'center',
+      gap: clamp(h * 0.02, 10, 24),
+    },
     center: { flex: 1, backgroundColor: theme.bg, alignItems: 'center', justifyContent: 'center', gap: 16 },
     head: { flexDirection: rtl ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' },
     counter: { color: theme.textMuted, fontSize: clamp(h * 0.038, 16, 26) },

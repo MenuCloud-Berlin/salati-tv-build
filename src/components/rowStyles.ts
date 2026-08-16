@@ -110,9 +110,33 @@ export function makeRowStyles(
       height: Math.min(cardW - pad * 2, mediaH),
       borderRadius: 12,
       marginBottom: pad * 0.7,
-      alignSelf: rtl ? 'flex-end' : 'flex-start',
+      // Mittig: das Cover ist quadratisch und von der HOEHE gedeckelt, die
+      // Karte aber breiter — linksbuendig blieb rechts daneben ein leerer
+      // Streifen, der wie ein Fehler aussah (Bildschirmbefund 2026-08-16).
+      alignSelf: 'center',
     },
     coverFallback: { backgroundColor: theme.accentSoft, alignItems: 'center', justifyContent: 'center' },
+    /**
+     * Die Folgennummer als grosses, blasses Zeichen hinter dem Abspielsymbol.
+     *
+     * WARUM (Befund 2026-08-16 auf der Store-Seite): die Lernvideos haben keine
+     * Vorschaubilder — der Index auf R2 fuehrt zu 95 Folgen kein einziges Bild.
+     * Die Reihe zeigte deshalb neun IDENTISCHE graue Kaesten mit demselben
+     * Dreieck; das sieht nicht nach Zurueckhaltung aus, sondern nach fehlendem
+     * Bild. Die Nummer gibt jeder Kachel ein eigenes Gesicht und sagt zugleich
+     * etwas Nuetzliches: die Videos sind ein Kurs, die Reihenfolge zaehlt.
+     */
+    thumbNummer: {
+      position: 'absolute',
+      color: theme.accent,
+      opacity: 0.22,
+      fontSize: Math.round(mediaH * 0.62),
+      fontWeight: '800',
+      // Ziffern in einer sehr grossen Groesse tragen sonst oben und unten
+      // Luft mit, die die Kachel aus der Mitte schiebt.
+      lineHeight: Math.round(mediaH * 0.72),
+      includeFontPadding: false,
+    },
     cardTitle: { color: theme.text, fontSize: titleFont, fontWeight: '600', textAlign: align },
     cardMeta: {
       color: theme.textMuted,

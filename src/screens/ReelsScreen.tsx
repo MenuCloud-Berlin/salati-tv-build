@@ -86,6 +86,13 @@ export function ReelsScreen() {
                 onPress={() => setPlaying(v.video_url)}
                 style={styles.card}>
                 <View style={styles.thumb}>
+                  {/* Die Nummer gehoert in die Kachel, nicht nur in die
+                      Kleinzeile darunter: bis 1.9.0 stand sie allein dort, und
+                      auf drei Meter Abstand sah die Reihe weiterhin nach fuenf
+                      gleichen Karten aus (Fortsetzung des Befunds von unten). */}
+                  <Text style={styles.thumbNummer}>
+                    {v.episode_no}.{v.index}
+                  </Text>
                   <Icon name="bolt" size={rowIconSize(height)} color={theme.accent} />
                 </View>
                 <Text style={styles.cardTitle} numberOfLines={2}>

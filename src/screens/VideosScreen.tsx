@@ -93,6 +93,11 @@ export function VideosScreen() {
                 onPress={() => setPlaying(v.video_url)}
                 style={styles.card}>
                 <View style={styles.thumb}>
+                  {/* Ohne Vorschaubild (der Index fuehrt keins) gaebe die
+                      Kachel nur ein Dreieck her — neun davon nebeneinander
+                      sehen nach fehlendem Bild aus. Die Folgennummer gibt
+                      jeder Kachel ein Gesicht (s. components/rowStyles.ts). */}
+                  <Text style={styles.thumbNummer}>{v.episode_no}</Text>
                   <Icon name="play" size={rowIconSize(height)} color={theme.accent} />
                 </View>
                 <Text style={styles.cardTitle} numberOfLines={2}>
