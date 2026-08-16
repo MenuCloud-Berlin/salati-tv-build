@@ -3,7 +3,7 @@
 > Stand 2026-08-16. Play versionCode 14, App Store Build 2.
 > Vorgänger 1.8.1 ist in beiden Läden freigegeben.
 
-Alles in dieser Fassung geht auf vier Beobachtungen des Nutzers am Gerät
+Alles in dieser Fassung geht auf Beobachtungen des Nutzers am Gerät
 zurück. Sie stehen hier mit dem, was tatsächlich falsch war — nicht mit dem,
 was gebaut wurde.
 
@@ -16,8 +16,16 @@ stundenlang im Raum steht, ist das der Unterschied zwischen „Gerät an" und
 
 Neu: `components/Hintergrund.tsx`, **einmal** in `App.tsx` hinter allen
 Bildschirmen, mit vier Möglichkeiten — *Ruhig*, *Lichtschein*, *Verlauf*,
-*Muster* (achtzackiger Rub-al-Hizb-Stern, gekachelt, auf 7 % gedimmt). Die Wahl
-steht in den Einstellungen unter *Anzeige* und wird gespeichert.
+*Muster* (achtzackiger Rub-al-Hizb-Stern, als Raster). Die Wahl steht in den
+Einstellungen unter *Anzeige* und wird gespeichert.
+
+**Am Gerät nachgemessen, zweimal korrigiert.** Die erste Fassung des Musters
+benutzte `<Pattern patternUnits="userSpaceOnUse">` und kam auf dem Android-TV-
+Emulator **gar nicht an**: eine Pixelmessung über 600 Punkte der dunklen Ecke
+ergab durchgehend denselben Wert (11,11,13). Der Verlauf daneben (LinearGradient,
+gleiche `id`-Mechanik) kam an — es lag also an `Pattern`, nicht an der Referenz.
+Das Raster wird jetzt ausgerechnet und als **ein** Pfad gezeichnet. Und der
+Verlauf war mit 14 % am unteren Rand kaum wahrnehmbar; jetzt 24 %.
 
 Bewusst **ohne Fotos**: ein 4K-Bild wären mehrere Megabyte im Paket, und die
 vorhandenen Motive der Handy-App liegen bei 900 px — auf 65 Zoll hochskaliert
@@ -101,11 +109,35 @@ zusätzlich in der Bedienleiste des Lesers, beschriftet statt als Zeichen: „Aa
 versteht auf drei Meter Abstand niemand. Der Wert wird gespeichert wie zuvor,
 es ist derselbe Schalter.
 
+## 6. „Dass man Home, Zurück usw. — also Optionen — ausblenden kann"
+
+Ein Fernseher steht stundenlang im Raum. Die Gebetsuhr ist dafür gemacht — die
+Zeile darunter („OK öffnet das Menü") ist es nicht: beim ersten Mal nötig,
+danach nur noch Text auf einem Bild, das sonst nichts sagen will. Dasselbe gilt
+für „OK = Pause · Zurück = Liste" im Rezitatoren-Bildschirm und die Bedienleiste
+des Lesers.
+
+Neu unter *Anzeige* → **Bedienhinweise**: *Immer sichtbar* (ab Werk), *Nach 10
+Sekunden*, *Nach 30 Sekunden*. Jeder Tastendruck holt sie zurück und beginnt die
+Wartezeit von vorn.
+
+Zwei bewusste Entscheidungen:
+
+- **Ausgeblendet wird über die Deckkraft, nicht durch Ausbauen.** Die Knöpfe
+  bleiben an ihrem Platz und fokussierbar; wären sie weg, spränge der Fokus beim
+  Wiedereinblenden irgendwohin und der erste Tastendruck ginge ins Leere.
+- **Ab Werk verschwindet nichts.** Wer die App nicht kennt, soll die Bedienung
+  nicht suchen müssen. Die Einstellung steht dafür direkt neben dem Hintergrund.
+
+Der Zustand liegt neben dem Baum (`lib/bedienungSichtbar.ts`): die
+Tastenereignisse kommen in `App.tsx` an, gebraucht wird die Antwort in vier
+Bildschirmen, und keiner davon ist Elternteil eines anderen.
+
 ## Prüfstand
 
     npx tsc --noEmit    0 Fehler
     npm run lint        0 Errors
-    npx jest            621 Tests, 28 Suiten
+    npx jest            631 Tests, 30 Suiten
 
 Neu geprüft wird unter anderem: dass beim Aufteilen kein Wort verloren geht oder
 doppelt erscheint, dass kein Abschnitt mehr Zeilen braucht als hineinpassen,

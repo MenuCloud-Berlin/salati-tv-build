@@ -48,6 +48,8 @@ import {
   setQuranFont,
   setQuranSukun,
   setReaderScale,
+  AUSBLEND_ZEITEN,
+  setBedienungAusblenden,
   setHintergrund,
   setTheme,
   toggleReaderOption,
@@ -488,7 +490,7 @@ function AzanSection({ s }: { s: Styles }) {
  * anderes als „Papier" in einem hellen Wohnzimmer.
  */
 function DisplaySection({ s }: { s: Styles }) {
-  const { theme: aktiv, hintergrund } = useTvSettings();
+  const { theme: aktiv, hintergrund, bedienungAusblenden } = useTvSettings();
   const { t } = useTranslation();
   return (
     <>
@@ -534,6 +536,30 @@ function DisplaySection({ s }: { s: Styles }) {
               style={[s.themeCard, active && s.activeCard]}>
               <Text style={[s.cardLabel, active && s.activeText]} numberOfLines={1}>
                 {t(hintergrundNameKey(hg))}
+              </Text>
+            </FocusCard>
+          );
+        })}
+      </View>
+
+      {/* Bedienhinweise ausblenden. Nutzerwunsch 2026-08-16: ein Fernseher
+          steht stundenlang im Raum, und Zeilen wie „OK oeffnet das Menue" oder
+          „OK = Pause" sind beim ersten Mal noetig und danach nur noch Text auf
+          einem Bild, das sonst nichts sagen will. Jede Taste holt sie zurueck.
+          Ab Werk verschwindet nichts: wer die App nicht kennt, soll die
+          Bedienung nicht suchen muessen. */}
+      <Text style={s.section}>{t('settings.autoHide.title')}</Text>
+      <Text style={s.hint}>{t('settings.autoHide.hint')}</Text>
+      <View style={s.grid}>
+        {AUSBLEND_ZEITEN.map((sek) => {
+          const active = sek === bedienungAusblenden;
+          return (
+            <FocusCard
+              key={sek}
+              onPress={() => setBedienungAusblenden(sek)}
+              style={[s.themeCard, active && s.activeCard]}>
+              <Text style={[s.cardLabel, active && s.activeText]} numberOfLines={1}>
+                {sek === 0 ? t('settings.autoHide.never') : t('settings.autoHide.after', { n: sek })}
               </Text>
             </FocusCard>
           );

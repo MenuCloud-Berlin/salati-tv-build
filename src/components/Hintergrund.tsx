@@ -1,6 +1,6 @@
 import { useId, useMemo } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
-import Svg, { Defs, G, LinearGradient, Path, Pattern, Rect, Stop } from 'react-native-svg';
+import Svg, { Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
 import { AmbientGlow } from '@/components/AmbientGlow';
 import { useTvSettings } from '@/lib/settings';
@@ -88,41 +88,44 @@ export function Hintergrund() {
     );
   }
 
-  // muster: achtzackiger Stern (Rub al-Hizb), gekachelt und sehr weit
-  // heruntergedimmt. Die Kachelgroesse haengt an der kurzen Bildschirmseite,
-  // damit das Muster auf jedem Panel gleich fein wirkt.
-  const kachel = Math.round(kurz * 0.12);
-  // Geraetebefund 2026-08-16 (Android-TV-Emulator, 1080p): mit 7 % Deckkraft und
-  // 1,5 dp Strich war das Muster auf Schwarz NICHT zu sehen — Gold auf #0a0a0a
-  // ergibt dort einen Grauwert von 24 gegen 10. Eine Einstellung, die man
-  // waehlen kann und dann nichts bewirkt, ist schlimmer als keine. Der Strich
-  // waechst jetzt mit der Kachel, sonst wird das Muster auf 4K wieder duenn.
-  const strich = Math.max(1.5, kachel * 0.03);
+  // muster: achtzackiger Stern (Rub al-Hizb), gekachelt.
+  //
+  // GERAETEBEFUND 2026-08-16 (Android-TV-Emulator, 1080p): die erste Fassung
+  // benutzte `<Pattern patternUnits="userSpaceOnUse">` und war am Bildschirm
+  // NICHT zu sehen. Kein Darstellungsproblem, sondern gar keine Zeichnung: eine
+  // Pixelmessung ueber 600 Punkte der dunklen Ecke ergab durchgehend denselben
+  // Wert (11,11,13). react-native-svg fuellt hier keine Flaeche mit einer
+  // Kachel — der Verlauf daneben (LinearGradient, gleiche `id`-Mechanik) kam
+  // dagegen an, es liegt also an `Pattern`, nicht an der Referenz.
+  //
+  // Statt die Bibliothek zu ueberreden, wird das Raster ausgerechnet und als EIN
+  // Pfad gezeichnet. Ein Pfad statt hunderter Knoten, weil der Hintergrund
+  // stehenbleibt und nichts davon fuer sich ansprechbar sein muss.
+  const kachel = Math.round(kurz * 0.14);
+  const strich = Math.max(1.5, kachel * 0.028);
+  const spalten = Math.ceil(width / kachel) + 1;
+  const zeilen = Math.ceil(height / kachel) + 1;
+  const teile: string[] = [];
+  for (let sp = 0; sp < spalten; sp++) {
+    for (let z = 0; z < zeilen; z++) {
+      const cx = sp * kachel + kachel / 2;
+      const cy = z * kachel + kachel / 2;
+      // Zwei um 45° gedrehte Quadrate ergeben den Achtzack. Als Umriss statt
+      // gefuellt: gefuellt wuerde das Muster bei dieser Groesse zu einer
+      // Flaeche verlaufen.
+      teile.push(quadrat(cx, cy, kachel * 0.3, 0), quadrat(cx, cy, kachel * 0.3, Math.PI / 4));
+    }
+  }
   return (
     <View pointerEvents="none" style={styles.fill}>
       <Svg width="100%" height="100%">
-        <Defs>
-          <Pattern id={id} width={kachel} height={kachel} patternUnits="userSpaceOnUse">
-            <G opacity={0.18}>
-              {/* Zwei um 45° gedrehte Quadrate ergeben den Achtzack. Als
-                  Umriss statt gefuellt: gefuellt wuerde das Muster bei dieser
-                  Groesse zu einer Flaeche verlaufen. */}
-              <Path
-                d={quadrat(kachel / 2, kachel / 2, kachel * 0.3, 0)}
-                stroke={theme.accent}
-                strokeWidth={strich}
-                fill="none"
-              />
-              <Path
-                d={quadrat(kachel / 2, kachel / 2, kachel * 0.3, Math.PI / 4)}
-                stroke={theme.accent}
-                strokeWidth={strich}
-                fill="none"
-              />
-            </G>
-          </Pattern>
-        </Defs>
-        <Rect x="0" y="0" width="100%" height="100%" fill={`url(#${id})`} />
+        <Path
+          d={teile.join(' ')}
+          stroke={theme.accent}
+          strokeOpacity={0.18}
+          strokeWidth={strich}
+          fill="none"
+        />
       </Svg>
     </View>
   );

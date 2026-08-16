@@ -17,6 +17,7 @@ import {
 } from '@/lib/quranFonts';
 import { DEFAULT_THEME_ID, isThemeId, type ThemeId } from '@/lib/theme';
 import { istHintergrundId, type HintergrundId } from '@/components/Hintergrund';
+
 import {
   clampOffset,
   DEFAULT_CALC_EXTRAS,
@@ -30,6 +31,19 @@ import {
   type PrayerTimeOffsets,
   type TvLocation,
 } from '@/lib/prayerTimes';
+
+/**
+ * Wartezeiten fuer das Ausblenden der Bedienhinweise, in SEKUNDEN.
+ * 0 heisst „nie". Bewusst wenige, weite Stufen statt eines Schiebereglers: mit
+ * der Fernbedienung ist jede Zwischenstufe ein weiterer Tastendruck, und
+ * zwischen 10 und 30 Sekunden liegt der ganze Unterschied.
+ */
+export const AUSBLEND_ZEITEN = [0, 10, 30] as const;
+export type AusblendZeit = (typeof AUSBLEND_ZEITEN)[number];
+
+export function istAusblendZeit(v: unknown): v is AusblendZeit {
+  return typeof v === 'number' && (AUSBLEND_ZEITEN as readonly number[]).includes(v);
+}
 
 // Persistente TV-Einstellungen (Standort, Madhab, Zeitformat, Sprache). Ein
 // winziger Store mit useSyncExternalStore statt Context — Standort/Zeitformat
@@ -56,6 +70,11 @@ export interface TvSettings {
   theme: ThemeId;
   /** Was hinter allen Bildschirmen liegt (s. components/Hintergrund.tsx). */
   hintergrund: HintergrundId;
+  /**
+   * Nach wie vielen Sekunden Ruhe die Bedienhinweise verschwinden.
+   * 0 = nie (s. lib/bedienungSichtbar.ts).
+   */
+  bedienungAusblenden: AusblendZeit;
   /** Koran-Schrift des Lesers (Katalog wie in der Handy-App). */
   quranFont: QuranFontId;
   /** Sukun-Zeichen der KFGQPC-Schrift: Madina-Haken oder Kreis. */
@@ -119,6 +138,9 @@ let state: TvSettings = {
   // Voreinstellung bleibt die ruhige Flaeche: wer den Fernseher als Uhr
   // laufen laesst, soll nicht ungefragt ein Muster bekommen.
   hintergrund: 'ruhig',
+  // Voreinstellung: nichts verschwindet. Wer die App kennt, schaltet es
+  // ein; wer sie nicht kennt, soll die Bedienung nicht suchen muessen.
+  bedienungAusblenden: 0,
   quranFont: DEFAULT_QURAN_FONT,
   quranSukun: 'madina',
   readerScale: DEFAULT_READER_SCALE,
@@ -208,6 +230,7 @@ function persist() {
       offsets: state.offsets,
       theme: state.theme,
       hintergrund: state.hintergrund,
+      bedienungAusblenden: state.bedienungAusblenden,
       quranFont: state.quranFont,
       quranSukun: state.quranSukun,
       readerScale: state.readerScale,
@@ -256,6 +279,9 @@ async function hydrate() {
         // zurueck, statt `undefined` in jede Farbe des Baums zu tragen.
         theme: isThemeId(parsed.theme) ? parsed.theme : DEFAULT_THEME_ID,
         hintergrund: istHintergrundId(parsed.hintergrund) ? parsed.hintergrund : 'ruhig',
+        bedienungAusblenden: istAusblendZeit(parsed.bedienungAusblenden)
+          ? parsed.bedienungAusblenden
+          : 0,
         quranFont: isQuranFontId(parsed.quranFont) ? parsed.quranFont : DEFAULT_QURAN_FONT,
         quranSukun: parsed.quranSukun === 'kreis' ? 'kreis' : 'madina',
         readerScale: isReaderScale(parsed.readerScale) ? parsed.readerScale : DEFAULT_READER_SCALE,
@@ -321,6 +347,12 @@ export function setTheme(theme: ThemeId) {
 
 export function setHintergrund(hintergrund: HintergrundId) {
   state = { ...state, hintergrund };
+  persist();
+  emit();
+}
+
+export function setBedienungAusblenden(bedienungAusblenden: AusblendZeit) {
+  state = { ...state, bedienungAusblenden };
   persist();
   emit();
 }

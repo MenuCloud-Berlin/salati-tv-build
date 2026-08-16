@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import { AmbientGlow } from '@/components/AmbientGlow';
+import { useBedienungSichtbar } from '@/lib/bedienungSichtbar';
 import { HintergrundStreifen } from '@/components/HintergrundStreifen';
 
 import {
@@ -42,6 +43,7 @@ export function ClockScreen({ location: override }: { location?: TvLocation } = 
   const settings = useTvSettings();
   const { t, locale, rtl } = useTranslation();
   const theme = useTheme();
+  const bedienungSichtbar = useBedienungSichtbar();
   const location = override ?? settings.location;
   const is24h = settings.is24h;
   const { height, width } = useWindowDimensions();
@@ -158,7 +160,12 @@ export function ClockScreen({ location: override }: { location?: TvLocation } = 
         })}
       </View>
 
-      <View style={s.footer}>
+      {/* Die Fusszeile sagt beim ersten Mal, wie man weiterkommt — danach ist
+          sie nur noch Text auf einem Bild, das sonst nichts sagen will. Sie
+          verschwindet deshalb nach der eingestellten Zeit und ist bei der
+          naechsten Taste wieder da (s. lib/bedienungSichtbar.ts). Ausgeblendet
+          wird ueber die Deckkraft: die Uhr darunter soll nicht springen. */}
+      <View style={[s.footer, !bedienungSichtbar && s.verborgen]}>
         <Text style={s.brand}>SALATI</Text>
         <Text style={s.hint}>
           {andereZone ? t('clock.localTime', { city: locationLabel(location, locale) }) : t('clock.openMenu')}
@@ -278,6 +285,7 @@ function makeStyles(h: number, w: number, rtl: boolean, theme: Theme) {
     // Eigener Abstand nach oben: die Reihe stiess vorher direkt an die
     // Wortmarke, weil `space-between` den Rest verteilt und unten nichts uebrig
     // blieb (Bildschirmbefund 2026-08-08).
+    verborgen: { opacity: 0 },
     footer: { alignItems: 'center', gap: clamp(h * 0.008, 3, 8), marginTop: clamp(h * 0.022, 8, 20) },
     brand: { color: theme.accent, opacity: 0.75, fontSize: clamp(h * 0.03, 14, 26), letterSpacing: 12, textAlign: 'center' },
     hint: { color: theme.textFaint, fontSize: clamp(h * 0.024, 12, 20), letterSpacing: 1, textAlign: 'center' },

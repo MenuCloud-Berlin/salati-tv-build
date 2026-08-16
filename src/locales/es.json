@@ -121,6 +121,12 @@
     "asrEarlier": "Temprano (Shafi/Maliki/Hanbali - estándar)",
     "asrLater": "Tarde (Hanafi)",
     "asrSchool": "Escuela para Asr",
+    "autoHide": {
+      "title": "Indicaciones en pantalla",
+      "hint": "Desaparecen tras este tiempo sin pulsar nada. Cualquier tecla las devuelve.",
+      "never": "Siempre visibles",
+      "after": "Tras {n} segundos"
+    },
     "azan": {
       "allOff": "Desactivar todo",
       "hint": "La llamada suena solo mientras Salati está en pantalla; el televisor no abre la aplicación por sí solo. Pulsa Atrás para detener una llamada en curso.",

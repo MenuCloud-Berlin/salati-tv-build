@@ -20,6 +20,7 @@ import {
   useOfflineAudio,
 } from '@/lib/offlineAudio';
 import { FocusCard } from '@/components/FocusCard';
+import { useBedienungSichtbar } from '@/lib/bedienungSichtbar';
 import { useTranslation } from '@/lib/i18n';
 import type { Theme } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
@@ -66,6 +67,7 @@ export function AudioNowPlaying({
 }) {
   const { spielt: playing, status } = useHintergrundAudio();
   const { width, height } = useWindowDimensions();
+  const bedienungSichtbar = useBedienungSichtbar();
   const { t, rtl } = useTranslation();
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(width, height, rtl, theme), [width, height, rtl, theme]);
@@ -163,7 +165,7 @@ export function AudioNowPlaying({
           ) : null}
         </View>
 
-        <Text style={styles.hint}>
+        <Text style={[styles.hint, !bedienungSichtbar && styles.verborgen]}>
           {fehler
             ? t('player.saveError')
             : fortschritt !== null
@@ -239,6 +241,7 @@ function makeStyles(w: number, h: number, rtl: boolean, theme: Theme) {
     speicherAktiv: { borderColor: theme.accent, borderWidth: 2, backgroundColor: theme.cardActive },
     speicherGlyph: { color: theme.text, fontSize: clamp(play * 0.2, 15, 28), fontWeight: '700' },
     speicherAktivText: { color: theme.accent },
+    verborgen: { opacity: 0 },
     hint: {
       color: theme.textFaint,
       fontSize: clamp(h * 0.035, 15, 24),
