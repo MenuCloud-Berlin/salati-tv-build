@@ -97,7 +97,14 @@ export function VideosScreen() {
                       Kachel nur ein Dreieck her — neun davon nebeneinander
                       sehen nach fehlendem Bild aus. Die Folgennummer gibt
                       jeder Kachel ein Gesicht (s. components/rowStyles.ts). */}
-                  <Text style={styles.thumbNummer}>{v.episode_no}</Text>
+                  <Text
+                    style={styles.thumbNummer}
+                    numberOfLines={1}
+                    // Dreistellige Folgen (der Kurs geht bis 95, spaeter mehr)
+                    // waeren sonst breiter als die Kachel.
+                    adjustsFontSizeToFit>
+                    {v.episode_no}
+                  </Text>
                   <View style={styles.thumbSymbol}>
                     <Icon name="play" size={Math.round(rowIconSize(height) * 0.62)} color={theme.accent} />
                   </View>
