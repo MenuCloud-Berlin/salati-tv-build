@@ -98,7 +98,9 @@ export function VideosScreen() {
                       sehen nach fehlendem Bild aus. Die Folgennummer gibt
                       jeder Kachel ein Gesicht (s. components/rowStyles.ts). */}
                   <Text style={styles.thumbNummer}>{v.episode_no}</Text>
-                  <Icon name="play" size={rowIconSize(height)} color={theme.accent} />
+                  <View style={styles.thumbSymbol}>
+                    <Icon name="play" size={Math.round(rowIconSize(height) * 0.62)} color={theme.accent} />
+                  </View>
                 </View>
                 <Text style={styles.cardTitle} numberOfLines={2}>
                   {v.title}
