@@ -3,6 +3,7 @@ import { BackHandler, ScrollView, StyleSheet, Text, useWindowDimensions, View } 
 
 import { AudioNowPlaying } from '@/components/AudioNowPlaying';
 import { FocusCard } from '@/components/FocusCard';
+import { fokusUeberstand } from '@/components/fokusUeberstand';
 import { StateView } from '@/components/StateView';
 import { SURAHS } from '@/data/surahs';
 import { useTranslation } from '@/lib/i18n';
@@ -111,7 +112,10 @@ export function RecitersScreen() {
     <View style={styles.root}>
       <Text style={styles.title}>{t('reciters.title')}</Text>
       {kamAusAblage('reciters') ? <Text style={styles.subtitle}>{t('common.offlineList')}</Text> : null}
-      <ScrollView contentContainerStyle={styles.grid} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.gridScroll}
+        contentContainerStyle={styles.grid}
+        showsVerticalScrollIndicator={false}>
         {reciters.map((r, i) => (
           <FocusCard
             key={r.id}
@@ -144,7 +148,10 @@ function SurahPicker({ reciter, onPick }: { reciter: Reciter; onPick: (n: number
     <View style={styles.root}>
       <Text style={styles.title}>{reciter.name}</Text>
       <Text style={styles.subtitle}>{reciter.rewaya}</Text>
-      <ScrollView contentContainerStyle={styles.grid} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.gridScroll}
+        contentContainerStyle={styles.grid}
+        showsVerticalScrollIndicator={false}>
         {surahs.map((s, i) => (
           <FocusCard
             key={s.n}
@@ -187,12 +194,21 @@ function makeStyles(h: number, w: number, rtl: boolean, theme: Theme) {
   const sCols = w >= 1400 ? 6 : 4;
   const surahW = Math.floor((availW - gap * (sCols - 1)) / sCols) - 1;
   const cardH = clamp(h * 0.24, 108, 160);
+  // Rahmen der fokussierten Karte nicht an der Scroll-Kante abschneiden.
+  const ueber = fokusUeberstand(Math.max(reciterW, cardH));
 
   return StyleSheet.create({
     root: { flex: 1, backgroundColor: theme.bg, paddingHorizontal: padH, paddingTop: padV, paddingBottom: padV * 0.4 },
     title: { color: theme.accent, fontSize: clamp(h * 0.05, 26, 44), fontWeight: '800', letterSpacing: rtl ? 0 : 2, textAlign: rtl ? 'right' : 'left' },
     subtitle: { color: theme.textMuted, fontSize: clamp(h * 0.032, 16, 26), marginTop: 4, marginBottom: 8, textAlign: rtl ? 'right' : 'left' },
-    grid: { flexDirection: rtl ? 'row-reverse' : 'row', flexWrap: 'wrap', gap, paddingVertical: clamp(h * 0.025, 12, 24) },
+    gridScroll: { marginHorizontal: -ueber, marginVertical: -ueber },
+    grid: {
+      flexDirection: rtl ? 'row-reverse' : 'row',
+      flexWrap: 'wrap',
+      gap,
+      paddingHorizontal: ueber,
+      paddingVertical: clamp(h * 0.025, 12, 24) + ueber,
+    },
     reciterCard: { width: reciterW, height: cardH, padding: clamp(h * 0.03, 16, 24), justifyContent: 'center' },
     reciterName: { color: theme.text, fontSize: clamp(h * 0.035, 18, 28), fontWeight: '700', textAlign: rtl ? 'right' : 'left' },
     reciterRewaya: { color: theme.textMuted, fontSize: clamp(h * 0.026, 14, 20), marginTop: 6, textAlign: rtl ? 'right' : 'left' },

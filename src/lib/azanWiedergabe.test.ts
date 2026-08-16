@@ -35,11 +35,13 @@ const mockCreate = jest.fn(() => {
 jest.mock('expo-video', () => ({ createVideoPlayer: (...a: unknown[]) => mockCreate(...(a as [])) }));
 
 import { azanLaeuft, azanSpielen, azanStoppen } from '@/lib/azanRuf';
+import { abspielen, zuruecksetzenFuerTest } from '@/lib/hintergrundAudio';
 
 const RUF = { prayer: 'maghrib' as const, choice: 'adhan1' as const, zeit: new Date(2026, 7, 8, 20, 45) };
 
 beforeEach(() => {
   azanStoppen();
+  zuruecksetzenFuerTest();
   mockSpieler.length = 0;
   mockCreate.mockClear();
 });
@@ -87,4 +89,23 @@ it('haelt die Uhr am Laufen, wenn der Spieler nicht startet', () => {
 it('vertraegt ein Stoppen ohne laufenden Ruf', () => {
   expect(() => azanStoppen()).not.toThrow();
   expect(azanLaeuft()).toBe(false);
+});
+
+it('haelt eine laufende Rezitation an, wenn der Gebetsruf kommt', () => {
+  // Seit 1.9.0 ueberlebt die Rezitation den Bildschirmwechsel — sie kann also
+  // noch laufen, wenn die Gebetszeit erreicht ist. Zwei Stimmen uebereinander
+  // waeren fuer den Nutzer schlimmer als gar kein Ruf.
+  abspielen({ uri: 'https://a/sure.mp3', title: 'Al-Faatiha', loop: false, quelle: 'reciters' });
+  const rezitation = mockSpieler[0];
+  // Der native Spieler meldet, dass er wirklich spielt.
+  (rezitation.hoerer.get('playingChange') as unknown as (e: { isPlaying: boolean }) => void)?.({
+    isPlaying: true,
+  });
+
+  azanSpielen(RUF, 1);
+
+  expect(rezitation.pause).toHaveBeenCalled();
+  // Nur angehalten, NICHT freigegeben: nach dem Ruf soll der Nutzer dort
+  // weiterhoeren, wo er war.
+  expect(rezitation.release).not.toHaveBeenCalled();
 });

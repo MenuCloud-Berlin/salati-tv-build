@@ -1,6 +1,8 @@
 import { useEffect, useSyncExternalStore } from 'react';
 import { createVideoPlayer, type VideoPlayer } from 'expo-video';
 
+import { pausieren as hintergrundPausieren } from '@/lib/hintergrundAudio';
+
 import {
   AZAN_PRAYERS,
   azanAktiv,
@@ -94,6 +96,11 @@ export function azanSpielen(faellig: RufFaellig, lautstaerke: number): void {
   const quelle = azanQuelle(faellig.choice);
   if (quelle == null) return;
   azanStoppen();
+  // Der Gebetsruf hat Vorrang. Seit die Rezitation den Bildschirmwechsel
+  // ueberlebt (lib/hintergrundAudio.ts), kann sie hier noch laufen — dann
+  // laegen zwei Stimmen uebereinander. Nur pausieren, nicht beenden: nach dem
+  // Ruf soll der Nutzer da weiterhoeren, wo er war.
+  hintergrundPausieren();
   try {
     const p = createVideoPlayer(quelle);
     p.volume = Math.max(0, Math.min(1, lautstaerke));

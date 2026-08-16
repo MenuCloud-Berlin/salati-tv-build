@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import { FocusCard } from '@/components/FocusCard';
+import { fokusUeberstand } from '@/components/fokusUeberstand';
 import {
   AZAN_AUS,
   AZAN_CHOICES,
@@ -741,6 +742,9 @@ function makeStyles(w: number, h: number, rtl: boolean, theme: Theme) {
   const azanGap = clamp(gap * 0.6, 6, 12);
   const azanNameW = clamp(paneW * 0.16, 80, 210);
   const azanW = Math.floor((paneW - gap - azanNameW - azanGap * 5) / 5) - 1;
+  // Die breiteste Karte im Bereich ist die volle Bahn (paneW - gap); danach
+  // richtet sich der Ausgleich, damit auch ihr Rahmen ganz zu sehen ist.
+  const ueber = fokusUeberstand(paneW);
   return StyleSheet.create({
     root: {
       flex: 1,
@@ -765,8 +769,12 @@ function makeStyles(w: number, h: number, rtl: boolean, theme: Theme) {
       marginTop: clamp(h * 0.02, 8, 16),
       textAlign: align,
     },
-    pane: { flex: 1 },
-    paneContent: { paddingBottom: clamp(h * 0.06, 24, 60), paddingHorizontal: gap / 2 },
+    pane: { flex: 1, marginHorizontal: -ueber, marginVertical: -ueber },
+    paneContent: {
+      paddingTop: ueber,
+      paddingBottom: clamp(h * 0.06, 24, 60) + ueber,
+      paddingHorizontal: gap / 2 + ueber,
+    },
     title: {
       color: theme.accent,
       fontSize: clamp(h * 0.045, 22, 40),
