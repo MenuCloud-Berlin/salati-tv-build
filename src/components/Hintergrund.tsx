@@ -101,8 +101,12 @@ export function Hintergrund() {
   // Statt die Bibliothek zu ueberreden, wird das Raster ausgerechnet und als EIN
   // Pfad gezeichnet. Ein Pfad statt hunderter Knoten, weil der Hintergrund
   // stehenbleibt und nichts davon fuer sich ansprechbar sein muss.
-  const kachel = Math.round(kurz * 0.14);
-  const strich = Math.max(1.5, kachel * 0.028);
+  // Kachelgroesse und Deckkraft sind am Bildschirm eingestellt, nicht geraten
+  // (2026-08-16, 1080p): bei 14 % Kachel und 18 % Deckkraft zeichnete das
+  // Muster durch die halbdurchsichtigen Karten hindurch und nahm der Uhr die
+  // Aufmerksamkeit. Groessere Kacheln und 12 % geben Textur, ohne mitzureden.
+  const kachel = Math.round(kurz * 0.18);
+  const strich = Math.max(1.5, kachel * 0.022);
   const spalten = Math.ceil(width / kachel) + 1;
   const zeilen = Math.ceil(height / kachel) + 1;
   const teile: string[] = [];
@@ -127,7 +131,7 @@ export function Hintergrund() {
         <Path
           d={teile.join(' ')}
           stroke={theme.accent}
-          strokeOpacity={0.18}
+          strokeOpacity={0.12}
           strokeWidth={strich}
           fill="none"
         />

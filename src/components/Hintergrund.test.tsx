@@ -57,9 +57,9 @@ it('zeichnet das Muster ueber den ganzen Bildschirm', async () => {
   expect(Math.min(...p.map((q) => q.x))).toBeLessThan(maxX * 0.15);
   expect(Math.min(...p.map((q) => q.y))).toBeLessThan(maxY * 0.15);
 
-  // Sichtbar heisst: nicht am unteren Ende der Skala. Bei 7 % (der ersten
-  // Fassung) ergab Gold auf #0a0a0a einen Grauwert von 24 gegen 10.
-  expect(pfade[0].props.strokeOpacity).toBeGreaterThanOrEqual(0.15);
+  // Sichtbar heisst: nicht am unteren Ende der Skala. Bei 12 % ergibt Gold auf
+  // #0a0a0a einen Grauwert von 35 gegen 11 — am Bildschirm nachgemessen.
+  expect(pfade[0].props.strokeOpacity).toBeGreaterThanOrEqual(0.1);
   expect(pfade[0].props.strokeWidth).toBeGreaterThanOrEqual(1.5);
 
   // Und die Zeichenflaeche muss eine GROESSE haben. Mit `width="100%"` kam am
