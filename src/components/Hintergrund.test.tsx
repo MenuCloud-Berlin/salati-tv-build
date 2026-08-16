@@ -61,6 +61,19 @@ it('zeichnet das Muster ueber den ganzen Bildschirm', async () => {
   // Fassung) ergab Gold auf #0a0a0a einen Grauwert von 24 gegen 10.
   expect(pfade[0].props.strokeOpacity).toBeGreaterThanOrEqual(0.15);
   expect(pfade[0].props.strokeWidth).toBeGreaterThanOrEqual(1.5);
+
+  // Und die Zeichenflaeche muss eine GROESSE haben. Mit `width="100%"` kam am
+  // Geraet kein einziger Strich an: die Pfadpunkte stehen in dp, und ohne
+  // festes Sichtfeld legt react-native-svg keinen dazu passenden Raum an
+  // (Bildschirmbefund 2026-08-16 — Typecheck, Lint und Tests waren gruen,
+  // waehrend die Flaeche leer blieb).
+  const flaechen = r.root!.queryAll((n) => typeof n.props?.bbWidth !== 'undefined');
+  expect(flaechen.length).toBeGreaterThan(0);
+  for (const f of flaechen) {
+    expect(typeof f.props.bbWidth).toBe('number');
+    expect(f.props.bbWidth).toBeGreaterThan(0);
+    expect(f.props.bbHeight).toBeGreaterThan(0);
+  }
 });
 
 /** Zaehlt Knoten eines Typs im gerenderten Baum. react-native-svg schreibt

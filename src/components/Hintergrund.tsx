@@ -118,7 +118,12 @@ export function Hintergrund() {
   }
   return (
     <View pointerEvents="none" style={styles.fill}>
-      <Svg width="100%" height="100%">
+      {/* Groesse und Sichtfeld ausdruecklich in dp, nicht in Prozent.
+          Geraetebefund 2026-08-16: mit `width="100%"` kam KEIN Strich an — die
+          Pfadpunkte stehen in dp, und ohne feste Groesse legt react-native-svg
+          keinen dazu passenden Zeichenraum an. Der Verlauf daneben fiel nicht
+          auf, weil sein Rechteck ebenfalls in Prozent misst. */}
+      <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
         <Path
           d={teile.join(' ')}
           stroke={theme.accent}

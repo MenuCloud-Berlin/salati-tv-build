@@ -58,7 +58,11 @@ export function makeRowStyles(
   // Ausgleich fuer die im Fokus wachsende Karte (s. components/fokusUeberstand.ts).
   const ueberstand = fokusUeberstand(Math.max(cardW, cardH));
   return StyleSheet.create({
-    root: { flex: 1, backgroundColor: theme.bg },
+    // Ohne eigene Grundfarbe: die traegt App.tsx, und darueber liegt der
+    // gewaehlte Hintergrund (components/Hintergrund.tsx). Deckend gefuellt
+    // blendete dieser Bildschirm ihn aus, obwohl die Einstellung „liegt
+    // hinter allen Bereichen" verspricht (Bildschirmbefund 2026-08-16).
+    root: { flex: 1 },
     content: { paddingHorizontal: padH, paddingVertical: padV },
     title: {
       color: theme.accent,

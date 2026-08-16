@@ -112,7 +112,7 @@ function makeStyles(w: number, h: number, rtl: boolean, theme: Theme) {
   const nameFont = clamp(cardH * 0.15, 15, 24);
   const nameZeile = Math.round(nameFont * 1.3);
   return StyleSheet.create({
-    root: { flex: 1, backgroundColor: theme.bg, paddingHorizontal: padH, paddingVertical: clamp(h * 0.05, 20, 48) },
+    root: { flex: 1, paddingHorizontal: padH, paddingVertical: clamp(h * 0.05, 20, 48) },
     title: base.title,
     gridScroll: base.gridScroll,
     grid: base.grid,
