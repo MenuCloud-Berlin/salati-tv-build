@@ -17,6 +17,7 @@ import { CITIES, cityForLocation, cityLabel } from '@/data/cities';
 import { useTranslation } from '@/lib/i18n';
 import { LOCALE_ENDONYMS, SUPPORTED_LOCALES } from '@/lib/locale';
 import { METHOD_REGION_ORDER, PRAYER_METHODS } from '@/lib/methods';
+import { SETTINGS_BEREICHE, type SettingsBereich } from '@/lib/nav';
 import {
   HIGH_LATITUDE_SETTINGS,
   METHOD_FULL_NAMES,
@@ -86,8 +87,12 @@ const HIGH_LAT_KEYS: Record<HighLatitudeSetting, string> = {
  * Jetzt: links eine feste Bereichsspalte, rechts nur der gewählte Bereich. Der
  * Weg zu jeder Einstellung ist damit höchstens zwei Ebenen tief.
  */
-const SECTIONS = ['language', 'location', 'prayer', 'azan', 'display', 'reader', 'storage'] as const;
-type SectionId = (typeof SECTIONS)[number];
+// Die Liste steht in lib/nav.ts, nicht hier: sie wird auch fuer das
+// Startargument `-salatiBereich` gebraucht, und zwei getrennte Listen laufen
+// frueher oder spaeter auseinander — genau der Fehler, den SCREENS dort schon
+// einmal hatte.
+const SECTIONS = SETTINGS_BEREICHE;
+type SectionId = SettingsBereich;
 
 const SECTION_KEYS: Record<SectionId, string> = {
   language: 'settings.language',
@@ -108,8 +113,11 @@ const SECTION_KEYS: Record<SectionId, string> = {
 // fest deutsch, während die Handy-App 14 Sprachen kann. Sie steht bewusst als
 // ERSTER Bereich und trägt den Initialfokus: wer die Oberfläche nicht lesen
 // kann, muss sie zuerst finden.
-export function SettingsScreen() {
-  const [section, setSection] = useState<SectionId>('language');
+export function SettingsScreen({ startBereich }: { startBereich?: SectionId | null } = {}) {
+  // `startBereich` setzt nur den ANFANG. Die Leiste bleibt wie sie ist, und wer
+  // von Hand wechselt, bekommt seinen Bereich (s. lib/nav.ts — gebraucht wird
+  // es fuer die Bildschirmfoto-Automatik, die keine Fernbedienung hat).
+  const [section, setSection] = useState<SectionId>(startBereich ?? 'language');
   const { width, height } = useWindowDimensions();
   const { t, rtl } = useTranslation();
   const theme = useTheme();

@@ -56,9 +56,12 @@ import { useLatestRef } from '@/lib/useLatestRef';
 //     beginnen.
 //   • Die Suren-Auswahl war ein Raster mit 114 Kacheln; bis Sure 100 sind das
 //     rund 25 Mal DPAD_DOWN.
-export function QuranReaderScreen() {
-  const [stage, setStage] = useState<'picker' | 'reading'>('picker');
-  const [surah, setSurah] = useState(1);
+export function QuranReaderScreen({ startSurah }: { startSurah?: number | null } = {}) {
+  // Mit vorgegebener Sure faengt der Leser beim Lesen an, nicht bei der
+  // Auswahl. Nur der Startwert: wer danach zurueckgeht, landet wie immer in
+  // der Suren-Auswahl.
+  const [stage, setStage] = useState<'picker' | 'reading'>(startSurah ? 'reading' : 'picker');
+  const [surah, setSurah] = useState(startSurah ?? 1);
   const { height, width } = useWindowDimensions();
 
   useEffect(() => {

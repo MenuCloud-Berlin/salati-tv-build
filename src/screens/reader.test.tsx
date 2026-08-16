@@ -317,3 +317,19 @@ describe('Leser', () => {
   });
 });
 
+
+describe('Startziel', () => {
+  it('faengt mit vorgegebener Sure beim Lesen an statt bei der Auswahl', async () => {
+    // Ohne das kam die Bildschirmfoto-Automatik nur bis zur Surenliste — auf der
+    // Store-Seite stand deshalb unter „Den Koran am Fernseher lesen" eine Liste
+    // von Namen (Befund 2026-08-16).
+    const r = await render(<QuranReaderScreen startSurah={2} />);
+    expect(r.queryByText('Al-Faatiha')).toBeNull(); // keine Auswahl
+    expect(r.getByText(/Al-Baqara/)).toBeTruthy();
+  });
+
+  it('bleibt ohne Vorgabe bei der Auswahl', async () => {
+    const r = await render(<QuranReaderScreen />);
+    expect(r.getByText('Al-Faatiha')).toBeTruthy();
+  });
+});

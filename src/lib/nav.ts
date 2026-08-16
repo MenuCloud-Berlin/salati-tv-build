@@ -71,7 +71,61 @@ export function screenFromLaunchArgument(einstellungen: unknown): Screen | null 
 
 export function screenFromUrl(url: string | null | undefined): Screen | null {
   if (typeof url !== 'string') return null;
-  const treffer = /^salatitv:\/\/screen\/([a-z]+)\/?$/i.exec(url.trim());
+  const treffer = /^salatitv:\/\/screen\/([a-z]+)(?:\/\d+)?\/?$/i.exec(url.trim());
   const name = treffer?.[1]?.toLowerCase();
   return isScreen(name) ? name : null;
+}
+
+/**
+ * Ein Ziel INNERHALB eines Bildschirms.
+ *
+ * Warum es das gibt: die Bildschirmfoto-Automatik kam nur bis zur Auswahl. Auf
+ * der Store-Seite stand deshalb unter „Den Koran am Fernseher lesen" eine Liste
+ * von Surennamen — von dem, was die Unterschrift verspricht, war nichts zu
+ * sehen. Am Fernseher fuehrt die Fernbedienung weiter; im tvOS-Simulator gibt
+ * es keine, also muss das Ziel beim Start mitkommen.
+ *
+ * Der Wert ist BEWUSST unverbindlich: was nicht passt, wird verworfen und der
+ * Bildschirm startet wie immer. Ein falscher Wert von aussen darf nie mehr
+ * bewirken, als ignoriert zu werden.
+ */
+export function surahFromLaunchArgument(einstellungen: unknown): number | null {
+  if (!einstellungen || typeof einstellungen !== 'object') return null;
+  return pruefeSure((einstellungen as Record<string, unknown>).salatiSure);
+}
+
+/** Sure aus einer Adresse: `salatitv://screen/quran/4`. */
+export function surahFromUrl(url: string | null | undefined): number | null {
+  if (typeof url !== 'string') return null;
+  const treffer = /^salatitv:\/\/screen\/quran\/(\d+)\/?$/i.exec(url.trim());
+  return pruefeSure(treffer?.[1]);
+}
+
+function pruefeSure(wert: unknown): number | null {
+  const n = typeof wert === 'number' ? wert : typeof wert === 'string' ? Number(wert) : NaN;
+  return Number.isInteger(n) && n >= 1 && n <= 114 ? n : null;
+}
+
+/** Bereiche des Einstellungs-Bildschirms — Reihenfolge wie in der Leiste. */
+export const SETTINGS_BEREICHE = [
+  'language',
+  'location',
+  'prayer',
+  'azan',
+  'display',
+  'reader',
+  'storage',
+] as const;
+
+export type SettingsBereich = (typeof SETTINGS_BEREICHE)[number];
+
+export function istSettingsBereich(v: unknown): v is SettingsBereich {
+  return typeof v === 'string' && (SETTINGS_BEREICHE as readonly string[]).includes(v);
+}
+
+/** Bereich aus einem Startargument: `-salatiBereich prayer`. */
+export function settingsBereichFromLaunchArgument(einstellungen: unknown): SettingsBereich | null {
+  if (!einstellungen || typeof einstellungen !== 'object') return null;
+  const wert = (einstellungen as Record<string, unknown>).salatiBereich;
+  return istSettingsBereich(wert) ? wert : null;
 }

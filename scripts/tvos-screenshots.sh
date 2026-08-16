@@ -43,15 +43,27 @@ ZIEL="$(cd "$(dirname "$0")/.." && pwd)/screenshots/appletv"
 # nach dem Start, bevor abgedrueckt wird. Sie deckt zweierlei ab: den Kaltstart
 # (jedes Bild bekommt einen frischen Start) und das Nachladen der Listen ueber
 # das Netz — ein Foto vom Ladezustand nuetzt niemandem.
+#
+# Drittes Feld (optional) = zusaetzliches Startargument. Zwei Bilder brauchen
+# das (Befund 2026-08-16 beim Nachsehen der Store-Seite):
+#
+#   * "quran" zeigte die SURENLISTE, waehrend die Unterschrift "Den Koran am
+#     Fernseher lesen" verspricht. Eine Liste von Namen zeigt davon nichts.
+#   * "settings" zeigte die SPRACHWAHL, waehrend die Unterschrift von
+#     23 Berechnungsmethoden und Madhab sprach. Bild und Text sagten
+#     Verschiedenes.
+#
+# Am Fernseher fuehrt die Fernbedienung weiter; im Simulator gibt es keine,
+# also kommt das Ziel beim Start mit (s. lib/nav.ts).
 AUFNAHMEN=(
   "clock:15"
   "home:14"
-  "quran:20"
+  "quran:22:-salatiSure 4"
   "reciters:20"
   "radio:20"
   "videos:20"
   "quiz:16"
-  "settings:14"
+  "settings:14:-salatiBereich prayer"
 )
 
 # --- Simulator besorgen ------------------------------------------------------
@@ -101,11 +113,15 @@ for SPRACHE in $SPRACHEN; do
   NR=0
   for EINTRAG in "${AUFNAHMEN[@]}"; do
     SCREEN="${EINTRAG%%:*}"
-    WARTEN="${EINTRAG##*:}"
+    REST="${EINTRAG#*:}"
+    WARTEN="${REST%%:*}"
+    # Drittes Feld ist optional; ohne es bleibt EXTRA leer.
+    if [ "$REST" != "$WARTEN" ]; then EXTRA="${REST#*:}"; else EXTRA=""; fi
     NR=$((NR + 1))
     xcrun simctl terminate "$UDID" "$BUNDLE_ID" >/dev/null 2>&1 || true
+    # shellcheck disable=SC2086  # EXTRA soll in zwei Argumente zerfallen
     xcrun simctl launch "$UDID" "$BUNDLE_ID" \
-      -salatiScreen "$SCREEN" \
+      -salatiScreen "$SCREEN" $EXTRA \
       -AppleLanguages "($SPRACHE)" -AppleLocale "$GEBIET" >/dev/null
     sleep "$WARTEN"
     DATEI=$(printf '%s/%02d-%s.png' "$ORDNER" "$NR" "$SCREEN")
