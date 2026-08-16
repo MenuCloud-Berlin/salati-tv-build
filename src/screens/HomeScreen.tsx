@@ -203,6 +203,8 @@ function makeStyles(o: {
   const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
   const align = o.rtl ? ('right' as const) : ('left' as const);
   const th = o.theme;
+  const hintFont = clamp(o.tileH * 0.095, 13, 20);
+  const hintZeile = Math.round(hintFont * 1.3);
   return StyleSheet.create({
     root: { flex: 1, backgroundColor: th.bg, paddingHorizontal: o.padH, paddingTop: o.padV, paddingBottom: o.padV },
     header: {
@@ -254,6 +256,18 @@ function makeStyles(o: {
     },
     iconWrap: { marginBottom: 'auto' },
     label: { color: th.text, fontSize: clamp(o.tileH * 0.15, 18, 32), fontWeight: '700', textAlign: align },
-    hint: { color: th.textMuted, fontSize: clamp(o.tileH * 0.095, 13, 20), marginTop: 4, textAlign: align },
+    hint: {
+      color: th.textMuted,
+      fontSize: hintFont,
+      lineHeight: hintZeile,
+      marginTop: 4,
+      textAlign: align,
+      // Zwei Zeilen sind RESERVIERT, auch wo nur eine steht. Sonst schiebt eine
+      // umbrechende Unterzeile („Mit Rezitation & Uebersetzung") ihren Titel
+      // nach oben, und in derselben Reihe stehen die Titel auf verschiedenen
+      // Hoehen (Bildschirmbefund 2026-08-16). Die Kachel ist unten buendig
+      // (`justifyContent: 'flex-end'`), deshalb wirkt sich das direkt aus.
+      height: hintZeile * 2,
+    },
   });
 }

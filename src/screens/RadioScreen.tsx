@@ -109,6 +109,8 @@ function makeStyles(w: number, h: number, rtl: boolean, theme: Theme) {
   const cols = w >= 1400 ? 4 : 3;
   const cardW = Math.floor((w - padH * 2 - gap * (cols - 1)) / cols) - 1;
   const cardH = clamp(h * 0.22, 96, 170);
+  const nameFont = clamp(cardH * 0.15, 15, 24);
+  const nameZeile = Math.round(nameFont * 1.3);
   return StyleSheet.create({
     root: { flex: 1, backgroundColor: theme.bg, paddingHorizontal: padH, paddingVertical: clamp(h * 0.05, 20, 48) },
     title: base.title,
@@ -130,9 +132,16 @@ function makeStyles(w: number, h: number, rtl: boolean, theme: Theme) {
     },
     name: {
       color: theme.text,
-      fontSize: clamp(cardH * 0.15, 15, 24),
+      fontSize: nameFont,
+      lineHeight: nameZeile,
       fontWeight: '600',
       textAlign: rtl ? 'right' : 'left',
+      // Zwei Zeilen sind RESERVIERT, auch wo nur eine steht. Sonst wandert bei
+      // „Radio Shaik Abu Bakr Al Shatri" das Symbol nach oben und die Kacheln
+      // einer Reihe stehen auf verschiedenen Hoehen (Bildschirmbefund
+      // 2026-08-16). Die Karte ist mittig ausgerichtet, deshalb wirkt sich
+      // jede zusaetzliche Zeile auf BEIDE Elemente aus.
+      height: nameZeile * 2,
     },
   });
 }
