@@ -70,6 +70,23 @@ const AUFNAHMEN = [
 
 const GEBIET = { de: 'de-DE', en: 'en-US', tr: 'tr-TR', ar: 'ar-SA' };
 
+/**
+ * Sprachen, deren Oberflaeche von rechts nach links laeuft.
+ *
+ * Fuer sie muessen die Richtungstasten GESPIEGELT werden: die Raster stehen auf
+ * `row-reverse`, „rechts" bewegt den Fokus also nach links. Ohne die Spiegelung
+ * lief die Automatik in der arabischen Fassung gegen den Rand und nahm Sure 1
+ * statt Sure 4 auf (Befund 2026-08-16 — das Bild sah plausibel aus, zeigte aber
+ * den falschen Vers).
+ */
+const RTL = new Set(['ar', 'ur', 'fa', 'ps']);
+const spiegeln = (taste, sprache) => {
+  if (!RTL.has(sprache)) return taste;
+  if (taste === K.rechts) return K.links;
+  if (taste === K.links) return K.rechts;
+  return taste;
+};
+
 const arg = (name, vorgabe) => {
   const i = process.argv.indexOf(`--${name}`);
   return i > -1 ? process.argv[i + 1] : vorgabe;
@@ -102,10 +119,23 @@ function laufende() {
     .map((z) => z.split('\t')[0]);
 }
 
-/** Name des AVD hinter einer Seriennummer, oder null. */
+/**
+ * Name des AVD hinter einer Seriennummer, oder null.
+ *
+ * MIT ZEITGRENZE: laeuft nebenher ein FREMDER Emulator, dessen Konsole nicht
+ * mehr antwortet, blockiert `adb emu avd name` ohne Grenze — und damit den
+ * ganzen Lauf, noch bevor die erste Zeile ausgegeben ist (2026-08-16, vier
+ * Emulatoren auf der Maschine). Wer nicht binnen zehn Sekunden antwortet, ist
+ * nicht der gesuchte.
+ */
 function avdName(serie) {
   try {
-    return execFileSync(ADB, ['-s', serie, 'emu', 'avd', 'name'], { encoding: 'utf8' }).split('\n')[0].trim();
+    return execFileSync(ADB, ['-s', serie, 'emu', 'avd', 'name'], {
+      encoding: 'utf8',
+      timeout: 10_000,
+    })
+      .split('\n')[0]
+      .trim();
   } catch {
     return null;
   }
@@ -114,10 +144,15 @@ function avdName(serie) {
 // Das RICHTIGE Geraet suchen, nicht das erste. Am 2026-08-11 lief nebenher ein
 // Telefon-Emulator, und der Lauf lieferte acht Bilder in 1284x2778 — Play haette
 // sie als TV-Bilder abgelehnt, und aufgefallen waere es erst dort.
-const vorher = laufende().filter((s) => avdName(s) === AVD);
+// `--geraet emulator-5584` ueberspringt die Suche ganz. Auf einer Maschine mit
+// mehreren Emulatoren ist das der sichere Weg — und der schnelle.
+const GEWAEHLT = arg('geraet', null);
+const vorher = GEWAEHLT
+  ? laufende().filter((s) => s === GEWAEHLT)
+  : laufende().filter((s) => avdName(s) === AVD);
 if (vorher.length) {
   geraet = vorher[0];
-  console.log(`Emulator ${AVD} laeuft schon: ${geraet}`);
+  console.log(`Emulator ${GEWAEHLT ?? AVD} laeuft schon: ${geraet}`);
 } else {
   if (!EMULATOR) throw new Error('emulator.exe nicht gefunden');
   console.log(`Starte Emulator ${AVD} …`);
@@ -178,7 +213,7 @@ for (const sprache of SPRACHEN) {
     ]) {
       if (!folge) continue;
       for (const taste of folge) {
-        adb('shell', 'input', 'keyevent', String(taste));
+        adb('shell', 'input', 'keyevent', String(spiegeln(taste, sprache)));
         await schlaf(0.5);
       }
       await schlaf(danach ?? 2);
