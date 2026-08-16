@@ -1,8 +1,8 @@
 # Salati TV — offene Punkte
 
-> Stand 2026-08-16, Release **1.9.0** (Play versionCode 14, App Store Build 2).
-> Vorgaenger 1.8.1 ist in BEIDEN Laeden durch: App Store `READY_FOR_SALE`,
-> Play production `completed` mit vc 13.
+> Stand 2026-08-16, Release **1.9.0** ist in BEIDEN Laeden:
+> Play production `completed` mit versionCode 14, App Store Build 4
+> `WAITING_FOR_REVIEW`. Vorgaenger 1.8.1 war zuvor in beiden durch.
 >
 > **Zuerst lesen:** Hergang und Fallstricke der Apple-Einreichung stehen in
 > `docs/APPLE-TV-2026-08-11.md`.
@@ -13,15 +13,23 @@
 
 | Kanal | Stand | Beleg |
 |---|---|---|
-| Apple App Store | **1.8.1 freigegeben** | `node scripts/asc-listing.mjs --pruefen`: Version 1.8.1 `READY_FOR_SALE`, Auftritt `READY_FOR_SALE`, alle vier Sprachen |
-| Google Play (internal + production) | **1.8.1, vc 13, freigegeben** | `node scripts/play-status.mjs`: production `completed` vc 13 |
-| APK-Download (salati.pro) | **1.8.1** | `node scripts/upload-apk-r2.mjs --pruefen` |
+| Apple App Store | **1.9.0 in Pruefung** | `node scripts/asc-listing.mjs --pruefen`: Version 1.9.0 `WAITING_FOR_REVIEW`, Build 4 `VALID`, Einreichung `fcf4f606`; Bilder 4x8 `COMPLETE` |
+| Google Play (internal + production) | **1.9.0, vc 14** | `node scripts/play-status.mjs`: production und internal `completed` vc 14, Notizen in vier Sprachen |
+| APK-Download (salati.pro) | **1.9.0** | `node scripts/upload-apk-r2.mjs --pruefen`: HTTP 200, 103,2 MB; vor dem Hochladen geprueft auf vier ABIs, acht Koran-Schriften und Upload-Keystore |
 | Webseite salati.pro | **live** | TV-Sektion mit sieben Bildern aus 1.8.1 (am 2026-08-11 ersetzt) und dem Knopf „APK fuer Fire TV laden" |
 
-Die Store-Bilder sind am 2026-08-11 komplett neu gemacht worden: acht je
-Sprache, aus 1.8.1 statt aus 1.4.0, je Store aus der eigenen Plattform
-(Apple-TV-Simulator bzw. Android-TV-Emulator) und mit Bildunterschrift. Vorher
-bekamen alle vier Sprachen dieselben sieben englischen Aufnahmen.
+Die Store-Bilder sind am 2026-08-16 erneut komplett neu gemacht worden — 32 je
+Store, aus 1.9.0. Zwei davon zeigten vorher etwas anderes, als ihre Unterschrift
+versprach: unter „Den Koran am Fernseher lesen" stand die Surenliste, unter
+„Genau nach deiner Moschee · 23 Berechnungsmethoden" die Sprachwahl. Die
+Automatik kam nur bis zur Auswahl; jetzt gibt es Ziele INNERHALB eines
+Bildschirms (`salatitv://screen/quran/4`, `-salatiSure`, `-salatiBereich`).
+
+Drei Werkzeugfehler kamen dabei heraus, alle behoben: das Android-Skript hing an
+einem fremden Emulator mit toter Konsole (jetzt Zeitgrenze + `--geraet`), es
+spiegelte die Richtungstasten in RTL-Sprachen nicht (Arabisch zeigte Sure 1 statt
+Sure 4), und der Apple-Simulator kennt die App unter tvOS 26 nach einem Neustart
+nicht mehr (jetzt Installation je Sprache).
 
     node scripts/androidtv-screenshots.mjs --apk <apk>     # Android-TV-Emulator
     gh workflow run tvos-screenshots.yml --repo MenuCloud-Berlin/salati-tv-build
