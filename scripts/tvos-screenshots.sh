@@ -110,6 +110,13 @@ for SPRACHE in $SPRACHEN; do
   xcrun simctl bootstatus "$UDID" -b
   echo "Sprache am Geraet: $(plutil -extract AppleLanguages json -o - "$PLIST") / $GEBIET"
 
+  # NACH jedem Start neu installieren. Unter tvOS 26 ueberlebt die Anmeldung
+  # der App den Neustart des Simulators nicht mehr: der erste `simctl launch`
+  # brach ab mit „Application de.salatibox.tv is unknown to FrontBoard", obwohl
+  # `simctl install` zuvor ohne Fehler durchlief (Lauf 31964934856). Unter
+  # tvOS 18.5 hatte dieselbe Reihenfolge noch funktioniert.
+  xcrun simctl install "$UDID" "$APP_PFAD"
+
   NR=0
   for EINTRAG in "${AUFNAHMEN[@]}"; do
     SCREEN="${EINTRAG%%:*}"
