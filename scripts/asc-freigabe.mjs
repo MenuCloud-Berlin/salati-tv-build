@@ -62,7 +62,7 @@ const PRUEFER = {
   contactFirstName: 'Domenic',
   contactLastName: 'Moran',
   contactPhone: '+493076764546',
-  contactEmail: 'menucloudberlin@gmail.com',
+  contactEmail: 'info@menucloud-berlin.de',
   demoAccountRequired: false,
   notes: [
     'Alle Funktionen sind ohne Konto und ohne Anmeldung nutzbar.',

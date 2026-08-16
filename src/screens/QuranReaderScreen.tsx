@@ -314,7 +314,10 @@ function Reader({
   // Haelfte, muesste schon ein gewoehnlicher Vers geblaettert werden.
   const arabAnteil = zusatz === 0 ? 1 : zusatz === 1 ? 0.78 : 0.6;
   // `onLayout` misst die Flaeche MIT Polster; gerechnet wird mit dem Inneren.
-  const innen = Math.max(0, buehne.h - s.buehnenPolster * 2);
+  // Zwischen Vers, Umschrift und Uebersetzung bleibt eine Luecke: ohne sie
+  // stossen sie aneinander, sobald eine der Zeilen ihren Kasten fuellt
+  // (Geraetebefund 2026-08-16 an An-Nisaa, Vers 1).
+  const innen = Math.max(0, buehne.h - s.buehnenPolster * 2 - s.zeilenLuecke * zusatz);
   const arabH = innen * arabAnteil;
   const zusatzH = zusatz > 0 ? (innen - arabH) / zusatz : 0;
 
@@ -636,6 +639,7 @@ function readerStyles(h: number, w: number, rtl: boolean, theme: Theme, scale: n
   const { fontSize: arabSize, lineHeight: arabLine } = readerVerseMetrics(h, scale);
   const ctrl = clamp(h * 0.09, 50, 92);
   const buehnenPolster = clamp(h * 0.02, 12, 30);
+  const zeilenLuecke = clamp(h * 0.018, 10, 26);
   const translitSize = clamp(h * 0.036 * scale, 16, 40);
   const uebersetzungSize = clamp(h * 0.038 * scale, 16, 42);
   const uebersetzungLine = clamp(h * 0.052 * scale, 24, 60);
@@ -648,7 +652,7 @@ function readerStyles(h: number, w: number, rtl: boolean, theme: Theme, scale: n
       // `overflow: 'hidden'` ist hier kein Zierrat, sondern die Zusicherung: was
       // die Rechnung wider Erwarten doch nicht fasst, bleibt in der Buehne und
       // legt sich NICHT ueber die Bedienleiste.
-      stage: { flex: 1, justifyContent: 'center', overflow: 'hidden', paddingVertical: buehnenPolster },
+      stage: { flex: 1, justifyContent: 'center', overflow: 'hidden', paddingVertical: buehnenPolster, gap: zeilenLuecke },
       arabBox: { justifyContent: 'center', overflow: 'hidden' },
       zusatzBox: { justifyContent: 'center', overflow: 'hidden' },
       arabicRow: { flexDirection: 'row-reverse', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'flex-end' },
@@ -673,6 +677,7 @@ function readerStyles(h: number, w: number, rtl: boolean, theme: Theme, scale: n
       arabischGroesse: arabSize,
       arabischZeile: arabLine,
       buehnenPolster,
+      zeilenLuecke,
       translitGroesse: translitSize,
       uebersetzungGroesse: uebersetzungSize,
       uebersetzungZeile: uebersetzungLine,

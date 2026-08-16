@@ -32,7 +32,15 @@ const sprachen = texteFuer('apple');
 
 // ── Version (tvOS) ──────────────────────────────────────────────────────────
 const versionen = await asc(`/apps/${APP_ID}/appStoreVersions?filter[platform]=TV_OS&limit=10`);
-let v = versionen.data.find((x) => x.attributes.versionString === version) ?? versionen.data[0] ?? null;
+// Eine bereits VEROEFFENTLICHTE Version darf nicht umbenannt werden: Apple
+// weist den PATCH ab, und bis 1.8.1 freigegeben war, fiel das nicht auf, weil
+// `data[0]` immer die bearbeitbare Fassung war. Wiederverwendet wird deshalb
+// nur, was denselben Namen traegt oder noch bearbeitbar ist.
+const BEARBEITBAR = ['PREPARE_FOR_SUBMISSION', 'DEVELOPER_REJECTED', 'REJECTED', 'METADATA_REJECTED'];
+let v =
+  versionen.data.find((x) => x.attributes.versionString === version) ??
+  versionen.data.find((x) => BEARBEITBAR.includes(x.attributes.appStoreState)) ??
+  null;
 
 if (!v && !NUR_PRUEFEN) {
   const r = await asc('/appStoreVersions', {
@@ -131,6 +139,23 @@ for (const t of sprachen) {
 
 const verLocs = await asc(`/appStoreVersions/${v.id}/appStoreVersionLocalizations?limit=50`);
 
+// „Neu in dieser Version". Apple verlangt den Text ab der ZWEITEN Fassung; er
+// stand bisher nirgends im Ablauf und musste von Hand in die Oberflaeche.
+// Quelle ist dieselbe Datei wie fuer Play, die Sprachschluessel unterscheiden
+// sich aber (Apple: tr und ar-SA, Play: tr-TR und ar).
+const NOTIZ_LOCALE = { 'de-DE': 'de-DE', 'en-US': 'en-US', 'tr-TR': 'tr', ar: 'ar-SA' };
+const notizPfad = path.join(HIER, '..', 'store', `release-notes-${version}.json`);
+const notizen = {};
+if (fs.existsSync(notizPfad)) {
+  for (const [k, text] of Object.entries(JSON.parse(fs.readFileSync(notizPfad, 'utf8')))) {
+    const locale = NOTIZ_LOCALE[k];
+    if (locale) notizen[locale] = String(text).slice(0, 4000);
+  }
+  console.log(`Neuerungen aus release-notes-${version}.json: ${Object.keys(notizen).join(', ')}`);
+} else {
+  console.log(`Keine release-notes-${version}.json — „Neu in dieser Version" bleibt unveraendert.`);
+}
+
 for (const t of sprachen) {
   const texte = {
     description: t.description,
@@ -139,6 +164,7 @@ for (const t of sprachen) {
     supportUrl: t.supportUrl,
     marketingUrl: t.marketingUrl,
   };
+  if (notizen[t.locale]) texte.whatsNew = notizen[t.locale];
   const vorhanden = verLocs.data.find((l) => l.attributes.locale === t.locale);
 
   if (NUR_PRUEFEN) {

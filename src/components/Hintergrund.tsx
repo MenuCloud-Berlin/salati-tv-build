@@ -78,8 +78,8 @@ export function Hintergrund() {
           <Defs>
             <LinearGradient id={id} x1="0" y1="0" x2="0" y2="1">
               <Stop offset="0%" stopColor={theme.accent} stopOpacity={0} />
-              <Stop offset="60%" stopColor={theme.glowRing} stopOpacity={0.06} />
-              <Stop offset="100%" stopColor={theme.accent} stopOpacity={0.14} />
+              <Stop offset="55%" stopColor={theme.glowRing} stopOpacity={0.1} />
+              <Stop offset="100%" stopColor={theme.accent} stopOpacity={0.24} />
             </LinearGradient>
           </Defs>
           <Rect x="0" y="0" width="100%" height="100%" fill={`url(#${id})`} />
@@ -92,25 +92,31 @@ export function Hintergrund() {
   // heruntergedimmt. Die Kachelgroesse haengt an der kurzen Bildschirmseite,
   // damit das Muster auf jedem Panel gleich fein wirkt.
   const kachel = Math.round(kurz * 0.12);
+  // Geraetebefund 2026-08-16 (Android-TV-Emulator, 1080p): mit 7 % Deckkraft und
+  // 1,5 dp Strich war das Muster auf Schwarz NICHT zu sehen — Gold auf #0a0a0a
+  // ergibt dort einen Grauwert von 24 gegen 10. Eine Einstellung, die man
+  // waehlen kann und dann nichts bewirkt, ist schlimmer als keine. Der Strich
+  // waechst jetzt mit der Kachel, sonst wird das Muster auf 4K wieder duenn.
+  const strich = Math.max(1.5, kachel * 0.03);
   return (
     <View pointerEvents="none" style={styles.fill}>
       <Svg width="100%" height="100%">
         <Defs>
           <Pattern id={id} width={kachel} height={kachel} patternUnits="userSpaceOnUse">
-            <G opacity={0.07}>
+            <G opacity={0.18}>
               {/* Zwei um 45° gedrehte Quadrate ergeben den Achtzack. Als
                   Umriss statt gefuellt: gefuellt wuerde das Muster bei dieser
                   Groesse zu einer Flaeche verlaufen. */}
               <Path
                 d={quadrat(kachel / 2, kachel / 2, kachel * 0.3, 0)}
                 stroke={theme.accent}
-                strokeWidth={1.5}
+                strokeWidth={strich}
                 fill="none"
               />
               <Path
                 d={quadrat(kachel / 2, kachel / 2, kachel * 0.3, Math.PI / 4)}
                 stroke={theme.accent}
-                strokeWidth={1.5}
+                strokeWidth={strich}
                 fill="none"
               />
             </G>
