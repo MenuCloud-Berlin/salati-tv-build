@@ -1,7 +1,11 @@
-# Salati TV 1.9.0 — Hintergründe, Hintergrundwiedergabe, lange Verse
+# Salati TV 1.9.0 / 1.9.1 — Hintergründe, Hintergrundwiedergabe, lange Verse
 
-> Stand 2026-08-16. Play versionCode 14, App Store Build 2.
-> Vorgänger 1.8.1 ist in beiden Läden freigegeben.
+> Stand 2026-08-16. Ausgeliefert als **1.9.1** — Play versionCode 15,
+> App Store Build 5. Vorgänger 1.8.1 ist in beiden Läden freigegeben.
+>
+> 1.9.0 (vc 14) ging kurz zuvor heraus und wurde noch am selben Tag durch 1.9.1
+> ersetzt: danach kamen Korrekturen dazu, die der Nutzer sieht — vor allem der
+> Wortabstand im Vers auf Apple TV. Am Funktionsumfang ändert 1.9.1 nichts.
 
 Alles in dieser Fassung geht auf Beobachtungen des Nutzers am Gerät
 zurück. Sie stehen hier mit dem, was tatsächlich falsch war — nicht mit dem,

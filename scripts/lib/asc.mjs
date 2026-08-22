@@ -11,7 +11,7 @@ const jwt = require('jsonwebtoken');
 
 export const KEY_ID = 'H73GL4Q2AQ';
 export const ISSUER = 'de348707-2ec6-4079-b3a4-74c17c31ba0c';
-export const KEY_PATH = 'C:/Users/domen/Documents/MenuCloud/AuthKey_H73GL4Q2AQ_Apple.p8';
+export const KEY_PATH = 'C:/Users/domen/Documents/90_Werkstatt/schluessel/AuthKey_H73GL4Q2AQ_Apple.p8';
 export const TEAM_ID = 'ZKG548NGDR';
 export const BUNDLE_ID = 'de.salatibox.tv';
 // Der App-Datensatz „Salati TV" (tvOS). Angelegt am 2026-08-11 ueber die

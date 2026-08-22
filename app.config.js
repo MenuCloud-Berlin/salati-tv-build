@@ -117,6 +117,10 @@ module.exports = {
     // Release-Signierung mit dem echten Upload-Keystore; ueberlebt `expo prebuild`,
     // weil android/ gitignored ist und neu erzeugt wird.
     './plugins/with-release-signing',
+    // Natives Android-Foreground-Service-Modul fuer den Gebetsruf im
+    // Hintergrund (s. plugins/with-adhan-alarm.js + plugins/adhan-native/).
+    // Nur Android — Apple TV hat kein Aequivalent (bewusste Scope-Entscheidung).
+    './plugins/with-adhan-alarm',
     // Nur der tvOS-Build uebersetzt ExpoModulesCore aus den Quellen; die
     // brauchen ein Swift-Merkmal, das im Sprachstand 6 noch aus ist.
     './plugins/with-swift-weak-let',

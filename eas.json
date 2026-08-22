@@ -51,7 +51,7 @@
   "submit": {
     "production": {
       "android": {
-        "serviceAccountKeyPath": "C:/Users/domen/Documents/menucloud-mobile-build/play-service-account.json",
+        "serviceAccountKeyPath": "C:/Users/domen/Documents/90_Werkstatt/menucloud-mobile-build/play-service-account.json",
         "track": "internal"
       }
     }

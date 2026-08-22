@@ -23,7 +23,7 @@ const jwt = require('jsonwebtoken');
 const HIER = path.dirname(fileURLToPath(import.meta.url));
 const TV = path.join(HIER, '..');
 const PACKAGE = 'de.salatibox.tv';
-const SA_PATH = 'C:/Users/domen/Documents/menucloud-mobile-build/play-service-account.json';
+const SA_PATH = 'C:/Users/domen/Documents/90_Werkstatt/menucloud-mobile-build/play-service-account.json';
 
 /** Die vier Sprachen des Eintrags (s. scripts/play-listings.mjs). */
 const SPRACHEN = ['de-DE', 'en-US', 'tr-TR', 'ar'];

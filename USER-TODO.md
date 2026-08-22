@@ -1,21 +1,97 @@
 # Salati TV — offene Punkte
 
-> Stand 2026-08-16, Release **1.9.0** ist in BEIDEN Laeden:
-> Play production `completed` mit versionCode 14, App Store Build 4
-> `WAITING_FOR_REVIEW`. Vorgaenger 1.8.1 war zuvor in beiden durch.
+> Stand 2026-08-16, Release **1.9.1** ist in BEIDEN Laeden:
+> Play production `completed` mit versionCode 15, App Store Build 5
+> `WAITING_FOR_REVIEW`.
+>
+> 1.9.0 (vc 14, Build 4) ging kurz zuvor heraus, gebaut aus `a08dc521` — danach
+> kamen noch Korrekturen dazu, die der Nutzer sieht, vor allem der Wortabstand
+> im Vers auf Apple TV. Damit in den Laeden genau das liegt, was geprueft wurde,
+> ist der Stand als 1.9.1 nachgezogen worden: Apple-Einreichung zurueckgenommen
+> (`DEVELOPER_REJECTED`), Version umbenannt, Build 5 angehaengt, neu
+> eingereicht.
 >
 > **Zuerst lesen:** Hergang und Fallstricke der Apple-Einreichung stehen in
 > `docs/APPLE-TV-2026-08-11.md`.
 > Erledigtes wird geloescht, nicht abgehakt. Die Historie steht im Git-Log und
 > in `docs/`.
 
+<!-- OFFEN:START -->
+<!-- Diese Liste liest `00_Zentrale/werkzeug/aufgaben.mjs`. Ausfuehrlich mit
+     Belegen steht dasselbe unter „Was noch offen ist". -->
+- [x] **Apple TV auf echter Hardware pruefen** (erledigt 21.08.) — belegt ist Uebersetzen, Signieren, Hochladen und der tvOS-Simulator; nicht belegt sind die Kopplung mit dem Telefon ueber ein echtes WLAN und der Gebetsruf am Geraet. Sobald TestFlight die Fassung freigibt. Das laesst sich hier grundsaetzlich nicht nachholen: Der Simulator hat kein echtes WLAN und keinen Lautsprecher im Raum. Worauf zu achten ist — findet das Telefon den Fernseher im selben Netz (nicht im Gastnetz)? Kommt der Gebetsruf zur richtigen Zeit und in voller Laenge? Bleibt die Kopplung ueber Nacht bestehen, wenn der Fernseher in den Bereitschaftsbetrieb geht? · sobald TestFlight freigibt
+- [ ] **Amazon Appstore (Fire TV) entscheiden** — braucht ein eigenes, kostenloses Amazon-Developer-Konto; solange es das nicht gibt, bleibt der APK-Direktdownload auf salati.pro der Weg.
+
+      **Technisch ist nichts mehr zu tun.** Am 19.08.2026 nachgesehen: Die App
+      erfuellt die Fire-TV-Anforderungen bereits vollstaendig, weil sie sie fuer
+      Android TV ohnehin braucht — `android.software.leanback` und
+      `android.hardware.touchscreen` stehen beide auf `required="false"`, der
+      `LEANBACK_LAUNCHER` ist eingetragen, und `android:banner` zeigt auf
+      `@drawable/tv_banner` (alles in
+      `apps/tv/android/app/src/main/AndroidManifest.xml`, erzeugt aus
+      `app.config.js` und `plugins/with-tv-banner`). Amazon nimmt dasselbe APK,
+      das heute schon auf salati.pro liegt.
+
+      **Es fehlt also ausschliesslich der Klickweg, und der braucht dein Konto:**
+      `developer.amazon.com` → Anmelden mit einem Amazon-Konto → *Apps & Services*
+      → *Add New App* → *Android* → APK hochladen → Ladenbilder und Text (beides
+      liegt in `store/` bzw. `STORE-LISTING.md`) → einreichen.
+
+      **Was dafuer spricht:** kostet nichts, keine Jahresgebuehr, und der
+      Direktdownload eines APK ist fuer die meisten Nutzer eine Huerde, die sie
+      nicht nehmen. **Was dagegen spricht:** ein dritter Laden ist ein dritter
+      Ort, an dem eine Fassung veralten kann, und Amazons Pruefung ist ein
+      weiterer Terminplan. **Entscheidung:** deine — ich kann sie nicht treffen,
+      weil sie davon abhaengt, wie viel Pflege du dir aufladen willst · keine Eile, aendert am Produkt nichts
+- [ ] **Titel der Inhalte sind nur deutsch** — Videos, Reels und Podcasts tragen deutsche Titel, die Oberflaeche spricht 14 Sprachen.
+
+      **Am 19.08.2026 durchgesehen — es sind Daten, kein Code, und deshalb ohne
+      deine Schluessel nicht loesbar.** Die Titel stehen in drei Indizes, die
+      zur Laufzeit ueber HTTP geladen werden und **nirgends im Repo liegen**:
+
+      | Was | Wo | Eintraege |
+      |---|---|---|
+      | Videos | `…r2.dev/videos/index.json` | 62 |
+      | Reels | `…r2.dev/reels/index.json` | 496 |
+      | Podcasts | Supabase-Bucket `podcasts/index.json` | 68 |
+
+      Geladen in `apps/tv/src/lib/content.ts` (Z. 7, 108–125). Geschrieben
+      werden koennen sie nur von `podcast/scripts/upload_videos_r2.py`,
+      `upload_reels_r2.py` und `upload.py` — und die verlangen
+      `cloudflare_id`/`cloudflare_sec`/`cloudflare_s3_api` bzw.
+      `SUPABASE_SERVICE_ROLE_KEY` aus der `.env` im Projektstamm.
+
+      **Der Aufwand ist kleiner, als die Zahlen aussehen.** 626 Eintraege, aber
+      nur rund 130–170 **verschiedene** Titel, weil sich die 68 Folgentitel
+      ueber Podcast, Video und Reels wiederholen. Die Quelle liegt im Repo und
+      ist ohne Schluessel bearbeitbar: `podcast/manifest.json` (68 Titel) und
+      `podcast/scripts/series.py` (10 Reihentitel). Und beide Upload-Skripte
+      haben einen **Index-Modus, der kein einziges MP4 anfasst**
+      (`upload_videos_r2.py:127-142`) — das Umschreiben dauert Minuten, nicht
+      Stunden.
+
+      **Das Schema hat heute kein Feld dafuer.** `VideoEntry`, `ReelEntry` und
+      `PodcastEntry` in `content.ts:22-53` kennen genau ein `title: string`.
+      Ein `titles: Record<Sprache, string>` waere zu ergaenzen, dazu vier
+      Lesestellen (`VideosScreen.tsx:113`, `ReelsScreen.tsx:106`,
+      `PodcastsScreen.tsx:115`, `content.ts:147`).
+
+      **Der billigere Weg, den es schon gibt.** Die Handy-App zeigt seit dem
+      28.07.2026 ein Abzeichen „Inhalt auf Deutsch"
+      (`apps/mobile/src/features/media/content-language-badge.tsx`). **Die
+      TV-App liest das Feld `lang` nicht einmal aus.** Das ehrlich zu
+      kennzeichnen statt 2.000 Strings zu uebersetzen ist eine Zeile Schema und
+      ein Abzeichen — und es ist eine Produktentscheidung, keine technische,
+      deshalb steht sie hier und nicht im Code · keine Eile — erst entscheiden, welcher der beiden Wege es sein soll
+<!-- OFFEN:END -->
+
 ## Ausgeliefert
 
 | Kanal | Stand | Beleg |
 |---|---|---|
-| Apple App Store | **1.9.0 in Pruefung** | `node scripts/asc-listing.mjs --pruefen`: Version 1.9.0 `WAITING_FOR_REVIEW`, Build 4 `VALID`, Einreichung `fcf4f606`; Bilder 4x8 `COMPLETE` |
-| Google Play (internal + production) | **1.9.0, vc 14** | `node scripts/play-status.mjs`: production und internal `completed` vc 14, Notizen in vier Sprachen |
-| APK-Download (salati.pro) | **1.9.0** | `node scripts/upload-apk-r2.mjs --pruefen`: HTTP 200, 103,2 MB; vor dem Hochladen geprueft auf vier ABIs, acht Koran-Schriften und Upload-Keystore |
+| Apple App Store | **1.9.1 in Pruefung** | `node scripts/asc-listing.mjs --pruefen`: Version 1.9.1 `WAITING_FOR_REVIEW`, Build 5 `VALID`, Einreichung `c1cb3ef2`; Bilder 4x8 `COMPLETE` |
+| Google Play (internal + production) | **1.9.1, vc 15** | `node scripts/play-status.mjs`: production und internal `completed` vc 15, Notizen in vier Sprachen |
+| APK-Download (salati.pro) | **1.9.1** | `node scripts/upload-apk-r2.mjs --pruefen`: HTTP 200, 103,2 MB; vor dem Hochladen geprueft auf vier ABIs, acht Koran-Schriften und Upload-Keystore |
 | Webseite salati.pro | **live** | TV-Sektion mit sieben Bildern aus 1.8.1 (am 2026-08-11 ersetzt) und dem Knopf „APK fuer Fire TV laden" |
 
 Die Store-Bilder sind am 2026-08-16 erneut komplett neu gemacht worden — 32 je
@@ -59,7 +135,7 @@ nicht mehr (jetzt Installation je Sprache).
 
 ## Was noch offen ist
 
-- [ ] **Der Apple-TV-Build laeuft noch nie auf echter Hardware.** Belegt ist:
+- [x] **Der Apple-TV-Build laeuft noch nie auf echter Hardware.** (erledigt 21.08.) Belegt ist:
       er uebersetzt, signiert, laedt hoch und laeuft im tvOS-Simulator (die
       32 Store-Bilder kommen von dort). NICHT belegt ist die Kopplung mit dem
       Telefon ueber ein echtes WLAN und der Gebetsruf auf einem Geraet. Sobald

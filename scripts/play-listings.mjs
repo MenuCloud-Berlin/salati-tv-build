@@ -18,7 +18,7 @@ const require = createRequire('C:/Users/domen/Documents/MenuCloud/scripts/');
 const jwt = require('jsonwebtoken');
 
 const PACKAGE = 'de.salatibox.tv';
-const SA_PATH = 'C:/Users/domen/Documents/menucloud-mobile-build/play-service-account.json';
+const SA_PATH = 'C:/Users/domen/Documents/90_Werkstatt/menucloud-mobile-build/play-service-account.json';
 const DRY = process.argv.includes('--dry');
 
 const parsed = {};

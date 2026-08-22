@@ -1,4 +1,5 @@
 import { useEffect, useSyncExternalStore } from 'react';
+import { NativeModules, Platform } from 'react-native';
 import { createVideoPlayer, type VideoPlayer } from 'expo-video';
 
 import { pausieren as hintergrundPausieren } from '@/lib/hintergrundAudio';
@@ -11,7 +12,7 @@ import {
   type AzanPerPrayer,
   type AzanPrayer,
 } from '@/lib/azan';
-import { timesFor, type DayTimes } from '@/lib/prayerTimes';
+import { timesFor, type DayTimes, type PrayerCalcExtras, type TvLocation } from '@/lib/prayerTimes';
 import { calcExtras, useTvSettings } from '@/lib/settings';
 
 // Ausloesen und Abspielen des Gebetsrufs. Getrennt von `lib/azan.ts` (dem
@@ -191,4 +192,69 @@ export function useAzanAusloeser(): void {
 
   // Beim Verlassen der App keinen Ton zuruecklassen.
   useEffect(() => () => azanStoppen(), []);
+}
+
+// --- Nativer Hintergrund-Backstop -------------------------------------------
+//
+// Alles oben (useAzanAusloeser) laeuft nur, waehrend die App im Vordergrund
+// ist — bleibt unveraendert als Sofort-Pfad (Banner, kein Wartezeit-Sprung).
+// Fuer den Fall, dass der Fernseher gerade nicht auf der App steht (Home-
+// Launcher, anderer HDMI-Eingang, Standby), uebernimmt ein natives
+// Foreground-Service-Modul (plugins/adhan-native/, nur Android — Apple TV hat
+// kein Aequivalent, s. Memory project_salati_tv_adhan_architektur). Dieser
+// Hook liefert ihm nur die Rohdaten (Zeitstempel + Sound-Wahl); die gesamte
+// Gebetszeiten-Berechnung bleibt hier in JS, wie beim Handy-Widget-Alarm
+// (WidgetAlarmModule.kt: "JS kennt die Gebetszeiten, nativ nur den Zeitpunkt").
+
+interface AdhanAlarmNativeModul {
+  setSchedule: (timestampsMs: number[], prayerKeys: string[], soundKeys: string[]) => Promise<number>;
+  cancel: () => Promise<boolean>;
+}
+
+// Fehlt das Modul (kein Build mit dem Plugin, oder iOS/tvOS ohne Aequivalent),
+// bleibt es `null` — kein Absturz, der Vordergrund-Pfad traegt dann allein.
+const nativerAdhanAlarm: AdhanAlarmNativeModul | null =
+  Platform.OS === 'android' ? (NativeModules.AdhanAlarmScheduler ?? null) : null;
+
+const TAGE_VORAUS = 7;
+
+function planFuerNaechsteTage(
+  location: TvLocation,
+  extras: PrayerCalcExtras,
+  azan: AzanPerPrayer,
+): { timestampsMs: number[]; prayerKeys: string[]; soundKeys: string[] } {
+  const timestampsMs: number[] = [];
+  const prayerKeys: string[] = [];
+  const soundKeys: string[] = [];
+  const heute = new Date();
+  for (let tag = 0; tag < TAGE_VORAUS; tag++) {
+    const datum = new Date(heute.getFullYear(), heute.getMonth(), heute.getDate() + tag);
+    const times = timesFor(location, datum, extras);
+    for (const prayer of AZAN_PRAYERS) {
+      timestampsMs.push(times[prayer].getTime());
+      prayerKeys.push(prayer);
+      soundKeys.push(azan[prayer]);
+    }
+  }
+  return { timestampsMs, prayerKeys, soundKeys };
+}
+
+/**
+ * Haelt den nativen Alarm-Plan aktuell — bei jeder Einstellungsaenderung
+ * (Standort, Sound-Wahl, Berechnungsparameter) und einmal beim Start.
+ * Wird wie `useAzanAusloeser` einmal in App.tsx aufgerufen.
+ */
+export function useNativenAdhanPlan(): void {
+  const s = useTvSettings();
+  const { location, azan, highLatitude, offsets } = s;
+
+  useEffect(() => {
+    if (!s.loaded || !nativerAdhanAlarm) return;
+    const extras = calcExtras({ highLatitude, offsets });
+    const { timestampsMs, prayerKeys, soundKeys } = planFuerNaechsteTage(location, extras, azan);
+    nativerAdhanAlarm.setSchedule(timestampsMs, prayerKeys, soundKeys).catch(() => {
+      // Ein fehlgeschlagener Plan-Push darf die App nicht stoeren — der
+      // Vordergrund-Pfad (useAzanAusloeser) faengt es auf, solange sie offen ist.
+    });
+  }, [s.loaded, location, azan, highLatitude, offsets]);
 }
