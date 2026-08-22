@@ -28,7 +28,7 @@ import { ReelsScreen } from '@/screens/ReelsScreen';
 import { SettingsScreen } from '@/screens/SettingsScreen';
 import { VideosScreen } from '@/screens/VideosScreen';
 import { appleEinstellungen } from '@/lib/appleEinstellungen';
-import { azanLaeuft, azanStoppen, useAzanAusloeser, useAzanLauf } from '@/lib/azanRuf';
+import { azanLaeuft, azanStoppen, useAzanAusloeser, useAzanLauf, useNativenAdhanPlan } from '@/lib/azanRuf';
 import { useTranslation } from '@/lib/i18n';
 import {
   isScreen,
@@ -106,6 +106,9 @@ export default function App() {
   // Gebetsruf: der Ausloeser laeuft app-weit, nicht je Bildschirm — der Ruf
   // soll auch erklingen, wenn gerade der Koran-Leser offen ist.
   useAzanAusloeser();
+  // Haelt zusaetzlich den nativen Hintergrund-Alarm aktuell (Android) — feuert
+  // auch, wenn der Fernseher gerade nicht auf dieser App steht (s. azanRuf.ts).
+  useNativenAdhanPlan();
   const azanLauf = useAzanLauf();
 
   const navigate = useCallback((s: Screen) => setScreen(s), []);

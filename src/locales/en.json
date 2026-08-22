@@ -1,6 +1,7 @@
 {
   "clock": {
     "hijriDate": "{day} {month} {year}",
+    "jumua": "Jumu'a Mubarak",
     "localTime": "Local time in {city} · OK opens the menu",
     "next": "Next prayer",
     "openMenu": "OK opens the menu",
@@ -186,6 +187,14 @@
       },
       "title": "Quran font"
     },
+    "clockScale": {
+      "large": "Large",
+      "medium": "Medium",
+      "small": "Small",
+      "title": "Clock size",
+      "xlarge": "Extra large"
+    },
+    "jumuaModus": "Friday marker",
     "railHint": "Choose on the right · Back leaves settings",
     "readerAutoAdvance": "Continue to next surah",
     "readerContent": "Below the verse",
@@ -198,6 +207,7 @@
     },
     "readerTranslation": "Translation",
     "readerTranslit": "Transliteration",
+    "screensaverContent": "Show on the prayer clock",
     "sections": {
       "azan": "Call to prayer",
       "display": "Appearance",
@@ -235,7 +245,9 @@
       "title": "Minute adjustment"
     },
     "timeFormat": "Time format",
-    "title": "Settings"
+    "title": "Settings",
+    "versDesTages": "Verse of the day",
+    "wetter": "Weather"
   },
   "time": {
     "hoursShort": "h",

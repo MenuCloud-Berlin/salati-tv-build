@@ -21,6 +21,8 @@ import { calcExtras, useTvSettings } from '@/lib/settings';
 import { tagAmOrt, zeitInZone, zoneWeichtAb } from '@/lib/timezone';
 import type { Theme } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
+import { ladeVersDesTages, type VersDesTagesInhalt } from '@/lib/versDesTages';
+import { ladeWetter, wetterText, type WetterInhalt } from '@/lib/wetter';
 
 // Sechs Zeilen statt fuenf: der Sonnenaufgang ist das ENDE der Fadschr-Zeit und
 // damit die einzige Zahl, nach der man morgens wirklich schaut. Er fehlte hier,
@@ -87,8 +89,43 @@ export function ClockScreen({ location: override }: { location?: TvLocation } = 
   // Hinweis nur, wenn die Zone des Ortes wirklich von der des Fernsehers
   // abweicht — im Normalfall waere er nur Laerm.
   const andereZone = zoneWeichtAb(now, location.tz);
+  // Freitag AM ORT (nicht am Fernseher) — gleicher Kalendertag-Gedanke wie
+  // `tagesSchluessel` oben, sonst waere der Jumu'a-Hinweis in einer anderen
+  // Zeitzone am falschen Wochentag sichtbar.
+  const istFreitag = new Date(tagesSchluessel).getDay() === 5;
 
-  const s = useMemo(() => makeStyles(height, width, rtl, theme), [height, width, rtl, theme]);
+  const [vers, setVers] = useState<VersDesTagesInhalt | null>(null);
+  useEffect(() => {
+    if (!settings.versDesTagesAktiv) return;
+    let aktiv = true;
+    ladeVersDesTages(new Date(tagesSchluessel), settings.language)
+      .then((v) => { if (aktiv) setVers(v); })
+      .catch(() => { if (aktiv) setVers(null); }); // still: kein Vers ist kein Fehlerbild wert
+    // Raeumt bei jedem Neulauf (auch beim Ausschalten) den zuletzt gezeigten
+    // Vers weg, statt es synchron im Effekt-Koerper selbst zu tun.
+    return () => { aktiv = false; setVers(null); };
+  }, [settings.versDesTagesAktiv, settings.language, tagesSchluessel]);
+
+  const [wetter, setWetter] = useState<WetterInhalt | null>(null);
+  useEffect(() => {
+    if (!settings.wetterAktiv) return;
+    let aktiv = true;
+    const holen = () => {
+      ladeWetter(location.lat, location.lon)
+        .then((w) => { if (aktiv) setWetter(w); })
+        .catch(() => { if (aktiv) setWetter(null); });
+    };
+    holen();
+    // 30 Min. Takt: Temperatur muss nicht sekundengenau sein, spart Anfragen
+    // auf einem Geraet, das oft tagelang durchlaeuft.
+    const id = setInterval(holen, 30 * 60 * 1000);
+    return () => { aktiv = false; clearInterval(id); setWetter(null); };
+  }, [settings.wetterAktiv, location.lat, location.lon]);
+
+  const s = useMemo(
+    () => makeStyles(height, width, rtl, theme, settings.clockScale),
+    [height, width, rtl, theme, settings.clockScale],
+  );
   // Countdown-Einheiten in der Oberflaechensprache (Audit 2026-07-28, T17) —
   // vorher stand „1h 55m" auch mitten im arabischen Satz. Bewusst ohne useMemo:
   // `t` ist bei jedem Render eine neue Closure, ein Memo auf [t] wuerde nie
@@ -115,12 +152,22 @@ export function ClockScreen({ location: override }: { location?: TvLocation } = 
       <View style={s.header}>
         {/* Audit 2026-07-28 (T16): stand hier fest deutsch („Mekka") — auch in
             arabischer Oberflaeche. */}
-        <Text style={s.location} numberOfLines={1}>{locationLabel(location, locale)}</Text>
+        <View style={s.locationBlock}>
+          <Text style={s.location} numberOfLines={1}>{locationLabel(location, locale)}</Text>
+          {settings.jumuaModusAktiv && istFreitag && (
+            <Text style={s.jumua} numberOfLines={1}>{t('clock.jumua')}</Text>
+          )}
+        </View>
         <View style={s.dateBlock}>
           <Text style={s.date} numberOfLines={1}>{dateLabel}</Text>
           <Text style={s.hijri} numberOfLines={1}>
             {t('clock.hijriDate', { day: hijri.day, month: hijri.month, year: hijri.year })}
           </Text>
+          {wetter && (
+            <Text style={s.wetter} numberOfLines={1}>
+              {wetter.temperaturC}° · {wetterText(wetter.code)}
+            </Text>
+          )}
         </View>
       </View>
 
@@ -159,6 +206,15 @@ export function ClockScreen({ location: override }: { location?: TvLocation } = 
           );
         })}
       </View>
+
+      {/* Vers des Tages — knapp gehalten, damit die eng bemessene Hoehe
+          (s. Kommentar oben zu useWindowDimensions) nicht ueberladen wird. */}
+      {vers && (
+        <View style={s.versBlock}>
+          <Text style={s.versArabisch} numberOfLines={2}>{vers.arabisch}</Text>
+          <Text style={s.versUebersetzung} numberOfLines={2}>{vers.uebersetzung}</Text>
+        </View>
+      )}
 
       {/* Die Fusszeile sagt beim ersten Mal, wie man weiterkommt — danach ist
           sie nur noch Text auf einem Bild, das sonst nichts sagen will. Sie
@@ -222,12 +278,12 @@ function formatDate(now: Date, tag: string): string {
 }
 
 /** Höhen-/breiten-relative Styles — fit-by-design auf jeder TV-Dichte. */
-function makeStyles(h: number, w: number, rtl: boolean, theme: Theme) {
+function makeStyles(h: number, w: number, rtl: boolean, theme: Theme, clockScale = 1) {
   // Clamp gegen Extremwerte (sehr kleine/große dp-Flächen).
   const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
   const padV = clamp(h * 0.055, 24, 72);
   const padH = clamp(w * 0.06, 32, 120);
-  const clockSize = clamp(h * 0.24, 92, 280);
+  const clockSize = clamp(h * 0.24, 92, 280) * clockScale;
   // Buchstabenabstand zerreisst arabische/persische Ligaturen — im RTL-Layout
   // deshalb auf 0. Die lateinische Wortmarke „SALATI" behaelt ihren Abstand.
   const track = rtl ? 0 : undefined;
@@ -250,10 +306,13 @@ function makeStyles(h: number, w: number, rtl: boolean, theme: Theme) {
       height: Math.min(w * 0.85, h * 1.15),
     },
     header: { flexDirection: rtl ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+    locationBlock: { alignItems: rtl ? 'flex-end' : 'flex-start', flexShrink: 1 },
     location: { color: theme.accent, fontSize: clamp(h * 0.055, 20, 40), fontWeight: '700', letterSpacing: track ?? 1, flexShrink: 1 },
+    jumua: { color: theme.accent, opacity: 0.85, fontSize: clamp(h * 0.03, 12, 22), marginTop: 2, textAlign: rtl ? 'right' : 'left' },
     dateBlock: { alignItems: rtl ? 'flex-start' : 'flex-end', flexShrink: 1 },
     date: { color: theme.textMuted, fontSize: clamp(h * 0.042, 15, 32), textAlign: rtl ? 'left' : 'right' },
     hijri: { color: theme.textFaint, fontSize: clamp(h * 0.032, 12, 24), marginTop: 2, textAlign: rtl ? 'left' : 'right' },
+    wetter: { color: theme.textFaint, fontSize: clamp(h * 0.03, 12, 22), marginTop: 2, textAlign: rtl ? 'left' : 'right' },
     clockBlock: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center' },
     clock: { color: theme.text, fontSize: clockSize, fontWeight: '200', letterSpacing: 2, lineHeight: clockSize * 1.02 },
     seconds: { color: theme.accent, fontSize: clockSize * 0.3, fontWeight: '300', marginBottom: clockSize * 0.14, marginLeft: 10 },
@@ -284,6 +343,14 @@ function makeStyles(h: number, w: number, rtl: boolean, theme: Theme) {
     // Eigener Abstand nach oben: die Reihe stiess vorher direkt an die
     // Wortmarke, weil `space-between` den Rest verteilt und unten nichts uebrig
     // blieb (Bildschirmbefund 2026-08-08).
+    versBlock: { alignItems: 'center', gap: 2, marginTop: clamp(h * 0.01, 4, 10) },
+    versArabisch: {
+      color: theme.text, fontSize: clamp(h * 0.036, 15, 30), fontWeight: '500',
+      textAlign: 'center', writingDirection: 'rtl', maxWidth: w * 0.82,
+    },
+    versUebersetzung: {
+      color: theme.textMuted, fontSize: clamp(h * 0.026, 11, 20), textAlign: 'center', maxWidth: w * 0.7,
+    },
     verborgen: { opacity: 0 },
     footer: { alignItems: 'center', gap: clamp(h * 0.008, 3, 8), marginTop: clamp(h * 0.022, 8, 20) },
     brand: { color: theme.accent, opacity: 0.75, fontSize: clamp(h * 0.03, 14, 26), letterSpacing: 12, textAlign: 'center' },

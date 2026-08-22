@@ -1,6 +1,7 @@
 {
   "clock": {
     "hijriDate": "{day}. {month} {year}",
+    "jumua": "Jumu'a Mubarak",
     "localTime": "Ortszeit {city} · OK öffnet das Menü",
     "next": "Nächstes Gebet",
     "openMenu": "OK öffnet das Menü",
@@ -187,6 +188,14 @@
       "title": "Koran-Schriftart"
     },
     "railHint": "Rechts wählen · Zurück-Taste verlässt die Einstellungen",
+    "clockScale": {
+      "large": "Groß",
+      "medium": "Mittel",
+      "small": "Klein",
+      "title": "Uhr-Größe",
+      "xlarge": "Sehr groß"
+    },
+    "jumuaModus": "Freitags-Kennzeichnung",
     "readerAutoAdvance": "Weiter zur nächsten Sure",
     "readerContent": "Unter dem Vers",
     "readerScale": {
@@ -196,6 +205,7 @@
       "title": "Koran-Schriftgröße",
       "xlarge": "Sehr groß"
     },
+    "screensaverContent": "Auf der Gebetsuhr zeigen",
     "readerTranslation": "Übersetzung",
     "readerTranslit": "Umschrift",
     "sections": {
@@ -235,7 +245,9 @@
       "title": "Minuten-Korrektur"
     },
     "timeFormat": "Zeitformat",
-    "title": "Einstellungen"
+    "title": "Einstellungen",
+    "versDesTages": "Vers des Tages",
+    "wetter": "Wetter"
   },
   "time": {
     "hoursShort": "h",

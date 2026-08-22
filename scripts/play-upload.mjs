@@ -8,7 +8,7 @@ const require = createRequire('C:/Users/domen/Documents/MenuCloud/scripts/');
 const jwt = require('jsonwebtoken');
 
 const PACKAGE = 'de.salatibox.tv';
-const SA_PATH = 'C:/Users/domen/Documents/menucloud-mobile-build/play-service-account.json';
+const SA_PATH = 'C:/Users/domen/Documents/90_Werkstatt/menucloud-mobile-build/play-service-account.json';
 const TV = 'C:/Users/domen/Documents/SalatiTech/apps/tv';
 const APK = 'C:/Users/domen/AppData/Local/Temp/claude/C--Users-domen-Documents-SalatiTech/9081dad2-7d18-4f23-b8b0-9d0a2da03c6f/scratchpad/salati-tv-fixed.apk';
 

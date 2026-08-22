@@ -11,7 +11,7 @@ const require = createRequire('C:/Users/domen/Documents/MenuCloud/scripts/');
 const jwt = require('jsonwebtoken');
 
 const PACKAGE = 'de.salatibox.tv';
-const SA_PATH = 'C:/Users/domen/Documents/menucloud-mobile-build/play-service-account.json';
+const SA_PATH = 'C:/Users/domen/Documents/90_Werkstatt/menucloud-mobile-build/play-service-account.json';
 // Pfad zum AAB als Argument. Stand bis 2026-07-29 fest verdrahtet auf eine
 // Datei im Zwischenspeicher einer alten Sitzung — dadurch ging zweimal ein
 // veraltetes Bundle (versionCode 1) hoch, waehrend Play korrekt ablehnte

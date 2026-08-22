@@ -103,6 +103,14 @@ export interface TvSettings {
   azan: AzanPerPrayer;
   /** Lautstaerke des Gebetsrufs, 0,1 bis 1,0. */
   azanVolume: number;
+  /** Groesse der Uhr auf dem Screensaver-Bildschirm, als Faktor (s. CLOCK_SCALES). */
+  clockScale: ClockScale;
+  /** Rotierenden Vers des Tages unter der Uhr zeigen (Datenquelle: Handy-App-Verspool). */
+  versDesTagesAktiv: boolean;
+  /** Freitags-Kennzeichnung auf dem Screensaver (rein visuell, keine eigene Zeitlogik). */
+  jumuaModusAktiv: boolean;
+  /** Temperatur-Anzeige auf dem Screensaver (Open-Meteo, kein Schluessel/Kosten). */
+  wetterAktiv: boolean;
   loaded: boolean;
 }
 
@@ -114,6 +122,15 @@ export const DEFAULT_READER_SCALE: ReaderScale = 1;
 
 function isReaderScale(v: unknown): v is ReaderScale {
   return typeof v === 'number' && (READER_SCALES as readonly number[]).includes(v);
+}
+
+/** Waehlbare Groessen der Screensaver-Uhr — gleiches Stufen-Prinzip wie READER_SCALES. */
+export const CLOCK_SCALES = [0.8, 1, 1.25, 1.5] as const;
+export type ClockScale = (typeof CLOCK_SCALES)[number];
+export const DEFAULT_CLOCK_SCALE: ClockScale = 1;
+
+function isClockScale(v: unknown): v is ClockScale {
+  return typeof v === 'number' && (CLOCK_SCALES as readonly number[]).includes(v);
 }
 
 function isQuranFontId(v: unknown): v is QuranFontId {
@@ -149,6 +166,13 @@ let state: TvSettings = {
   readerAutoAdvance: true,
   azan: AZAN_AUS,
   azanVolume: 1,
+  clockScale: DEFAULT_CLOCK_SCALE,
+  // Neue Bildschirminhalte bewusst opt-in, wie hintergrund/bedienungAusblenden
+  // oben: niemand soll nach einem Update ungefragt neue Inhalte auf dem
+  // Wohnzimmer-Fernseher sehen.
+  versDesTagesAktiv: false,
+  jumuaModusAktiv: false,
+  wetterAktiv: false,
   loaded: false,
 };
 
@@ -239,6 +263,10 @@ function persist() {
       readerAutoAdvance: state.readerAutoAdvance,
       azan: state.azan,
       azanVolume: state.azanVolume,
+      clockScale: state.clockScale,
+      versDesTagesAktiv: state.versDesTagesAktiv,
+      jumuaModusAktiv: state.jumuaModusAktiv,
+      wetterAktiv: state.wetterAktiv,
     }),
   ).catch(() => {});
 }
@@ -290,6 +318,10 @@ async function hydrate() {
         readerAutoAdvance: parsed.readerAutoAdvance ?? true,
         azan: normalizeAzan(parsed.azan),
         azanVolume: clampAzanVolume(parsed.azanVolume),
+        clockScale: isClockScale(parsed.clockScale) ? parsed.clockScale : DEFAULT_CLOCK_SCALE,
+        versDesTagesAktiv: parsed.versDesTagesAktiv ?? false,
+        jumuaModusAktiv: parsed.jumuaModusAktiv ?? false,
+        wetterAktiv: parsed.wetterAktiv ?? false,
         loaded: true,
       };
     } else {
@@ -416,6 +448,30 @@ export function setAzanAlle(azan: AzanPerPrayer) {
 
 export function setAzanVolume(v: number) {
   state = { ...state, azanVolume: clampAzanVolume(v) };
+  persist();
+  emit();
+}
+
+export function setClockScale(clockScale: ClockScale) {
+  state = { ...state, clockScale };
+  persist();
+  emit();
+}
+
+export function setVersDesTagesAktiv(aktiv: boolean) {
+  state = { ...state, versDesTagesAktiv: aktiv };
+  persist();
+  emit();
+}
+
+export function setJumuaModusAktiv(aktiv: boolean) {
+  state = { ...state, jumuaModusAktiv: aktiv };
+  persist();
+  emit();
+}
+
+export function setWetterAktiv(aktiv: boolean) {
+  state = { ...state, wetterAktiv: aktiv };
   persist();
   emit();
 }

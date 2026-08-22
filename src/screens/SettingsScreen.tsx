@@ -37,18 +37,23 @@ import {
 import { QURAN_FONTS, adaptQuranText } from '@/lib/quranFonts';
 import {
   adjustOffset,
+  CLOCK_SCALES,
   READER_SCALES,
   resetOffsets,
   setAzanAlle,
   setAzanChoice,
   setAzanVolume,
+  setClockScale,
   setHighLatitude,
   setIs24h,
+  setJumuaModusAktiv,
   setLanguage,
   setLocation,
   setQuranFont,
   setQuranSukun,
   setReaderScale,
+  setVersDesTagesAktiv,
+  setWetterAktiv,
   AUSBLEND_ZEITEN,
   setBedienungAusblenden,
   setHintergrund,
@@ -498,7 +503,8 @@ function AzanSection({ s }: { s: Styles }) {
  * anderes als „Papier" in einem hellen Wohnzimmer.
  */
 function DisplaySection({ s }: { s: Styles }) {
-  const { theme: aktiv, hintergrund, bedienungAusblenden } = useTvSettings();
+  const { theme: aktiv, hintergrund, bedienungAusblenden, clockScale, versDesTagesAktiv, jumuaModusAktiv, wetterAktiv } =
+    useTvSettings();
   const { t } = useTranslation();
   return (
     <>
@@ -572,6 +578,44 @@ function DisplaySection({ s }: { s: Styles }) {
             </FocusCard>
           );
         })}
+      </View>
+
+      <Text style={s.section}>{t('settings.clockScale.title')}</Text>
+      <View style={s.row}>
+        {CLOCK_SCALES.map((v, i) => {
+          const active = clockScale === v;
+          return (
+            <FocusCard
+              key={v}
+              onPress={() => setClockScale(v)}
+              style={[s.stepWide, active && s.activeCard]}>
+              <Text style={[s.toggleLabel, active && s.activeText]} numberOfLines={1}>
+                {t(`settings.clockScale.${['small', 'medium', 'large', 'xlarge'][i]}`)}
+              </Text>
+            </FocusCard>
+          );
+        })}
+      </View>
+
+      <Text style={s.section}>{t('settings.screensaverContent')}</Text>
+      <View style={s.row}>
+        {(
+          [
+            [versDesTagesAktiv, setVersDesTagesAktiv, 'settings.versDesTages'],
+            [jumuaModusAktiv, setJumuaModusAktiv, 'settings.jumuaModus'],
+            [wetterAktiv, setWetterAktiv, 'settings.wetter'],
+          ] as const
+        ).map(([an, setter, labelKey]) => (
+          <FocusCard
+            key={labelKey}
+            onPress={() => setter(!an)}
+            style={[s.toggleCard, an && s.activeCard]}>
+            <Text style={[s.toggleLabel, an && s.activeText]} numberOfLines={2}>
+              {t(labelKey)}
+            </Text>
+            <Text style={[s.toggleState, an && s.activeText]}>{an ? '✓' : '—'}</Text>
+          </FocusCard>
+        ))}
       </View>
     </>
   );
