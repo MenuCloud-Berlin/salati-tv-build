@@ -29,7 +29,8 @@ import de.salatibox.tv.R
  * RN/Metro-Asset - deren Dateiname bekommt beim Bundling einen Hash, den
  * natives Java/Kotlin nicht kennt). Das Config-Plugin
  * (plugins/with-adhan-alarm.js) kopiert dieselben Quelldateien wie die App
- * (assets/audio/azan/*.mp3) zusaetzlich nach android/app/src/main/res/raw/.
+ * (assets/audio/azan, adhan1/adhan2/fajr als mp3) zusaetzlich nach
+ * android/app/src/main/res/raw/.
  */
 class AdhanPlaybackService : Service() {
   private var player: MediaPlayer? = null
