@@ -4,7 +4,8 @@
     "localTime": "وقت محلی {city} · دکمهٔ تأیید منو را باز می‌کند",
     "next": "نماز بعدی",
     "openMenu": "دکمه OK منو را باز می‌کند",
-    "timeLeft": "{time} باقی‌مانده"
+    "timeLeft": "{time} باقی‌مانده",
+    "jumua": "جمعه مبارک"
   },
   "common": {
     "loading": "در حال بارگذاری…",
@@ -147,7 +148,8 @@
       "ruhig": "ساده",
       "schein": "درخشش",
       "verlauf": "طیف",
-      "muster": "نقش"
+      "muster": "نقش",
+      "bewegt": "متحرک"
     },
     "current": "فعلی",
     "format12": "۱۲ ساعته (۲:۳۰ PM)",
@@ -235,7 +237,18 @@
       "title": "اصلاح دقیقه‌ای"
     },
     "timeFormat": "قالب زمان",
-    "title": "تنظیمات"
+    "title": "تنظیمات",
+    "jumuaModus": "نشانه جمعه",
+    "screensaverContent": "نمایش روی ساعت نماز",
+    "clockScale": {
+      "title": "اندازه ساعت",
+      "small": "کوچک",
+      "medium": "متوسط",
+      "large": "بزرگ",
+      "xlarge": "خیلی بزرگ"
+    },
+    "versDesTages": "آیه روز",
+    "wetter": "آب و هوا"
   },
   "time": {
     "hoursShort": "س",

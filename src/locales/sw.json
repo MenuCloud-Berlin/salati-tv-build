@@ -4,7 +4,8 @@
     "localTime": "Saa za {city} · OK hufungua menyu",
     "next": "Sala inayofuata",
     "openMenu": "OK hufungua menyu",
-    "timeLeft": "imebaki {time}"
+    "timeLeft": "imebaki {time}",
+    "jumua": "Ijumaa Mubarak"
   },
   "common": {
     "loading": "Inapakia…",
@@ -147,7 +148,8 @@
       "ruhig": "Tulivu",
       "schein": "Mwangaza",
       "verlauf": "Mpito",
-      "muster": "Muundo"
+      "muster": "Muundo",
+      "bewegt": "Inayosonga"
     },
     "current": "Sasa",
     "format12": "Saa 12 (2:30 PM)",
@@ -235,7 +237,18 @@
       "title": "Marekebisho ya dakika"
     },
     "timeFormat": "Muundo wa muda",
-    "title": "Mipangilio"
+    "title": "Mipangilio",
+    "jumuaModus": "Alama ya Ijumaa",
+    "screensaverContent": "Onyesha kwenye saa ya swala",
+    "clockScale": {
+      "title": "Ukubwa wa saa",
+      "small": "Ndogo",
+      "medium": "Wastani",
+      "large": "Kubwa",
+      "xlarge": "Kubwa sana"
+    },
+    "versDesTages": "Aya ya siku",
+    "wetter": "Hali ya hewa"
   },
   "time": {
     "hoursShort": "sa",

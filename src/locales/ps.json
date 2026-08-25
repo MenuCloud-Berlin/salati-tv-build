@@ -4,7 +4,8 @@
     "localTime": "د {city} سیمه‌ییز وخت · OK مېنو پرانیزي",
     "next": "راتلونکی لمونځ",
     "openMenu": "OK مینو پرانیزي",
-    "timeLeft": "{time} پاتې"
+    "timeLeft": "{time} پاتې",
+    "jumua": "جمعه مبارک"
   },
   "common": {
     "loading": "بارېږي…",
@@ -147,7 +148,8 @@
       "ruhig": "ساده",
       "schein": "ځلا",
       "verlauf": "تدریج",
-      "muster": "نښې"
+      "muster": "نښې",
+      "bewegt": "خوځنده"
     },
     "current": "اوسنی",
     "format12": "۱۲ ساعته (۲:۳۰ PM)",
@@ -235,7 +237,18 @@
       "title": "د دقيقو سمون"
     },
     "timeFormat": "د وخت بڼه",
-    "title": "امستنې"
+    "title": "امستنې",
+    "jumuaModus": "د جمعې نښه",
+    "screensaverContent": "د لمانځه په ساعت کې ښودل",
+    "clockScale": {
+      "title": "د ساعت اندازه",
+      "small": "کوچنی",
+      "medium": "منځنی",
+      "large": "لوی",
+      "xlarge": "ډېر لوی"
+    },
+    "versDesTages": "د ورځې آیت",
+    "wetter": "هوا"
   },
   "time": {
     "hoursShort": "س",

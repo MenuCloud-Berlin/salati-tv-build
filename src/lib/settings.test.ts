@@ -111,6 +111,14 @@ describe('setLocation / setIs24h', () => {
       readerAutoAdvance: true,
       azan: { fajr: 'aus', dhuhr: 'aus', asr: 'aus', maghrib: 'aus', isha: 'aus' },
       azanVolume: 1,
+      // Nachgetragen 2026-08-25: diese vier Felder kamen mit der Uhr-Groesse,
+      // der Freitags-Kennzeichnung und den Uhr-Einblendungen dazu, standen
+      // aber nie in dieser Erwartung - der Test war seitdem rot. Genau das
+      // soll er ja bemerken, also gehoeren sie hier hinein.
+      clockScale: 1,
+      jumuaModusAktiv: false,
+      versDesTagesAktiv: false,
+      wetterAktiv: false,
     });
   });
 

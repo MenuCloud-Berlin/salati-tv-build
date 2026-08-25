@@ -4,7 +4,8 @@
     "localTime": "Hora local de {city} · OK abre el menú",
     "next": "Próxima oración",
     "openMenu": "OK abre el menú",
-    "timeLeft": "faltan {time}"
+    "timeLeft": "faltan {time}",
+    "jumua": "Yumu'a Mubarak"
   },
   "common": {
     "loading": "Cargando…",
@@ -147,7 +148,8 @@
       "ruhig": "Liso",
       "schein": "Resplandor",
       "verlauf": "Degradado",
-      "muster": "Patrón"
+      "muster": "Patrón",
+      "bewegt": "En movimiento"
     },
     "current": "Actual",
     "format12": "12 horas (2:30 PM)",
@@ -235,7 +237,18 @@
       "title": "Ajuste de minutos"
     },
     "timeFormat": "Formato de hora",
-    "title": "Ajustes"
+    "title": "Ajustes",
+    "jumuaModus": "Marca del viernes",
+    "screensaverContent": "Mostrar en el reloj de oración",
+    "clockScale": {
+      "title": "Tamaño del reloj",
+      "small": "Pequeño",
+      "medium": "Mediano",
+      "large": "Grande",
+      "xlarge": "Muy grande"
+    },
+    "versDesTages": "Versículo del día",
+    "wetter": "Tiempo"
   },
   "time": {
     "hoursShort": "h",

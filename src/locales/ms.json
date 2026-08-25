@@ -4,7 +4,8 @@
     "localTime": "Waktu tempatan {city} · OK membuka menu",
     "next": "Solat seterusnya",
     "openMenu": "OK membuka menu",
-    "timeLeft": "baki {time}"
+    "timeLeft": "baki {time}",
+    "jumua": "Jumaat Mubarak"
   },
   "common": {
     "loading": "Memuatkan…",
@@ -147,7 +148,8 @@
       "ruhig": "Polos",
       "schein": "Cahaya",
       "verlauf": "Kecerunan",
-      "muster": "Corak"
+      "muster": "Corak",
+      "bewegt": "Bergerak"
     },
     "current": "Semasa",
     "format12": "12 jam (2:30 PM)",
@@ -235,7 +237,18 @@
       "title": "Pelarasan minit"
     },
     "timeFormat": "Format masa",
-    "title": "Tetapan"
+    "title": "Tetapan",
+    "jumuaModus": "Penanda Jumaat",
+    "screensaverContent": "Papar pada jam solat",
+    "clockScale": {
+      "title": "Saiz jam",
+      "small": "Kecil",
+      "medium": "Sederhana",
+      "large": "Besar",
+      "xlarge": "Sangat besar"
+    },
+    "versDesTages": "Ayat hari ini",
+    "wetter": "Cuaca"
   },
   "time": {
     "hoursShort": "j",

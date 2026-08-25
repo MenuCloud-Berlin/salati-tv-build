@@ -51,7 +51,7 @@ module.exports = {
   // 1.10.0 (Release 2026-08-23): nativer Adhan-Hintergrunddienst (Android,
   // Foreground-Service statt reinem JS-Interval), plus Screensaver-Optionen
   // (Uhr-Groesse, Vers des Tages, Jumu'a-Kennzeichnung, Wetter).
-  version: '1.10.0',
+  version: '1.11.0',
   scheme: 'salatitv',
   orientation: 'landscape',
   icon: './assets/icon.png',
@@ -65,7 +65,7 @@ module.exports = {
     // 8 = 1.4.0; 7 liegt als 1.3.0 im Produktions-Track. 9 = 1.5.0, 10 = 1.6.0,
     // 11 = 1.7.0, 12 = 1.8.0 (von Play abgelehnt, siehe oben).
     // 16 = 1.10.0 (nativer Adhan-Dienst, Screensaver-Optionen).
-    versionCode: 16,
+    versionCode: 17,
     // Der Vordergrund darf NICHT icon.png sein: das ist seit 1.8.1 vollflaechig,
     // und die Maske zeigt vom 108-dp-Vordergrund nur die mittleren 72 dp — die
     // Zacken waeren abgeschnitten.
@@ -77,7 +77,7 @@ module.exports = {
     bundleIdentifier: 'de.salatibox.tv',
     // Wird beim Bauen vom Workflow hochgezaehlt; Apple lehnt eine schon
     // hochgeladene Build-Nummer ab, auch wenn die Version dieselbe bleibt.
-    buildNumber: '1',
+    buildNumber: '2',
     infoPlist: {
       // Der Fernseher oeffnet fuer die Handy-Kopplung einen TCP-Server im WLAN
       // (src/lib/pairing.ts). Ohne diesen Text verweigert tvOS den Zugriff aufs

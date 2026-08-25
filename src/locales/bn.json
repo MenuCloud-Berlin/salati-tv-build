@@ -4,7 +4,8 @@
     "localTime": "{city}-এর স্থানীয় সময় · OK মেনু খোলে",
     "next": "পরবর্তী নামাজ",
     "openMenu": "OK মেনু খোলে",
-    "timeLeft": "বাকি {time}"
+    "timeLeft": "বাকি {time}",
+    "jumua": "জুমা মোবারক"
   },
   "common": {
     "loading": "লোড হচ্ছে…",
@@ -147,7 +148,8 @@
       "ruhig": "সাদামাটা",
       "schein": "আভা",
       "verlauf": "গ্রেডিয়েন্ট",
-      "muster": "নকশা"
+      "muster": "নকশা",
+      "bewegt": "চলমান"
     },
     "current": "বর্তমান",
     "format12": "১২ ঘণ্টা (২:৩০ PM)",
@@ -235,7 +237,18 @@
       "title": "মিনিট সংশোধন"
     },
     "timeFormat": "সময় বিন্যাস",
-    "title": "সেটিংস"
+    "title": "সেটিংস",
+    "jumuaModus": "শুক্রবারের চিহ্ন",
+    "screensaverContent": "নামাজ ঘড়িতে দেখান",
+    "clockScale": {
+      "title": "ঘড়ির আকার",
+      "small": "ছোট",
+      "medium": "মাঝারি",
+      "large": "বড়",
+      "xlarge": "অতি বড়"
+    },
+    "versDesTages": "দিনের আয়াত",
+    "wetter": "আবহাওয়া"
   },
   "time": {
     "hoursShort": "ঘ",

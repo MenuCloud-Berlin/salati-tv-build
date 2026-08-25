@@ -4,7 +4,8 @@
     "localTime": "Waktu setempat {city} · OK membuka menu",
     "next": "Salat berikutnya",
     "openMenu": "OK membuka menu",
-    "timeLeft": "sisa {time}"
+    "timeLeft": "sisa {time}",
+    "jumua": "Jumat Mubarak"
   },
   "common": {
     "loading": "Memuat…",
@@ -147,7 +148,8 @@
       "ruhig": "Polos",
       "schein": "Cahaya",
       "verlauf": "Gradasi",
-      "muster": "Motif"
+      "muster": "Motif",
+      "bewegt": "Bergerak"
     },
     "current": "Saat ini",
     "format12": "12 jam (2:30 PM)",
@@ -235,7 +237,18 @@
       "title": "Koreksi menit"
     },
     "timeFormat": "Format waktu",
-    "title": "Pengaturan"
+    "title": "Pengaturan",
+    "jumuaModus": "Penanda Jumat",
+    "screensaverContent": "Tampilkan di jam salat",
+    "clockScale": {
+      "title": "Ukuran jam",
+      "small": "Kecil",
+      "medium": "Sedang",
+      "large": "Besar",
+      "xlarge": "Sangat besar"
+    },
+    "versDesTages": "Ayat hari ini",
+    "wetter": "Cuaca"
   },
   "time": {
     "hoursShort": "j",

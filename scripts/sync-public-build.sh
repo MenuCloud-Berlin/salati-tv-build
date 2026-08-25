@@ -33,6 +33,15 @@ rm -rf screenshots store coverage
 # Sicherheitsnetz, falls je etwas Vertrauliches getrackt wuerde.
 rm -f credentials.json .env .env.* *.jks *.p12 *.p8 2>/dev/null || true
 
+# Interne Planungs-/Audit-Dokumente gehoeren NICHT in den oeffentlichen
+# Spiegel (Vorfall 2026-08-24: USER-TODO.md und docs/ mit internen Audits
+# und Ablehnungs-Notizen standen wochenlang oeffentlich lesbar auf GitHub,
+# weil `git archive` sie unveraendert mitspiegelt). AGENTS.md/CLAUDE.md/
+# BACKLOG.md/PLAN-*/PLAY-* vorsorglich mit ausgeschlossen, falls sie hier
+# je auftauchen (existieren in apps/tv aktuell nicht).
+rm -rf docs
+rm -f USER-TODO.md AGENTS.md CLAUDE.md BACKLOG.md AUDIT-*.md PLAN-*.md PLAY-*.md 2>/dev/null || true
+
 cat > README.md <<'MD'
 # Salati TV — Build-Mirror (öffentlich)
 

@@ -4,7 +4,8 @@
     "localTime": "التوقيت المحلي في {city} · زر موافق يفتح القائمة",
     "next": "الصلاة القادمة",
     "openMenu": "زر OK يفتح القائمة",
-    "timeLeft": "بعد {time}"
+    "timeLeft": "بعد {time}",
+    "jumua": "جمعة مباركة"
   },
   "common": {
     "loading": "جارٍ التحميل…",
@@ -147,7 +148,8 @@
       "ruhig": "هادئة",
       "schein": "إضاءة",
       "verlauf": "تدرّج",
-      "muster": "زخرفة"
+      "muster": "زخرفة",
+      "bewegt": "متحرك"
     },
     "current": "الحالي",
     "format12": "١٢ ساعة (2:30 PM)",
@@ -235,7 +237,18 @@
       "title": "تعديل الدقائق"
     },
     "timeFormat": "صيغة الوقت",
-    "title": "الإعدادات"
+    "title": "الإعدادات",
+    "jumuaModus": "علامة الجمعة",
+    "screensaverContent": "إظهار على ساعة الصلاة",
+    "clockScale": {
+      "title": "حجم الساعة",
+      "small": "صغير",
+      "medium": "متوسط",
+      "large": "كبير",
+      "xlarge": "كبير جدًا"
+    },
+    "versDesTages": "آية اليوم",
+    "wetter": "الطقس"
   },
   "time": {
     "hoursShort": "س",

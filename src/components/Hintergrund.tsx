@@ -1,6 +1,6 @@
-import { useId, useMemo } from 'react';
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
-import Svg, { Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
+import { useEffect, useId, useMemo, useState } from 'react';
+import { AccessibilityInfo, Animated, Easing, StyleSheet, useWindowDimensions, View } from 'react-native';
+import Svg, { Circle, Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
 import { AmbientGlow } from '@/components/AmbientGlow';
 import { useTvSettings } from '@/lib/settings';
@@ -24,9 +24,9 @@ import { useTheme } from '@/lib/useTheme';
 // Flaeche mit Kante — genau daran ist die erste Fassung des Lichtscheins
 // gescheitert (s. components/AmbientGlow.tsx).
 
-export type HintergrundId = 'ruhig' | 'schein' | 'verlauf' | 'muster';
+export type HintergrundId = 'ruhig' | 'schein' | 'verlauf' | 'muster' | 'bewegt';
 
-export const HINTERGRUENDE: readonly HintergrundId[] = ['ruhig', 'schein', 'verlauf', 'muster'];
+export const HINTERGRUENDE: readonly HintergrundId[] = ['ruhig', 'schein', 'verlauf', 'muster', 'bewegt'];
 
 export function istHintergrundId(v: unknown): v is HintergrundId {
   return typeof v === 'string' && (HINTERGRUENDE as readonly string[]).includes(v);
@@ -50,6 +50,8 @@ export function Hintergrund() {
   );
 
   if (hintergrund === 'ruhig') return null;
+
+  if (hintergrund === 'bewegt') return <BewegterGrund />;
 
   if (hintergrund === 'schein') {
     // Zwei Lichter aus gegenueberliegenden Ecken — dieselbe Anordnung wie im
@@ -147,4 +149,124 @@ function quadrat(cx: number, cy: number, r: number, drehung: number): string {
     return `${(cx + r * Math.cos(w)).toFixed(2)},${(cy + r * Math.sin(w)).toFixed(2)}`;
   });
   return `M${punkte[0]} L${punkte[1]} L${punkte[2]} L${punkte[3]} Z`;
+}
+
+
+// --------------------------------------------------------------------------
+// "bewegt": die Rosette aus den Lernvideos, langsam drehend
+//
+// Uebernommen aus content/pipeline/video_muster.html - dort war es der Grund,
+// auf dem die Folien liegen, und der User wollte genau den auf dem Fernseher
+// wiederhaben ("die Hintergruende von den Videos fand ich sehr gut, so
+// bewegende Hintergruende, das koenntest du noch fuer die Gebetsuhr bauen").
+//
+// Bewegt wird NUR ueber `transform` und mit `useNativeDriver` - die Drehung
+// laeuft damit im UI-Faden und nicht ueber die JS-Bruecke. Auf einem
+// Fernseher-Chip ist das der Unterschied zwischen ruhiger Drehung und
+// Ruckeln; ausserdem laeuft sie weiter, waehrend JS anderes tut.
+//
+// Eine volle Umdrehung dauert dreieinhalb Minuten. Schneller sieht nach
+// Bildschirmschoner aus, langsamer sieht man gar nicht.
+const DREHUNG_MS = 210_000;
+
+function BewegterGrund() {
+  const theme = useTheme();
+  const { width, height } = useWindowDimensions();
+  const kurz = Math.min(width, height);
+  // useState statt useRef: der Lint-Regelsatz verbietet Ref-Zugriff waehrend
+  // des Renderns - und im Haus ist useState das gaengige Muster fuer einen
+  // Animationswert (FocusCard, ClockScreen).
+  const [dreh] = useState(() => new Animated.Value(0));
+  const [ruhig, setRuhig] = useState(false);
+
+  // Systemeinstellung "Bewegung reduzieren" achten: dann steht die Rosette
+  // still, statt sich zu drehen. Sie bleibt sichtbar - der Hintergrund ist
+  // die Zierde, nicht die Bewegung.
+  useEffect(() => {
+    let lebt = true;
+    AccessibilityInfo.isReduceMotionEnabled().then((an) => lebt && setRuhig(an));
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', (an) => setRuhig(an));
+    return () => {
+      lebt = false;
+      sub.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (ruhig) return;
+    const schleife = Animated.loop(
+      Animated.timing(dreh, {
+        toValue: 1,
+        duration: DREHUNG_MS,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    );
+    schleife.start();
+    return () => schleife.stop();
+  }, [dreh, ruhig]);
+
+  const winkel = dreh.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  // Die Rosette ist groesser als der Bildschirm und sitzt mittig - so laeuft
+  // beim Drehen nie eine Ecke ins Bild.
+  const gr = Math.round(Math.max(width, height) * 1.35);
+
+  return (
+    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+      <AmbientGlow color={theme.accent} size={kurz * 1.2} top={-height * 0.25} left={-width * 0.1} />
+      <Animated.View
+        style={{
+          position: 'absolute',
+          left: (width - gr) / 2,
+          top: (height - gr) / 2,
+          width: gr,
+          height: gr,
+          transform: [{ rotate: winkel }],
+        }}>
+        <Rosette groesse={gr} farbe={theme.accent} />
+      </Animated.View>
+    </View>
+  );
+}
+
+/** Zwoelf gleich grosse Kreise auf einem Kreis - das Grundmuster vieler
+ *  Ornamente. Ihre Schnittpunkte bilden die Blattform von selbst, es braucht
+ *  also keine gezeichneten Blaetter. Dazu feine Strahlen nach aussen: ohne sie
+ *  saehe die Rosette gedreht genauso aus wie ungedreht, und die Bewegung waere
+ *  unsichtbar (derselbe Befund wie beim Videohintergrund). */
+function Rosette({ groesse, farbe }: { groesse: number; farbe: string }) {
+  const m = groesse / 2;
+  const r = groesse * 0.21;
+  const kreise = Array.from({ length: 12 }, (_, i) => {
+    const w = (i * Math.PI) / 6;
+    return { cx: m + r * Math.cos(w), cy: m + r * Math.sin(w) };
+  });
+  const strahlen = Array.from({ length: 24 }, (_, i) => {
+    const w = (i * Math.PI) / 12;
+    const r1 = 2 * r + groesse * 0.018;
+    const r2 = r1 + groesse * (i % 2 ? 0.04 : 0.026);
+    return `M${(m + r1 * Math.cos(w)).toFixed(1)},${(m + r1 * Math.sin(w)).toFixed(1)} `
+      + `L${(m + r2 * Math.cos(w)).toFixed(1)},${(m + r2 * Math.sin(w)).toFixed(1)}`;
+  }).join(' ');
+  const strich = Math.max(1, groesse * 0.0012);
+
+  return (
+    <Svg width={groesse} height={groesse} viewBox={`0 0 ${groesse} ${groesse}`}>
+      {kreise.map((k, i) => (
+        <Circle
+          key={i}
+          cx={k.cx}
+          cy={k.cy}
+          r={r}
+          fill="none"
+          stroke={farbe}
+          strokeOpacity={0.13}
+          strokeWidth={strich}
+        />
+      ))}
+      <Circle cx={m} cy={m} r={r} fill="none" stroke={farbe} strokeOpacity={0.11} strokeWidth={strich} />
+      <Circle cx={m} cy={m} r={2 * r} fill="none" stroke={farbe} strokeOpacity={0.1} strokeWidth={strich} />
+      <Path d={strahlen} stroke={farbe} strokeOpacity={0.1} strokeWidth={strich} fill="none" />
+    </Svg>
+  );
 }

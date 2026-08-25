@@ -6,15 +6,28 @@ import { Icon } from '@/components/Icon';
 import { makeRowStyles, rowIconSize } from '@/components/rowStyles';
 import { StateView } from '@/components/StateView';
 import { VideoPlayer } from '@/components/VideoPlayer';
-import { fetchVideos, fmtDuration, groupBySeries,
-  kamAusAblage, type Section, type VideoEntry } from '@/lib/content';
+import { fetchVideos, fmtDuration, groupByCourse, groupBySeries, hatKurse,
+  kamAusAblage, type Kurs, type Section, type VideoEntry } from '@/lib/content';
 import { useTranslation } from '@/lib/i18n';
 import { useTheme } from '@/lib/useTheme';
 
-// Lern-Videos-Browser: Netflix-artige Reihen (nach series_title gruppiert),
-// D-Pad-Fokus, Auswahl spielt das Video im Vollbild (nativer Player).
+// Lern-Videos-Browser mit ZWEI Ebenen (seit 2026-08-25):
+//
+//   1. Kurse als Kacheln  - "welchen Kurs mache ich?"
+//   2. Kapitel als Reihen - Netflix-artig, Auswahl spielt im Vollbild
+//
+// Vorher war es EINE Ebene mit Reihen je Serie. Bei inzwischen 145 Eintraegen
+// braucht man mit dem Steuerkreuz Dutzende Tastendruecke bis zum Ziel - auf
+// dem Fernseher ist das der Unterschied zwischen bedienbar und unbedienbar
+// (User-Vorgabe: "erstmal auswaehlen welchen Kurs man macht, welches Kapitel,
+// welches Video").
+//
+// Bringt der Index keine Kursfelder mit (aeltere Fassung), bleibt es bei der
+// alten Reihen-Ansicht - deshalb steht `kurse.length > 0` in der Weiche.
 // Quelle: die vorhandene R2-videos/index.json (kein Neu-Hosting).
 export function VideosScreen() {
+  const [videos, setVideos] = useState<VideoEntry[] | null>(null);
+  const [kursId, setKursId] = useState<string | null>(null);
   const [sections, setSections] = useState<Section<VideoEntry>[] | null>(null);
   const [error, setError] = useState(false);
   const [playing, setPlaying] = useState<string | null>(null);
@@ -34,13 +47,18 @@ export function VideosScreen() {
   const reload = () => {
     setError(false);
     setSections(null);
+    setVideos(null);
     setAttempt((a) => a + 1);
   };
 
   useEffect(() => {
     let alive = true;
     fetchVideos()
-      .then((v) => alive && setSections(groupBySeries(v)))
+      .then((v) => {
+        if (!alive) return;
+        setVideos(v);
+        setSections(groupBySeries(v));
+      })
       .catch(() => alive && setError(true));
     return () => {
       alive = false;
@@ -54,10 +72,17 @@ export function VideosScreen() {
         setPlaying(null);
         return true;
       }
+      // Eine Ebene zurueck: aus den Kapiteln zurueck in die Kursauswahl.
+      // Ohne das haette die Zurueck-Taste den ganzen Bereich verlassen und
+      // der Weg zum Nachbarkurs fuehrte ueber das Hauptmenue.
+      if (kursId) {
+        setKursId(null);
+        return true;
+      }
       return false;
     });
     return () => sub.remove();
-  }, [playing]);
+  }, [playing, kursId]);
 
   if (playing) {
     return <VideoPlayer uri={playing} onEnd={() => setPlaying(null)} />;
@@ -70,15 +95,68 @@ export function VideosScreen() {
   if (error) {
     return <StateView messageKey="videos.loadError" onAction={reload} />;
   }
-  if (!sections) {
+  if (!sections || !videos) {
     return <StateView loading onAction={reload} />;
   }
 
+  const kurse = hatKurse(videos) ? groupByCourse(videos) : [];
+  const kurs: Kurs | undefined = kurse.find((k) => k.id === kursId);
+
+  // Ebene 1: Kursauswahl.
+  if (kurse.length > 0 && !kurs) {
+    return (
+      <ScrollView style={styles.root} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <Text style={styles.title}>{t('videos.title')}</Text>
+        {kamAusAblage('videos') ? <Text style={styles.cardMeta}>{t('common.offlineStreams')}</Text> : null}
+        <View style={styles.section}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.rowScroll}
+            contentContainerStyle={styles.row}>
+            {kurse.map((k, i) => (
+              <FocusCard
+                key={k.id}
+                hasTVPreferredFocus={i === 0}
+                onPress={() => setKursId(k.id)}
+                style={styles.card}>
+                <View style={styles.thumb}>
+                  <Text style={styles.thumbNummer} numberOfLines={1} adjustsFontSizeToFit>
+                    {k.ordnung}
+                  </Text>
+                  <View style={styles.thumbSymbol}>
+                    <Icon name="play" size={Math.round(rowIconSize(height) * 0.62)} color={theme.accent} />
+                  </View>
+                </View>
+                <Text style={styles.cardTitle} numberOfLines={2}>
+                  {k.titel}
+                </Text>
+                <Text style={styles.cardMeta} numberOfLines={1}>
+                  {k.kapitel.length} · {k.videos.length}
+                </Text>
+              </FocusCard>
+            ))}
+          </ScrollView>
+        </View>
+      </ScrollView>
+    );
+  }
+
+  // Ebene 2: Kapitel des gewaehlten Kurses (oder die alte Reihen-Ansicht,
+  // wenn der Index keine Kurse fuehrt).
+  const reihen: Section<VideoEntry>[] = kurs
+    ? kurs.kapitel.map((kap) => ({
+        key: `k${kap.nummer}`,
+        title: `${kap.nummer}. ${kap.titel}`.trim(),
+        items: kap.videos,
+      }))
+    : sections;
+
   return (
     <ScrollView style={styles.root} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-      <Text style={styles.title}>{t('videos.title')}</Text>
+      <Text style={styles.title}>{kurs ? kurs.titel : t('videos.title')}</Text>
       {kamAusAblage('videos') ? <Text style={styles.cardMeta}>{t('common.offlineStreams')}</Text> : null}
-      {sections.map((sec, si) => (
+      {reihen.map((sec, si) => (
         <View key={sec.key} style={styles.section}>
           <Text style={styles.sectionTitle}>{sec.title}</Text>
           <ScrollView

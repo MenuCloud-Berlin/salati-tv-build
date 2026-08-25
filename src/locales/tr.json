@@ -4,7 +4,8 @@
     "localTime": "{city} yerel saati · OK menüyü açar",
     "next": "Sonraki namaz",
     "openMenu": "OK menüyü açar",
-    "timeLeft": "{time} kaldı"
+    "timeLeft": "{time} kaldı",
+    "jumua": "Cuma Mübarek"
   },
   "common": {
     "loading": "Yükleniyor…",
@@ -147,7 +148,8 @@
       "ruhig": "Sade",
       "schein": "Işıltı",
       "verlauf": "Geçiş",
-      "muster": "Desen"
+      "muster": "Desen",
+      "bewegt": "Hareketli"
     },
     "current": "Şu an",
     "format12": "12 saat (2:30 PM)",
@@ -235,7 +237,18 @@
       "title": "Dakika düzeltmesi"
     },
     "timeFormat": "Saat biçimi",
-    "title": "Ayarlar"
+    "title": "Ayarlar",
+    "jumuaModus": "Cuma işareti",
+    "screensaverContent": "Namaz saatinde göster",
+    "clockScale": {
+      "title": "Saat boyutu",
+      "small": "Küçük",
+      "medium": "Orta",
+      "large": "Büyük",
+      "xlarge": "Çok büyük"
+    },
+    "versDesTages": "Günün ayeti",
+    "wetter": "Hava durumu"
   },
   "time": {
     "hoursShort": "sa",

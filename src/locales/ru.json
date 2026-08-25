@@ -4,7 +4,8 @@
     "localTime": "Местное время {city} · OK открывает меню",
     "next": "Следующий намаз",
     "openMenu": "OK открывает меню",
-    "timeLeft": "осталось {time}"
+    "timeLeft": "осталось {time}",
+    "jumua": "Джума мубарак"
   },
   "common": {
     "loading": "Загрузка…",
@@ -147,7 +148,8 @@
       "ruhig": "Спокойный",
       "schein": "Свечение",
       "verlauf": "Градиент",
-      "muster": "Узор"
+      "muster": "Узор",
+      "bewegt": "Движущийся"
     },
     "current": "Текущее",
     "format12": "12 часов (2:30 PM)",
@@ -235,7 +237,18 @@
       "title": "Поправка в минутах"
     },
     "timeFormat": "Формат времени",
-    "title": "Настройки"
+    "title": "Настройки",
+    "jumuaModus": "Отметка пятницы",
+    "screensaverContent": "Показывать на молитвенных часах",
+    "clockScale": {
+      "title": "Размер часов",
+      "small": "Маленький",
+      "medium": "Средний",
+      "large": "Большой",
+      "xlarge": "Очень большой"
+    },
+    "versDesTages": "Аят дня",
+    "wetter": "Погода"
   },
   "time": {
     "hoursShort": "ч",

@@ -28,6 +28,15 @@ export interface VideoEntry {
   duration_sec?: number;
   video_url: string;
   kind?: string;
+  // Kurs -> Kapitel -> Lektion (Index seit 2026-08-25). Alle OPTIONAL: ein
+  // aelterer Index ohne diese Felder ergibt kein Kursmenue, sondern faellt
+  // auf die Reihen-Ansicht zurueck.
+  course?: string;
+  course_title?: string;
+  course_order?: number;
+  chapter_no?: number;
+  chapter_title?: string;
+  lesson_no?: number;
 }
 
 export interface ReelEntry {
@@ -158,4 +167,71 @@ export function fmtDuration(sec?: number): string {
   const m = Math.floor(sec / 60);
   const s = sec % 60;
   return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+// --------------------------------------------------------------------------
+// Kursmenue: Kurs -> Kapitel -> Lektion
+//
+// Auf dem Fernseher ist eine Liste mit 145 Eintraegen unbedienbar - mit dem
+// Steuerkreuz braucht man Dutzende Tastendruecke bis zum Ziel. Deshalb erst
+// die Kurse (fuenf Kacheln), dann die Kapitel als Reihen (User 2026-08-25).
+// --------------------------------------------------------------------------
+export interface KursKapitel {
+  nummer: number;
+  titel: string;
+  videos: VideoEntry[];
+}
+
+export interface Kurs {
+  id: string;
+  titel: string;
+  ordnung: number;
+  kapitel: KursKapitel[];
+  videos: VideoEntry[];
+}
+
+function zahl(v: number | undefined, ersatz: number): number {
+  return typeof v === 'number' && Number.isFinite(v) ? v : ersatz;
+}
+
+/** Gruppiert die Videos zu Kursen und Kapiteln (Eintraege ohne Kurs entfallen). */
+export function groupByCourse(items: VideoEntry[]): Kurs[] {
+  const nachId = new Map<string, Kurs>();
+  for (const v of items) {
+    const id = v.course?.trim();
+    if (!id) continue;
+    let kurs = nachId.get(id);
+    if (!kurs) {
+      kurs = { id, titel: v.course_title?.trim() || id, ordnung: zahl(v.course_order, 99), kapitel: [], videos: [] };
+      nachId.set(id, kurs);
+    } else if (kurs.titel === id && v.course_title?.trim()) {
+      kurs.titel = v.course_title.trim();
+    }
+    const nummer = zahl(v.chapter_no, 99);
+    let kap = kurs.kapitel.find((k) => k.nummer === nummer);
+    if (!kap) {
+      kap = { nummer, titel: v.chapter_title?.trim() || '', videos: [] };
+      kurs.kapitel.push(kap);
+    } else if (!kap.titel && v.chapter_title?.trim()) {
+      kap.titel = v.chapter_title.trim();
+    }
+    kap.videos.push(v);
+  }
+  const kurse = [...nachId.values()];
+  for (const kurs of kurse) {
+    kurs.kapitel.sort((a, b) => a.nummer - b.nummer);
+    for (const kap of kurs.kapitel) {
+      kap.videos.sort(
+        (a, b) => zahl(a.lesson_no, a.episode_no) - zahl(b.lesson_no, b.episode_no) || a.episode_no - b.episode_no,
+      );
+    }
+    kurs.videos = kurs.kapitel.flatMap((k) => k.videos);
+  }
+  kurse.sort((a, b) => a.ordnung - b.ordnung || a.titel.localeCompare(b.titel));
+  return kurse;
+}
+
+/** true, sobald der Index eine Kurseinteilung mitbringt. */
+export function hatKurse(items: VideoEntry[]): boolean {
+  return items.some((v) => !!v.course?.trim());
 }

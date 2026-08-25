@@ -28,8 +28,8 @@ function punkte(d: string): { x: number; y: number }[] {
   }));
 }
 
-it('kennt genau vier Moeglichkeiten', () => {
-  expect([...HINTERGRUENDE]).toEqual(['ruhig', 'schein', 'verlauf', 'muster']);
+it('kennt genau fuenf Moeglichkeiten', () => {
+  expect([...HINTERGRUENDE]).toEqual(['ruhig', 'schein', 'verlauf', 'muster', 'bewegt']);
 });
 
 it('zeichnet bei „ruhig" nichts', async () => {
@@ -101,4 +101,17 @@ it('setzt beim Lichtschein zwei Lichter', async () => {
   const r = await render(<Hintergrund />);
   // AmbientGlow zeichnet je Licht einen eigenen Radialverlauf.
   expect(zaehle(r.toJSON(), 'RNSVGRadialGradient')).toBe(2);
+});
+
+it('zeichnet bei „bewegt" die Rosette', async () => {
+  setHintergrund('bewegt');
+  const r = await render(<Hintergrund />);
+  // Zwoelf Kreise auf einem Kreis plus zwei Ringe - ohne sie waere der Grund
+  // leer und die Drehung ginge ins Nichts.
+  const kreise = r.root!.queryAll((n) => typeof n.props?.r === 'number' && n.props.r > 0);
+  expect(kreise.length).toBeGreaterThanOrEqual(14);
+  // Und die Strahlen: ohne sie saehe die Rosette gedreht genauso aus wie
+  // ungedreht - die Bewegung waere unsichtbar.
+  const pfade = r.root!.queryAll((n) => typeof n.props?.d === 'string' && n.props.d.length > 0);
+  expect(pfade.length).toBeGreaterThan(0);
 });

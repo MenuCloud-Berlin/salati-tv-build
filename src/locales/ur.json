@@ -4,7 +4,8 @@
     "localTime": "{city} کا مقامی وقت · OK مینو کھولتا ہے",
     "next": "اگلی نماز",
     "openMenu": "OK مینو کھولتا ہے",
-    "timeLeft": "{time} باقی"
+    "timeLeft": "{time} باقی",
+    "jumua": "جمعہ مبارک"
   },
   "common": {
     "loading": "لوڈ ہو رہا ہے…",
@@ -147,7 +148,8 @@
       "ruhig": "سادہ",
       "schein": "روشنی",
       "verlauf": "ڈھلوان",
-      "muster": "نقش"
+      "muster": "نقش",
+      "bewegt": "متحرک"
     },
     "current": "موجودہ",
     "format12": "۱۲ گھنٹے (۲:۳۰ PM)",
@@ -235,7 +237,18 @@
       "title": "منٹ کی درستی"
     },
     "timeFormat": "وقت کی شکل",
-    "title": "ترتیبات"
+    "title": "ترتیبات",
+    "jumuaModus": "جمعہ کا نشان",
+    "screensaverContent": "نماز گھڑی پر دکھائیں",
+    "clockScale": {
+      "title": "گھڑی کا سائز",
+      "small": "چھوٹا",
+      "medium": "درمیانہ",
+      "large": "بڑا",
+      "xlarge": "بہت بڑا"
+    },
+    "versDesTages": "آج کی آیت",
+    "wetter": "موسم"
   },
   "time": {
     "hoursShort": "گھ",

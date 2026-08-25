@@ -4,7 +4,8 @@
     "localTime": "Heure locale de {city} · OK ouvre le menu",
     "next": "Prochaine prière",
     "openMenu": "OK ouvre le menu",
-    "timeLeft": "dans {time}"
+    "timeLeft": "dans {time}",
+    "jumua": "Joumou'a Moubarak"
   },
   "common": {
     "loading": "Chargement…",
@@ -147,7 +148,8 @@
       "ruhig": "Sobre",
       "schein": "Lueur",
       "verlauf": "Dégradé",
-      "muster": "Motif"
+      "muster": "Motif",
+      "bewegt": "En mouvement"
     },
     "current": "Actuelle",
     "format12": "12 heures (2:30 PM)",
@@ -235,7 +237,18 @@
       "title": "Correction en minutes"
     },
     "timeFormat": "Format de l'heure",
-    "title": "Réglages"
+    "title": "Réglages",
+    "jumuaModus": "Repère du vendredi",
+    "screensaverContent": "Afficher sur l'horloge de prière",
+    "clockScale": {
+      "title": "Taille de l'horloge",
+      "small": "Petit",
+      "medium": "Moyen",
+      "large": "Grand",
+      "xlarge": "Très grand"
+    },
+    "versDesTages": "Verset du jour",
+    "wetter": "Météo"
   },
   "time": {
     "hoursShort": "h",
