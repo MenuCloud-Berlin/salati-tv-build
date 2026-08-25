@@ -83,6 +83,33 @@ jobs:
           echo "Datei: $DATEI ($(du -h "$DATEI" | cut -f1))"
           unzip -l "$DATEI" | grep -oE "(lib/|base/lib/)[a-z0-9_-]+/" | sort -u
 
+      # Veroeffentlichen, sobald ein AAB gebaut wurde. Derselbe Weg wie bei der
+      # Handy-App (apps/mobile/scripts/ci-release-upload.mjs, hier als Kopie) -
+      # nur mit anderem Paketnamen. Ein Dienstkonto des Entwicklerkontos hat
+      # Zugriff auf ALLE seine Apps, es braucht also keinen zweiten Zugang.
+      #
+      # Fehlt das Geheimnis, wird der Schritt still uebersprungen und das AAB
+      # bleibt als Artefakt zum Hochladen von Hand. Genau so war es bis heute:
+      # der Fernseher hatte gar keinen Veroeffentlichungsschritt.
+      - name: AAB in den Play Store (Produktions-Track)
+        if: inputs.art == 'aab'
+        env:
+          PLAY_SERVICE_ACCOUNT_BASE64: ${{ secrets.PLAY_SERVICE_ACCOUNT_BASE64 }}
+        run: |
+          if [ -z "$PLAY_SERVICE_ACCOUNT_BASE64" ]; then
+            echo "PLAY_SERVICE_ACCOUNT_BASE64 fehlt - Veroeffentlichung uebersprungen."
+            echo "Das AAB haengt als Artefakt am Lauf."
+            exit 0
+          fi
+          # app.config.js exportiert das Expo-Objekt DIREKT, nicht unter .expo -
+          # anders als app.config.ts der Handy-App.
+          VERSION=$(node -e "console.log(require('./app.config.js').version)")
+          # Hausform des Fernsehers: release-notes-<version>.json
+          NOTES="store/release-notes-$VERSION.json"
+          echo "Version $VERSION, Notizen: $NOTES"
+          test -f "$NOTES"
+          node scripts/ci-release-upload.mjs             --package de.salatibox.tv             --aab android/app/build/outputs/bundle/release/app-release.aab             --notes "$NOTES"
+
       - uses: actions/upload-artifact@v4
         with:
           name: salati-tv-android
