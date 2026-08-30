@@ -15,8 +15,8 @@ import {
   type QuranFontId,
   type SukunStil,
 } from '@/lib/quranFonts';
-import { DEFAULT_THEME_ID, isThemeId, type ThemeId } from '@/lib/theme';
-import { istHintergrundId, type HintergrundId } from '@/components/Hintergrund';
+import { DEFAULT_THEME_ID, isThemeId, istAkzentId, type AkzentId, type ThemeId } from '@/lib/theme';
+import { istHintergrundId, type HintergrundId } from '@/lib/hintergruende';
 
 import {
   clampOffset,
@@ -68,8 +68,29 @@ export interface TvSettings {
   offsets: PrayerTimeOffsets;
   /** Farbwelt der Oberflaeche (s. lib/theme.ts). */
   theme: ThemeId;
-  /** Was hinter allen Bildschirmen liegt (s. components/Hintergrund.tsx). */
+  /** Was hinter allen Bildschirmen liegt (s. components/Hintergrund.tsx).
+   *  Gezeichnet (`ruhig`, `muster`, …) oder ein Motiv (`medium:<id>`). */
   hintergrund: HintergrundId;
+  /**
+   * Wie stark ein Foto- oder Video-Hintergrund abgedunkelt wird (0…1).
+   *
+   * Gilt NUR fuer Motive: ein Foto in voller Helligkeit macht die Uhrzeit
+   * darauf unlesbar, waehrend die gezeichneten Hintergruende von sich aus
+   * zurueckhaltend sind. Voreinstellung bewusst kraeftig — lieber zu ruhig als
+   * unleserlich.
+   */
+  hintergrundDimmung: Dimmung;
+  /** Foto-Hintergruende langsam wandern lassen (Systemeinstellung
+   *  „Bewegung reduzieren" sticht). */
+  fotoBewegung: boolean;
+  /** Akzentfarbe unabhaengig von der Farbwelt (s. lib/theme.ts). */
+  akzent: AkzentId;
+  /** Ziffernblatt statt Ziffern auf dem Screensaver. */
+  uhrStil: UhrStil;
+  /** Strichstaerke der Uhrzeit. */
+  uhrGewicht: UhrGewicht;
+  /** Sekunden neben der Uhrzeit zeigen. */
+  uhrSekunden: boolean;
   /**
    * Nach wie vielen Sekunden Ruhe die Bedienhinweise verschwinden.
    * 0 = nie (s. lib/bedienungSichtbar.ts).
@@ -124,6 +145,43 @@ function isReaderScale(v: unknown): v is ReaderScale {
   return typeof v === 'number' && (READER_SCALES as readonly number[]).includes(v);
 }
 
+/**
+ * Waehlbare Abdunkelungen eines Motiv-Hintergrunds.
+ *
+ * Vier weite Stufen statt eines Schiebereglers: mit der Fernbedienung ist jede
+ * Zwischenstufe ein weiterer Tastendruck (dieselbe Ueberlegung wie bei
+ * AUSBLEND_ZEITEN), und zwischen 25 % und 55 % liegt der ganze Unterschied.
+ */
+export const DIMMUNGEN = [0.15, 0.35, 0.55, 0.75] as const;
+export type Dimmung = (typeof DIMMUNGEN)[number];
+export const DEFAULT_DIMMUNG: Dimmung = 0.55;
+
+function istDimmung(v: unknown): v is Dimmung {
+  return typeof v === 'number' && (DIMMUNGEN as readonly number[]).includes(v);
+}
+
+/** Ziffern oder Ziffernblatt. */
+export const UHR_STILE = ['digital', 'analog'] as const;
+export type UhrStil = (typeof UHR_STILE)[number];
+
+function istUhrStil(v: unknown): v is UhrStil {
+  return typeof v === 'string' && (UHR_STILE as readonly string[]).includes(v);
+}
+
+/** Strichstaerke der Uhrzeit. Die Werte sind die tatsaechlichen
+ *  Schriftschnitte — so steht die Zuordnung an EINER Stelle. */
+export const UHR_GEWICHTE = ['leicht', 'normal', 'kraeftig'] as const;
+export type UhrGewicht = (typeof UHR_GEWICHTE)[number];
+export const UHR_GEWICHT_WERTE: Record<UhrGewicht, '200' | '400' | '700'> = {
+  leicht: '200',
+  normal: '400',
+  kraeftig: '700',
+};
+
+function istUhrGewicht(v: unknown): v is UhrGewicht {
+  return typeof v === 'string' && (UHR_GEWICHTE as readonly string[]).includes(v);
+}
+
 /** Waehlbare Groessen der Screensaver-Uhr — gleiches Stufen-Prinzip wie READER_SCALES. */
 export const CLOCK_SCALES = [0.8, 1, 1.25, 1.5] as const;
 export type ClockScale = (typeof CLOCK_SCALES)[number];
@@ -155,6 +213,12 @@ let state: TvSettings = {
   // Voreinstellung bleibt die ruhige Flaeche: wer den Fernseher als Uhr
   // laufen laesst, soll nicht ungefragt ein Muster bekommen.
   hintergrund: 'ruhig',
+  hintergrundDimmung: DEFAULT_DIMMUNG,
+  fotoBewegung: true,
+  akzent: 'thema',
+  uhrStil: 'digital',
+  uhrGewicht: 'leicht',
+  uhrSekunden: true,
   // Voreinstellung: nichts verschwindet. Wer die App kennt, schaltet es
   // ein; wer sie nicht kennt, soll die Bedienung nicht suchen muessen.
   bedienungAusblenden: 0,
@@ -254,6 +318,12 @@ function persist() {
       offsets: state.offsets,
       theme: state.theme,
       hintergrund: state.hintergrund,
+      hintergrundDimmung: state.hintergrundDimmung,
+      fotoBewegung: state.fotoBewegung,
+      akzent: state.akzent,
+      uhrStil: state.uhrStil,
+      uhrGewicht: state.uhrGewicht,
+      uhrSekunden: state.uhrSekunden,
       bedienungAusblenden: state.bedienungAusblenden,
       quranFont: state.quranFont,
       quranSukun: state.quranSukun,
@@ -307,6 +377,14 @@ async function hydrate() {
         // zurueck, statt `undefined` in jede Farbe des Baums zu tragen.
         theme: isThemeId(parsed.theme) ? parsed.theme : DEFAULT_THEME_ID,
         hintergrund: istHintergrundId(parsed.hintergrund) ? parsed.hintergrund : 'ruhig',
+        hintergrundDimmung: istDimmung(parsed.hintergrundDimmung)
+          ? parsed.hintergrundDimmung
+          : DEFAULT_DIMMUNG,
+        fotoBewegung: parsed.fotoBewegung ?? true,
+        akzent: istAkzentId(parsed.akzent) ? parsed.akzent : 'thema',
+        uhrStil: istUhrStil(parsed.uhrStil) ? parsed.uhrStil : 'digital',
+        uhrGewicht: istUhrGewicht(parsed.uhrGewicht) ? parsed.uhrGewicht : 'leicht',
+        uhrSekunden: parsed.uhrSekunden ?? true,
         bedienungAusblenden: istAusblendZeit(parsed.bedienungAusblenden)
           ? parsed.bedienungAusblenden
           : 0,
@@ -379,6 +457,42 @@ export function setTheme(theme: ThemeId) {
 
 export function setHintergrund(hintergrund: HintergrundId) {
   state = { ...state, hintergrund };
+  persist();
+  emit();
+}
+
+export function setHintergrundDimmung(hintergrundDimmung: Dimmung) {
+  state = { ...state, hintergrundDimmung };
+  persist();
+  emit();
+}
+
+export function setFotoBewegung(fotoBewegung: boolean) {
+  state = { ...state, fotoBewegung };
+  persist();
+  emit();
+}
+
+export function setAkzent(akzent: AkzentId) {
+  state = { ...state, akzent };
+  persist();
+  emit();
+}
+
+export function setUhrStil(uhrStil: UhrStil) {
+  state = { ...state, uhrStil };
+  persist();
+  emit();
+}
+
+export function setUhrGewicht(uhrGewicht: UhrGewicht) {
+  state = { ...state, uhrGewicht };
+  persist();
+  emit();
+}
+
+export function setUhrSekunden(uhrSekunden: boolean) {
+  state = { ...state, uhrSekunden };
   persist();
   emit();
 }

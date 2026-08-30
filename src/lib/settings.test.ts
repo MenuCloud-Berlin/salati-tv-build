@@ -102,6 +102,15 @@ describe('setLocation / setIs24h', () => {
       // genau das soll dieser Test bemerken.
       theme: 'mitternacht',
       hintergrund: 'ruhig',
+      // Darstellung 2026-08-30: Abdunkelung und Foto-Bewegung gelten fuer die
+      // Foto-/Video-Hintergruende, der Akzent loest die Farbe vom Thema, und
+      // die drei Uhr-Felder bestimmen ihr Aussehen.
+      hintergrundDimmung: 0.55,
+      fotoBewegung: true,
+      akzent: 'thema',
+      uhrStil: 'digital',
+      uhrGewicht: 'leicht',
+      uhrSekunden: true,
       bedienungAusblenden: 0,
       quranFont: 'kfgqpc',
       quranSukun: 'madina',

@@ -1,4 +1,8 @@
 {
+  "azan": {
+    "running": "Gebetsruf · {prayer}",
+    "runningHint": "Zurück beendet den Ruf"
+  },
   "clock": {
     "hijriDate": "{day}. {month} {year}",
     "jumua": "Jumu'a Mubarak",
@@ -14,6 +18,17 @@
     "offlineReaderPaket": "Ohne Netz — mitgelieferter Text, Übersetzung und Rezitation brauchen eine Verbindung",
     "offlineStreams": "Ohne Netz — Liste aus dem Speicher, Wiedergabe braucht eine Verbindung",
     "retry": "Erneut versuchen"
+  },
+  "hintergrund": {
+    "abendhimmel": "Abendhimmel",
+    "haram": "Masjid al-Haram",
+    "kaaba": "Kaaba",
+    "kaabaNacht": "Kaaba bei Nacht",
+    "kiswa": "Kiswa",
+    "medina": "Grüne Kuppel",
+    "medinaLuft": "Prophetenmoschee",
+    "ornament": "Kuppelornament",
+    "tawaf": "Tawaf"
   },
   "home": {
     "clock": "Gebetsuhr",
@@ -119,14 +134,27 @@
     "title": "Reels"
   },
   "settings": {
+    "akzent": {
+      "bernstein": "Bernstein",
+      "gold": "Gold",
+      "hint": "Gilt in jeder Farbwelt — der Grund bleibt, nur der Akzent wechselt.",
+      "koralle": "Koralle",
+      "lavendel": "Lavendel",
+      "saphir": "Saphir",
+      "silber": "Silber",
+      "smaragd": "Smaragd",
+      "thema": "Wie das Thema",
+      "title": "Akzentfarbe",
+      "tuerkis": "Türkis"
+    },
     "asrEarlier": "Früher (Shafi/Maliki/Hanbali - Standard)",
     "asrLater": "Später (Hanafi)",
     "asrSchool": "Asr-Schule",
     "autoHide": {
-      "title": "Bedienhinweise",
+      "after": "Nach {n} Sekunden",
       "hint": "Verschwinden nach dieser Zeit ohne Tastendruck. Jede Taste holt sie zurück.",
       "never": "Immer sichtbar",
-      "after": "Nach {n} Sekunden"
+      "title": "Bedienhinweise"
     },
     "azan": {
       "allOff": "Alle aus",
@@ -143,17 +171,42 @@
       "volume": "Lautstärke"
     },
     "background": {
-      "title": "Hintergrund",
+      "bewegt": "Bewegt",
+      "foto": "Foto",
+      "fotos": "Fotos",
+      "gezeichnet": "Gezeichnet",
       "hint": "Liegt hinter allen Bereichen und wirkt in jeder Farbwelt.",
+      "kuppel": "Kuppel",
+      "ladeFehler": "Die Motive konnten nicht geladen werden.",
+      "muster": "Muster",
+      "nachweis": "Bildnachweis",
       "ruhig": "Ruhig",
       "schein": "Lichtschein",
+      "sterne": "Sternenhimmel",
+      "title": "Hintergrund",
       "verlauf": "Verlauf",
-      "muster": "Muster",
-      "bewegt": "Bewegt"
+      "video": "Video",
+      "videos": "Videos"
+    },
+    "clockScale": {
+      "large": "Groß",
+      "medium": "Mittel",
+      "small": "Klein",
+      "title": "Uhr-Größe",
+      "xlarge": "Sehr groß"
     },
     "current": "Aktuell",
+    "dimmung": {
+      "hint": "Nur für Fotos und Videos — je dunkler, desto besser bleibt die Uhr lesbar.",
+      "leicht": "Leicht",
+      "mittel": "Mittel",
+      "sehrStark": "Sehr stark",
+      "stark": "Stark",
+      "title": "Abdunkelung"
+    },
     "format12": "12-Stunden (2:30 PM)",
     "format24": "24-Stunden (14:30)",
+    "fotoBewegung": "Fotos langsam bewegen",
     "highLatitude": {
       "auto": "Automatisch (empfohlen)",
       "hint": "Nördlich von etwa 48° Breite - also in weiten Teilen Deutschlands - sinkt die Sonne im Sommer nachts nicht tief genug, um die Fajr- und Isha-Winkel zu erreichen. Die Regel legt fest, wie beide Zeiten dann aus der Länge der Nacht abgeleitet werden. Je nach Regel können Fajr und Isha dabei um bis zu einer Stunde auseinanderliegen; eine allgemein anerkannte Lösung gibt es nicht. Wenn du dich nach deiner Moschee richten möchtest, wähle die Regel, die zu deren Zeiten passt.",
@@ -162,6 +215,7 @@
       "title": "Hochbreiten-Regel",
       "twilightAngle": "Winkelbasiert"
     },
+    "jumuaModus": "Freitags-Kennzeichnung",
     "language": "Sprache",
     "location": "Standort",
     "method": "Berechnungsmethode",
@@ -189,14 +243,6 @@
       "title": "Koran-Schriftart"
     },
     "railHint": "Rechts wählen · Zurück-Taste verlässt die Einstellungen",
-    "clockScale": {
-      "large": "Groß",
-      "medium": "Mittel",
-      "small": "Klein",
-      "title": "Uhr-Größe",
-      "xlarge": "Sehr groß"
-    },
-    "jumuaModus": "Freitags-Kennzeichnung",
     "readerAutoAdvance": "Weiter zur nächsten Sure",
     "readerContent": "Unter dem Vers",
     "readerScale": {
@@ -206,11 +252,12 @@
       "title": "Koran-Schriftgröße",
       "xlarge": "Sehr groß"
     },
-    "screensaverContent": "Auf der Gebetsuhr zeigen",
     "readerTranslation": "Übersetzung",
     "readerTranslit": "Umschrift",
+    "screensaverContent": "Auf der Gebetsuhr zeigen",
     "sections": {
       "azan": "Gebetsruf",
+      "background": "Hintergrund",
       "display": "Darstellung",
       "prayer": "Gebetszeiten",
       "reader": "Koran",
@@ -221,6 +268,9 @@
       "deleteHint": "OK löscht",
       "empty": "Nichts gespeichert",
       "hint": "Eine gespeicherte Sure spielt ohne Internet. Die Dateien liegen in der App — beim Deinstallieren sind sie weg.",
+      "motive": "Hintergrund-Motive",
+      "motiveBelegt": "{n} Motive · {size}",
+      "motiveLeer": "Nichts gespeichert",
       "title": "Gespeicherte Rezitationen",
       "used": "{n} Suren · {size}",
       "usedOne": "Eine Sure · {size}"
@@ -247,6 +297,18 @@
     },
     "timeFormat": "Zeitformat",
     "title": "Einstellungen",
+    "uhr": {
+      "analog": "Ziffernblatt",
+      "digital": "Ziffern",
+      "gewicht": "Strichstärke",
+      "hint": "Wie die Zeit auf dem Ruhebildschirm aussieht.",
+      "kraeftig": "Kräftig",
+      "leicht": "Leicht",
+      "normal": "Normal",
+      "sekunden": "Sekunden zeigen",
+      "stil": "Stil",
+      "title": "Uhr"
+    },
     "versDesTages": "Vers des Tages",
     "wetter": "Wetter"
   },
@@ -258,9 +320,5 @@
   "videos": {
     "loadError": "Videos konnten nicht geladen werden.",
     "title": "Videos"
-  },
-  "azan": {
-    "running": "Gebetsruf · {prayer}",
-    "runningHint": "Zurück beendet den Ruf"
   }
 }

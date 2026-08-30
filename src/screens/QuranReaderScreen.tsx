@@ -8,8 +8,6 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { useVideoPlayer } from 'expo-video';
-
 import { AmbientGlow } from '@/components/AmbientGlow';
 import { FocusCard } from '@/components/FocusCard';
 import { fokusUeberstand } from '@/components/fokusUeberstand';
@@ -17,15 +15,15 @@ import { useBedienungSichtbar } from '@/lib/bedienungSichtbar';
 import { StateView } from '@/components/StateView';
 import { SURAHS } from '@/data/surahs';
 import { useTranslation } from '@/lib/i18n';
+import { activeWordIndex, type ReaderVerse } from '@/lib/quranText';
+import { spielerHolen, umschalten, useHintergrundAudio } from '@/lib/hintergrundAudio';
 import {
-  activeWordIndex,
-  fetchSurahReader,
-  letzteLeseQuelle,
-  READER_RECITERS,
-  TRANSLATION_RESOURCES,
-  type ReaderVerse,
-} from '@/lib/quranText';
-import { pausieren as hintergrundPausieren } from '@/lib/hintergrundAudio';
+  nochmalVersuchen,
+  sureOeffnen,
+  useLeseSitzung,
+  versSpringen,
+  wiederholenUmschalten,
+} from '@/lib/leseSitzung';
 import { toggleReaderOption, useTvSettings } from '@/lib/settings';
 import type { Theme } from '@/lib/theme';
 import {
@@ -57,12 +55,26 @@ import { useLatestRef } from '@/lib/useLatestRef';
 //   • Die Suren-Auswahl war ein Raster mit 114 Kacheln; bis Sure 100 sind das
 //     rund 25 Mal DPAD_DOWN.
 export function QuranReaderScreen({ startSurah }: { startSurah?: number | null } = {}) {
-  // Mit vorgegebener Sure faengt der Leser beim Lesen an, nicht bei der
-  // Auswahl. Nur der Startwert: wer danach zurueckgeht, landet wie immer in
-  // der Suren-Auswahl.
-  const [stage, setStage] = useState<'picker' | 'reading'>(startSurah ? 'reading' : 'picker');
-  const [surah, setSurah] = useState(startSurah ?? 1);
+  const { locale } = useTranslation();
+  const sitzung = useLeseSitzung();
+  // Laeuft schon eine Lesung (sie ueberlebt seit 2026-08-30 den
+  // Bildschirmwechsel, s. lib/leseSitzung.ts), fuehrt der Leser sie fort statt
+  // in der Suren-Auswahl zu landen. Mit vorgegebener Sure — Startargument oder
+  // Deep Link — beginnt er unmittelbar beim Lesen.
+  const [stage, setStage] = useState<'picker' | 'reading'>(
+    startSurah || sitzung.aktiv ? 'reading' : 'picker',
+  );
   const { height, width } = useWindowDimensions();
+
+  // Die Sure des Startarguments EINMAL oeffnen — im Effekt, nicht im Rumpf:
+  // `sureOeffnen` startet einen Abruf und eine Wiedergabe, beides gehoert
+  // nicht ins Rendern. Danach fuehrt die Sitzung.
+  const startRef = useLatestRef(startSurah);
+  const spracheRef = useLatestRef(locale);
+  useEffect(() => {
+    const n = startRef.current;
+    if (n) sureOeffnen(n, spracheRef.current);
+  }, [startRef, spracheRef]);
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -76,9 +88,18 @@ export function QuranReaderScreen({ startSurah }: { startSurah?: number | null }
   }, [stage]);
 
   if (stage === 'picker') {
-    return <SurahPicker onPick={(n) => { setSurah(n); setStage('reading'); }} height={height} width={width} />;
+    return (
+      <SurahPicker
+        onPick={(n) => {
+          sureOeffnen(n, locale);
+          setStage('reading');
+        }}
+        height={height}
+        width={width}
+      />
+    );
   }
-  return <Reader surah={surah} onNextSurah={(n) => setSurah(n)} height={height} width={width} />;
+  return <Reader height={height} width={width} />;
 }
 
 /** Zwanzig Suren je Block — eine Bildschirmseite, die ohne Scrollen erfassbar
@@ -149,146 +170,35 @@ function SurahPicker({
   );
 }
 
-function Reader({
-  surah,
-  onNextSurah,
-  height,
-  width,
-}: {
-  surah: number;
-  onNextSurah: (n: number) => void;
-  height: number;
-  width: number;
-}) {
-  const { t, locale, rtl } = useTranslation();
+function Reader({ height, width }: { height: number; width: number }) {
+  const { t, rtl } = useTranslation();
   const theme = useTheme();
-  const { readerScale, readerTranslit, readerTranslation, readerAutoAdvance } = useTvSettings();
+  const { readerScale, readerTranslit, readerTranslation } = useTvSettings();
   const arab = useQuranFont();
   const bedienungSichtbar = useBedienungSichtbar();
-  const [verses, setVerses] = useState<ReaderVerse[] | null>(null);
-  const [quelle, setQuelle] = useState<'netz' | 'ablage' | 'paket'>('netz');
-  const [error, setError] = useState(false);
-  const [idx, setIdx] = useState(0); // aktueller Vers-Index
+  // Verse, Vers-Index, Wiederholen und das Weiterschalten liegen seit
+  // 2026-08-30 in lib/leseSitzung.ts — NEBEN dem Baum, damit die Rezitation
+  // den Wechsel zur Gebetsuhr ueberlebt. Dieser Bildschirm ist ihre
+  // Oberflaeche, nicht ihr Besitzer.
+  const { verses, idx, wiederholen, laedt, fehler, quelle, surah } = useLeseSitzung();
   const [posMs, setPosMs] = useState(0);
-  const [playing, setPlaying] = useState(true);
-  // „Vers wiederholen": spielt denselben Vers am Ende erneut, statt
-  // weiterzuschalten — die Funktion, die zum Auswendiglernen gebraucht wird und
-  // die es hier bisher gar nicht gab.
-  const [wiederholen, setWiederholen] = useState(false);
-  const reciterId = READER_RECITERS[0].id; // Alafasy (Wort-Sync)
-  // Wiederhol-Zaehler: ohne ihn war ein Ladefehler endgueltig (Audit 2026-07-28).
-  const [attempt, setAttempt] = useState(0);
-  const reload = () => setAttempt((a) => a + 1);
-
-  // Zuruecksetzen beim Wechsel von Sure/Sprache/Versuch: React-Muster
-  // „Zustand beim Rendern anpassen“ statt setState im Effektkoerper
-  // (react-hooks/set-state-in-effect). Der Effekt darunter laedt nur noch.
-  const ladeSchluessel = `${surah}|${locale}|${attempt}`;
-  const [letzterSchluessel, setLetzterSchluessel] = useState(ladeSchluessel);
-  if (letzterSchluessel !== ladeSchluessel) {
-    setLetzterSchluessel(ladeSchluessel);
-    setVerses(null);
-    setError(false);
-    setIdx(0);
-  }
-
-  const versesRef = useLatestRef(verses);
-  const idxRef = useLatestRef(idx);
-  const wiederholenRef = useLatestRef(wiederholen);
-  const autoRef = useLatestRef(readerAutoAdvance);
-
-  // Sure laden (bei Surenwechsel).
-  useEffect(() => {
-    let alive = true;
-    // Vers-Uebersetzung in der App-Sprache statt fest Deutsch (Audit T13):
-    // eine tuerkische Oberflaeche mit deutscher Uebersetzung darunter waere
-    // fuer den Nutzer schlechter als gar keine.
-    fetchSurahReader(surah, reciterId, TRANSLATION_RESOURCES[locale])
-      .then((v) => {
-        if (!alive) return;
-        setVerses(v);
-        // Woher der Text kommt, steht am Bildschirm: ohne Netz fehlt die
-        // Rezitation (ein Stream), beim mitgelieferten Text zusaetzlich die
-        // Uebersetzung. Ohne diesen Hinweis haelt der Nutzer die stumme
-        // Wiedergabe oder die fehlende Uebersetzung fuer einen Fehler.
-        setQuelle(letzteLeseQuelle());
-      })
-      .catch(() => alive && setError(true));
-    return () => {
-      alive = false;
-    };
-  }, [surah, reciterId, attempt, locale]);
+  const { spielt: playing } = useHintergrundAudio();
 
   const current = verses?.[idx];
-  const player = useVideoPlayer(null, (p) => {
-    p.loop = false;
-  });
-
-  // Der Leser bringt seine eigene Rezitation mit. Laeuft im Hintergrund noch
-  // eine (seit 1.9.0 ueberlebt sie den Bildschirmwechsel), wird sie angehalten
-  // — zwei Rezitationen uebereinander waeren unbrauchbar.
-  useEffect(() => {
-    hintergrundPausieren();
-  }, []);
-
-  // Beim Verswechsel die passende Audio-Quelle laden und abspielen.
-  useEffect(() => {
-    if (!current?.audioUrl) return;
-    try {
-      player.replace(current.audioUrl);
-      player.play();
-    } catch {
-      /* ignore */
-    }
-  }, [current?.audioUrl, player]);
-
-  // Vers-Ende → Wiederholen / nächster Vers / nächste Sure.
-  useEffect(() => {
-    const sub = player.addListener('playToEnd', () => {
-      const list = versesRef.current;
-      if (!list) return;
-      if (wiederholenRef.current) {
-        // Denselben Vers erneut: `seekBy` waere ungenau, ein neues `play()` ab
-        // Position 0 ist der klare Weg.
-        try {
-          player.currentTime = 0;
-          player.play();
-        } catch {
-          /* ignore */
-        }
-        return;
-      }
-      if (idxRef.current + 1 < list.length) {
-        setIdx(idxRef.current + 1);
-      } else if (autoRef.current) {
-        const next = surah < 114 ? surah + 1 : 1;
-        onNextSurah(next);
-      }
-      // Ohne Auto-Weiter bleibt der Leser am letzten Vers stehen — genau das
-      // ist der Sinn der Einstellung.
-    });
-    return () => sub.remove();
-  }, [player, surah, onNextSurah, versesRef, idxRef, wiederholenRef, autoRef]);
 
   // Position pollen (Wort-Sync). 80ms — Wort-Segmente sind teils <500ms.
+  // Gefragt wird der gemeinsame Spieler; er kann zwischendurch ausgetauscht
+  // werden (naechster Vers), deshalb bei jedem Takt neu holen.
   useEffect(() => {
     const id = setInterval(() => {
-      setPosMs(Math.round((player.currentTime ?? 0) * 1000));
-      setPlaying(player.playing);
+      const p = spielerHolen();
+      setPosMs(Math.round((p?.currentTime ?? 0) * 1000));
     }, 80);
     return () => clearInterval(id);
-  }, [player]);
+  }, []);
 
-  const toggle = () => {
-    if (player.playing) player.pause();
-    else player.play();
-  };
-  const springe = (delta: number) => {
-    const list = versesRef.current;
-    if (!list) return;
-    const ziel = idxRef.current + delta;
-    if (ziel >= 0 && ziel < list.length) setIdx(ziel);
-  };
+  const toggle = umschalten;
+  const springe = (delta: number) => versSpringen(delta);
 
   // Die Buehne misst sich selbst, statt aus der Bildschirmhoehe geschaetzt zu
   // werden: zwischen Kopfzeile, Bedienleiste und Hinweiszeile bleibt je nach
@@ -375,15 +285,17 @@ function Reader({
     if (erstes === undefined) return;
     const seg = segmenteRef.current?.find((sg) => sg[0] === erstes);
     if (!seg) return; // Text ohne Zeitstempel (mitgeliefertes Paket)
+    const p = spielerHolen();
+    if (!p) return;
     try {
       // `seekBy` statt `currentTime = …`: eine Zuweisung an den Spieler gilt
       // als Aenderung eines Hook-Ergebnisses (react-hooks/immutability), der
       // Sprung selbst ist eine Methode und damit erlaubt.
-      player.seekBy(seg[2] / 1000 - (player.currentTime ?? 0));
+      p.seekBy(seg[2] / 1000 - (p.currentTime ?? 0));
     } catch {
       /* ignore */
     }
-  }, [manuell, player, abschnitteRef, segmenteRef]);
+  }, [manuell, abschnitteRef, segmenteRef]);
 
   const translitText = zeigtTranslit
     ? sichtbareWorte.map((i) => current?.words[i]?.translit ?? '').join(' ').trim()
@@ -412,13 +324,11 @@ function Reader({
   // fokussierbares Element — auf Android TV fand die Fernbedienung dort keinen
   // Anker. Zudem war der Fehler endgueltig, obwohl der Abruf ueber drei
   // quran.com-Endpunkte laeuft und einzelne davon oft nur kurz haengen.
-  if (error) {
-    return (
-      <StateView messageKey="reader.loadError" onAction={reload} />
-    );
+  if (fehler) {
+    return <StateView messageKey="reader.loadError" onAction={nochmalVersuchen} />;
   }
-  if (!verses || !current) {
-    return <StateView loading onAction={reload} />;
+  if (laedt || !verses || !current) {
+    return <StateView loading onAction={nochmalVersuchen} />;
   }
 
   return (
@@ -496,7 +406,7 @@ function Reader({
           <Text style={s.ctrlGlyph}>⏭</Text>
         </FocusCard>
         <FocusCard
-          onPress={() => setWiederholen((v) => !v)}
+          onPress={wiederholenUmschalten}
           style={[s.ctrl, wiederholen && s.ctrlActive]}>
           <Text style={[s.ctrlGlyph, wiederholen && s.ctrlActiveText]}>↻</Text>
         </FocusCard>

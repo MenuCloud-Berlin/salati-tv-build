@@ -1,11 +1,15 @@
 {
+  "azan": {
+    "running": "Adhana · {prayer}",
+    "runningHint": "Rudi husimamisha adhana"
+  },
   "clock": {
     "hijriDate": "{day} {month} {year}",
+    "jumua": "Ijumaa Mubarak",
     "localTime": "Saa za {city} · OK hufungua menyu",
     "next": "Sala inayofuata",
     "openMenu": "OK hufungua menyu",
-    "timeLeft": "imebaki {time}",
-    "jumua": "Ijumaa Mubarak"
+    "timeLeft": "imebaki {time}"
   },
   "common": {
     "loading": "Inapakia…",
@@ -14,6 +18,17 @@
     "offlineReaderPaket": "Nje ya mtandao — maandishi yaliyomo; tafsiri na kisomo vinahitaji muunganisho",
     "offlineStreams": "Nje ya mtandao — orodha kutoka kwenye hifadhi, uchezaji unahitaji muunganisho",
     "retry": "Jaribu tena"
+  },
+  "hintergrund": {
+    "abendhimmel": "Anga la jioni",
+    "haram": "Msikiti Mtukufu",
+    "kaaba": "Kaaba",
+    "kaabaNacht": "Kaaba usiku",
+    "kiswa": "Kiswa",
+    "medina": "Kuba la Kijani",
+    "medinaLuft": "Msikiti wa Mtume",
+    "ornament": "Nakshi ya kuba",
+    "tawaf": "Tawafu"
   },
   "home": {
     "clock": "Saa ya sala",
@@ -119,14 +134,27 @@
     "title": "Reels"
   },
   "settings": {
+    "akzent": {
+      "bernstein": "Kaharabu",
+      "gold": "Dhahabu",
+      "hint": "Hutumika katika kila mandhari — mandharinyuma hubaki, rangi ya msisitizo pekee hubadilika.",
+      "koralle": "Marijani",
+      "lavendel": "Zambarau hafifu",
+      "saphir": "Yakuti samawi",
+      "silber": "Fedha",
+      "smaragd": "Zumaridi",
+      "thema": "Rangi ya mandhari",
+      "title": "Rangi ya msisitizo",
+      "tuerkis": "Turukwazi"
+    },
     "asrEarlier": "Mapema zaidi (Shafi'i/Maliki/Hanbali - kawaida)",
     "asrLater": "Baadaye (Hanafi)",
     "asrSchool": "Madhehebu ya Asr",
     "autoHide": {
-      "title": "Maelekezo skrinini",
+      "after": "Baada ya sekunde {n}",
       "hint": "Hupotea baada ya muda huu bila kubonyeza kitufe. Kitufe chochote hurudisha.",
       "never": "Yaonekane daima",
-      "after": "Baada ya sekunde {n}"
+      "title": "Maelekezo skrinini"
     },
     "azan": {
       "allOff": "Zima zote",
@@ -143,17 +171,42 @@
       "volume": "Sauti"
     },
     "background": {
-      "title": "Mandharinyuma",
+      "bewegt": "Inayosonga",
+      "foto": "Picha",
+      "fotos": "Picha",
+      "gezeichnet": "Michoro",
       "hint": "Iko nyuma ya sehemu zote na inafaa kwa kila rangi.",
+      "kuppel": "Kuba",
+      "ladeFehler": "Motifu hazikuweza kupakiwa.",
+      "muster": "Muundo",
+      "nachweis": "Sifa za picha",
       "ruhig": "Tulivu",
       "schein": "Mwangaza",
+      "sterne": "Anga la nyota",
+      "title": "Mandharinyuma",
       "verlauf": "Mpito",
-      "muster": "Muundo",
-      "bewegt": "Inayosonga"
+      "video": "Video",
+      "videos": "Video"
+    },
+    "clockScale": {
+      "large": "Kubwa",
+      "medium": "Wastani",
+      "small": "Ndogo",
+      "title": "Ukubwa wa saa",
+      "xlarge": "Kubwa sana"
     },
     "current": "Sasa",
+    "dimmung": {
+      "hint": "Kwa picha na video pekee — kadri inavyokuwa nyeusi, ndivyo saa inavyosomeka vizuri.",
+      "leicht": "Kidogo",
+      "mittel": "Wastani",
+      "sehrStark": "Nyingi sana",
+      "stark": "Nyingi",
+      "title": "Ufifishaji"
+    },
     "format12": "Saa 12 (2:30 PM)",
     "format24": "Saa 24 (14:30)",
+    "fotoBewegung": "Sogeza picha polepole",
     "highLatitude": {
       "auto": "Otomatiki (inapendekezwa)",
       "hint": "Kaskazini mwa takriban latitudo 48°, wakati wa kiangazi jua halishuki chini vya kutosha kufikia pembe za Fajr na Isha. Kanuni hii huamua jinsi nyakati hizo mbili zinavyopatikana kutokana na urefu wa usiku. Kulingana na kanuni, Fajr na Isha zinaweza kutofautiana hadi saa moja, na hakuna suluhisho linalokubalika kwa wote. Ukitaka kufuata msikiti wako, chagua kanuni inayolingana na nyakati zake.",
@@ -162,6 +215,7 @@
       "title": "Kanuni ya latitudo za juu",
       "twilightAngle": "Kwa kutumia pembe"
     },
+    "jumuaModus": "Alama ya Ijumaa",
     "language": "Lugha",
     "location": "Eneo",
     "method": "Njia ya hesabu",
@@ -200,8 +254,10 @@
     },
     "readerTranslation": "Tafsiri",
     "readerTranslit": "Matamshi",
+    "screensaverContent": "Onyesha kwenye saa ya swala",
     "sections": {
       "azan": "Adhana",
+      "background": "Mandharinyuma",
       "display": "Muonekano",
       "prayer": "Nyakati za sala",
       "reader": "Qur'an",
@@ -212,6 +268,9 @@
       "deleteHint": "OK hufuta",
       "empty": "Hakuna kilichohifadhiwa",
       "hint": "Sura iliyohifadhiwa hucheza bila intaneti. Faili zipo ndani ya programu — huondoka ikiondolewa.",
+      "motive": "Motifu za mandharinyuma",
+      "motiveBelegt": "Motifu {n} · {size}",
+      "motiveLeer": "Hakuna kilichohifadhiwa",
       "title": "Kisomo kilichohifadhiwa",
       "used": "Sura {n} · {size}",
       "usedOne": "Sura 1 · {size}"
@@ -238,14 +297,17 @@
     },
     "timeFormat": "Muundo wa muda",
     "title": "Mipangilio",
-    "jumuaModus": "Alama ya Ijumaa",
-    "screensaverContent": "Onyesha kwenye saa ya swala",
-    "clockScale": {
-      "title": "Ukubwa wa saa",
-      "small": "Ndogo",
-      "medium": "Wastani",
-      "large": "Kubwa",
-      "xlarge": "Kubwa sana"
+    "uhr": {
+      "analog": "Uso wa saa",
+      "digital": "Tarakimu",
+      "gewicht": "Unene",
+      "hint": "Jinsi saa inavyoonekana kwenye skrini ya kupumzika.",
+      "kraeftig": "Nene",
+      "leicht": "Nyembamba",
+      "normal": "Kawaida",
+      "sekunden": "Onyesha sekunde",
+      "stil": "Mtindo",
+      "title": "Saa"
     },
     "versDesTages": "Aya ya siku",
     "wetter": "Hali ya hewa"
@@ -258,9 +320,5 @@
   "videos": {
     "loadError": "Video hazikuweza kupakiwa.",
     "title": "Video"
-  },
-  "azan": {
-    "running": "Adhana · {prayer}",
-    "runningHint": "Rudi husimamisha adhana"
   }
 }

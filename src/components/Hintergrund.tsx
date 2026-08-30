@@ -1,9 +1,17 @@
 import { useEffect, useId, useMemo, useState } from 'react';
-import { AccessibilityInfo, Animated, Easing, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Animated, Easing, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
 import { AmbientGlow } from '@/components/AmbientGlow';
+import { MedienGrund } from '@/components/MedienGrund';
+// Die Kennungen selbst stehen in lib/hintergruende.ts — ohne einen einzigen
+// Import, damit die Einstellungen sie lesen koennen, ohne expo-video und das
+// Dateisystem mitzuziehen (der Grund steht dort).
+import { medienIdLesen } from '@/lib/hintergruende';
+import { fetchHintergrundMedien, useHintergrundMedien } from '@/lib/hintergrundMedien';
+import type { Screen } from '@/lib/nav';
 import { useTvSettings } from '@/lib/settings';
+import { useReduzierteBewegung } from '@/lib/useReduzierteBewegung';
 import { useTheme } from '@/lib/useTheme';
 
 // Hintergrund der ganzen App — liegt EINMAL in App.tsx hinter allen
@@ -15,41 +23,76 @@ import { useTheme } from '@/lib/useTheme';
 // Fernseher, der stundenlang im Raum steht, ist das der Unterschied zwischen
 // „Geraet an" und „schoen anzusehen".
 //
-// BEWUSST OHNE FOTOS: ein Bild fuer 4K waere mehrere Megabyte im Paket, und die
-// vorhandenen Motive der Handy-App liegen bei 900 px — hochskaliert auf 65 Zoll
-// sehen sie weich und wie ein Fehler aus. Alles hier ist gezeichnet und damit in
-// jeder Aufloesung scharf, ohne ein Byte Ladezeit.
+// GEZEICHNET UND FOTOGRAFIERT — zwei Sorten, ein Schalter (Stand 2026-08-30):
+//
+//   - Alles in DIESER Datei ist gezeichnet: in jeder Aufloesung scharf, kein
+//     Byte Ladezeit, da am ersten Tag ohne Netz. Bis 1.11.0 war das alles, was
+//     es gab — und der Nutzer sagte zu Recht, dass Ornament kein Motiv ist.
+//   - Fotos und Videos (Kaaba, Prophetenmoschee, Himmel) liegen NICHT im
+//     Paket, sondern im Katalog in R2 und werden bei Bedarf einmal auf das
+//     Geraet geladen (s. lib/hintergrundMedien.ts + components/MedienGrund.tsx).
+//     Der Grund steht dort; die Kurzfassung: mehrere Megabyte fuer etwas, das
+//     nicht jeder einschaltet, gehoeren nicht in ein APK.
 //
 // Ebenfalls bewusst: keine harten Kanten. Eine Flaeche mit Radius ist eine
 // Flaeche mit Kante — genau daran ist die erste Fassung des Lichtscheins
 // gescheitert (s. components/AmbientGlow.tsx).
 
-export type HintergrundId = 'ruhig' | 'schein' | 'verlauf' | 'muster' | 'bewegt';
+/**
+ * Bildschirme, auf denen ein FOTO oder VIDEO liegen darf — genau einer.
+ *
+ * Geraetebefund 2026-08-30, in dieser Reihenfolge gemessen:
+ *   • Hinter den EINSTELLUNGEN war die Seite mit dem Tawaf-Video kaum noch zu
+ *     lesen: hunderte helle Punkte hinter kleinem Text.
+ *   • Auf dem HUB sah es eindrucksvoll aus, aber die Unterzeilen der Kacheln
+ *     („Gebetszeiten & Countdown") verschwanden im Gewimmel.
+ *
+ * Die gezeichneten Hintergruende halten sich von selbst zurueck, ein Motiv
+ * nicht. Es gehoert deshalb genau dorthin, wo grosse Zahlen und wenig Text
+ * stehen und wo der Fernseher stundenlang steht: auf die Uhr. Ueberall sonst
+ * bleibt der ruhige Grund — die Einstellung bleibt bestehen, sie wirkt nur
+ * nicht ueberall.
+ */
+const MOTIV_BILDSCHIRME: readonly Screen[] = ['clock'];
 
-export const HINTERGRUENDE: readonly HintergrundId[] = ['ruhig', 'schein', 'verlauf', 'muster', 'bewegt'];
-
-export function istHintergrundId(v: unknown): v is HintergrundId {
-  return typeof v === 'string' && (HINTERGRUENDE as readonly string[]).includes(v);
-}
-
-/** Locale-Schluessel des Anzeigenamens. */
-export function hintergrundNameKey(id: HintergrundId): string {
-  return `settings.background.${id}`;
-}
-
-export function Hintergrund() {
-  const { hintergrund } = useTvSettings();
+export function Hintergrund({ screen }: { screen?: Screen } = {}) {
+  const { hintergrund, hintergrundDimmung, fotoBewegung } = useTvSettings();
   const theme = useTheme();
   const { width, height } = useWindowDimensions();
   const id = `hg-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   const kurz = Math.min(width, height);
+
+  // Foto/Video: der Katalog wird nur geholt, wenn wirklich eines gewaehlt ist
+  // — wer bei „Ruhig" bleibt, soll dafuer keine Anfrage ausloesen.
+  const gewaehltesMedium =
+    screen === undefined || MOTIV_BILDSCHIRME.includes(screen) ? medienIdLesen(hintergrund) : null;
+  const { katalog } = useHintergrundMedien();
+  useEffect(() => {
+    if (gewaehltesMedium && !katalog) void fetchHintergrundMedien().catch(() => {});
+  }, [gewaehltesMedium, katalog]);
 
   const styles = useMemo(
     () => StyleSheet.create({ fill: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 } }),
     [],
   );
 
+  // Ist ein Motiv gewaehlt, gibt es NUR das Motiv oder gar nichts — nie einen
+  // gezeichneten Ersatz. Ohne diese Zeile fiel die Auswahl unten auf das
+  // Muster durch, und auf allen Bildschirmen ausser der Uhr stand ploetzlich
+  // ein Ornament, das niemand eingestellt hatte (Emulator-Befund 2026-08-30).
+  if (medienIdLesen(hintergrund) !== null) {
+    const medium = gewaehltesMedium ? katalog?.find((m) => m.id === gewaehltesMedium) : null;
+    // Solange der Katalog fehlt (erster Start ohne Netz), bleibt der Grund
+    // ruhig — besser als ein halbes Bild oder ein Fehlerkasten hinter der Uhr.
+    if (!medium) return null;
+    return <MedienGrund medium={medium} dimmung={hintergrundDimmung} bewegtesFoto={fotoBewegung} />;
+  }
+
   if (hintergrund === 'ruhig') return null;
+
+  if (hintergrund === 'sterne') return <Sternenhimmel />;
+
+  if (hintergrund === 'kuppel') return <Kuppelnacht />;
 
   if (hintergrund === 'bewegt') return <BewegterGrund />;
 
@@ -177,20 +220,11 @@ function BewegterGrund() {
   // des Renderns - und im Haus ist useState das gaengige Muster fuer einen
   // Animationswert (FocusCard, ClockScreen).
   const [dreh] = useState(() => new Animated.Value(0));
-  const [ruhig, setRuhig] = useState(false);
-
   // Systemeinstellung "Bewegung reduzieren" achten: dann steht die Rosette
   // still, statt sich zu drehen. Sie bleibt sichtbar - der Hintergrund ist
-  // die Zierde, nicht die Bewegung.
-  useEffect(() => {
-    let lebt = true;
-    AccessibilityInfo.isReduceMotionEnabled().then((an) => lebt && setRuhig(an));
-    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', (an) => setRuhig(an));
-    return () => {
-      lebt = false;
-      sub.remove();
-    };
-  }, []);
+  // die Zierde, nicht die Bewegung. (Seit 2026-08-30 als gemeinsamer Haken,
+  // s. useReduzierteBewegung unten - drei Hintergruende brauchen ihn.)
+  const ruhig = useReduzierteBewegung();
 
   useEffect(() => {
     if (ruhig) return;
@@ -269,4 +303,184 @@ function Rosette({ groesse, farbe }: { groesse: number; farbe: string }) {
       <Path d={strahlen} stroke={farbe} strokeOpacity={0.1} strokeWidth={strich} fill="none" />
     </Svg>
   );
+}
+
+// --------------------------------------------------------------------------
+// "sterne": Sternenhimmel mit Mondsichel
+//
+// Der ruhigste der gezeichneten Hintergruende. Die Punkte tragen die Textfarbe
+// des Themas und nicht Weiss — sonst waere er auf „Papier" ein Fehlerbild.
+//
+// Die Sterne stehen FEST. Bewegt wird nur ihre Helligkeit, und zwar in zwei
+// Gruppen gegenlaeufig: ein ganzes Feld, das gemeinsam heller und dunkler
+// wird, sieht nach Bildschirmfehler aus, zwei versetzte Gruppen sehen nach
+// Nachthimmel aus. Beides laeuft ueber `opacity` mit `useNativeDriver`.
+const FUNKELN_MS = 5200;
+
+/** Feste Pseudo-Zufallszahlen: dieselbe Verteilung bei jedem Start. Ein echtes
+ *  `Math.random()` waere im Render unrein und liesse die Sterne bei jedem
+ *  Neuzeichnen springen. */
+function streu(i: number): number {
+  const x = Math.sin(i * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+function Sternenhimmel() {
+  const theme = useTheme();
+  const { width, height } = useWindowDimensions();
+  const [takt] = useState(() => new Animated.Value(0));
+  const ruhig = useReduzierteBewegung();
+
+  useEffect(() => {
+    if (ruhig) return;
+    const schleife = Animated.loop(
+      Animated.sequence([
+        Animated.timing(takt, { toValue: 1, duration: FUNKELN_MS, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        Animated.timing(takt, { toValue: 0, duration: FUNKELN_MS, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+      ]),
+    );
+    schleife.start();
+    return () => schleife.stop();
+  }, [takt, ruhig]);
+
+  const { a, b, sichel } = useMemo(() => sternenfeld(width, height), [width, height]);
+
+  const hellA = takt.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.9] });
+  const hellB = takt.interpolate({ inputRange: [0, 1], outputRange: [0.9, 0.35] });
+
+  return (
+    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+      <AmbientGlow
+        color={theme.glowRing}
+        size={Math.min(width, height) * 1.3}
+        bottom={-height * 0.45}
+        left={-width * 0.1}
+        intensity={0.08}
+      />
+      <Animated.View style={[StyleSheet.absoluteFill, ruhig ? { opacity: 0.6 } : { opacity: hellA }]}>
+        <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+          <Path d={a} fill={theme.text} fillOpacity={0.5} />
+        </Svg>
+      </Animated.View>
+      <Animated.View style={[StyleSheet.absoluteFill, ruhig ? { opacity: 0.6 } : { opacity: hellB }]}>
+        <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+          <Path d={b} fill={theme.text} fillOpacity={0.5} />
+        </Svg>
+      </Animated.View>
+      <View style={StyleSheet.absoluteFill}>
+        <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+          <Path d={sichel} fill={theme.accent} fillOpacity={0.3} />
+        </Svg>
+      </View>
+    </View>
+  );
+}
+
+/**
+ * Zwei Sternengruppen und die Mondsichel als Pfade.
+ *
+ * Exportiert, damit sich die Verteilung ohne Bildschirm pruefen laesst: die
+ * Sterne muessen im Bild liegen (ein Stern bei y > Hoehe ist gezeichnete
+ * Rechenzeit fuer nichts) und OBEN dichter stehen — unten steht auf jedem
+ * Bildschirm Text.
+ */
+export function sternenfeld(w: number, h: number): { a: string; b: string; sichel: string; punkte: { x: number; y: number }[] } {
+  const anzahl = 90;
+  const a: string[] = [];
+  const b: string[] = [];
+  const punkte: { x: number; y: number }[] = [];
+  for (let i = 0; i < anzahl; i++) {
+    const x = streu(i * 3 + 1) * w;
+    // Hoch 1,6 zieht die Verteilung nach oben: unten steht der Inhalt.
+    const y = Math.pow(streu(i * 3 + 2), 1.6) * h;
+    const r = 0.8 + streu(i * 3 + 3) * 1.9;
+    punkte.push({ x, y });
+    const kreis =
+      `M${(x - r).toFixed(1)},${y.toFixed(1)} a${r},${r} 0 1,0 ${(2 * r).toFixed(1)},0 ` +
+      `a${r},${r} 0 1,0 ${(-2 * r).toFixed(1)},0`;
+    (i % 2 === 0 ? a : b).push(kreis);
+  }
+  // Mondsichel aus zwei Boegen: der zweite ist minimal groesser und laeuft
+  // zurueck, die Flaeche dazwischen bleibt stehen. Bewusst ohne Maske — eine
+  // Maske erzeugt auf Android einen eigenen Stapelkontext.
+  const r = Math.min(w, h) * 0.075;
+  const mx = w * 0.82;
+  const my = h * 0.2;
+  const sichel =
+    `M${mx},${my - r} A${r},${r} 0 1,0 ${mx},${my + r} ` +
+    `A${(r * 1.25).toFixed(1)},${(r * 1.25).toFixed(1)} 0 0,1 ${mx},${my - r} Z`;
+  return { a: a.join(' '), b: b.join(' '), sichel, punkte };
+}
+
+// --------------------------------------------------------------------------
+// "kuppel": Moschee-Silhouette am unteren Rand
+//
+// Der einzige gezeichnete Hintergrund mit einem MOTIV. Er sitzt bewusst unten
+// und laesst die obere Haelfte frei: dort steht auf jedem Bildschirm der
+// Inhalt. Die Silhouette ist ein einziger Pfad — Kuppel, zwei Minarette und
+// eine Mauer, gerechnet aus der Bildschirmbreite, damit sie auf 4K genauso
+// sitzt wie auf 720p.
+function Kuppelnacht() {
+  const theme = useTheme();
+  const { width, height } = useWindowDimensions();
+  const id = `kn-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+  const pfad = useMemo(() => bausilhouette(width, height), [width, height]);
+
+  return (
+    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+      <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+        <Defs>
+          <LinearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0%" stopColor={theme.glowRing} stopOpacity={0} />
+            <Stop offset="70%" stopColor={theme.accent} stopOpacity={0.08} />
+            <Stop offset="100%" stopColor={theme.accent} stopOpacity={0.2} />
+          </LinearGradient>
+        </Defs>
+        <Rect x="0" y="0" width={width} height={height} fill={`url(#${id})`} />
+        <Path d={pfad} fill={theme.accent} fillOpacity={0.22} />
+      </Svg>
+    </View>
+  );
+}
+
+/**
+ * Kuppel, Minarette und Mauer als EIN Pfad.
+ *
+ * Alle Masse relativ zu Breite und Hoehe: die Silhouette soll auf jedem Panel
+ * dieselbe Form haben. Exportiert, damit sich die Geometrie ohne Bildschirm
+ * pruefen laesst — sie muss im unteren Drittel bleiben.
+ */
+export function bausilhouette(w: number, h: number): string {
+  const boden = h;
+  const mauer = h * 0.9;
+  const mitte = w / 2;
+  const kuppelR = w * 0.1;
+  const kuppelBasis = mauer - kuppelR * 0.15;
+  const trommel = kuppelBasis + kuppelR * 0.35;
+  const minarettB = w * 0.016;
+  const minarettH = h * 0.26;
+  const minarettX = [mitte - w * 0.2, mitte + w * 0.2];
+
+  const teile: string[] = [];
+  teile.push(`M0,${boden} L0,${mauer} L${w},${mauer} L${w},${boden} Z`);
+  teile.push(
+    `M${mitte - kuppelR},${trommel} L${mitte - kuppelR},${kuppelBasis} ` +
+      `A${kuppelR},${kuppelR * 1.15} 0 0,1 ${mitte + kuppelR},${kuppelBasis} ` +
+      `L${mitte + kuppelR},${trommel} Z`,
+  );
+  const spitze = kuppelBasis - kuppelR * 1.15;
+  teile.push(`M${mitte},${spitze} l${-kuppelR * 0.05},${-h * 0.03} l${kuppelR * 0.1},0 Z`);
+  for (const x of minarettX) {
+    const kopf = mauer - minarettH;
+    teile.push(
+      `M${x - minarettB},${mauer} L${x - minarettB},${kopf} L${x + minarettB},${kopf} L${x + minarettB},${mauer} Z`,
+    );
+    teile.push(
+      `M${x - minarettB * 1.6},${kopf} A${minarettB * 1.6},${minarettB * 2.2} 0 0,1 ${x + minarettB * 1.6},${kopf} Z`,
+    );
+    teile.push(
+      `M${x - minarettB * 0.35},${kopf - minarettB * 2.2} l0,${-h * 0.022} l${minarettB * 0.7},0 l0,${h * 0.022} Z`,
+    );
+  }
+  return teile.join(' ');
 }

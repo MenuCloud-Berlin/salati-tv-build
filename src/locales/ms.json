@@ -1,11 +1,15 @@
 {
+  "azan": {
+    "running": "Azan · {prayer}",
+    "runningHint": "Kembali menghentikan azan"
+  },
   "clock": {
     "hijriDate": "{day} {month} {year}",
+    "jumua": "Jumaat Mubarak",
     "localTime": "Waktu tempatan {city} · OK membuka menu",
     "next": "Solat seterusnya",
     "openMenu": "OK membuka menu",
-    "timeLeft": "baki {time}",
-    "jumua": "Jumaat Mubarak"
+    "timeLeft": "baki {time}"
   },
   "common": {
     "loading": "Memuatkan…",
@@ -14,6 +18,17 @@
     "offlineReaderPaket": "Tanpa rangkaian — teks disertakan; terjemahan dan tilawah perlukan sambungan",
     "offlineStreams": "Tanpa rangkaian — senarai dari storan, main balik perlukan sambungan",
     "retry": "Cuba lagi"
+  },
+  "hintergrund": {
+    "abendhimmel": "Langit senja",
+    "haram": "Masjidil Haram",
+    "kaaba": "Kaabah",
+    "kaabaNacht": "Kaabah waktu malam",
+    "kiswa": "Kiswah",
+    "medina": "Kubah Hijau",
+    "medinaLuft": "Masjid Nabawi",
+    "ornament": "Ornamen kubah",
+    "tawaf": "Tawaf"
   },
   "home": {
     "clock": "Jam solat",
@@ -119,14 +134,27 @@
     "title": "Reels"
   },
   "settings": {
+    "akzent": {
+      "bernstein": "Ambar",
+      "gold": "Emas",
+      "hint": "Berlaku untuk setiap tema — latar kekal, hanya aksen berubah.",
+      "koralle": "Karang",
+      "lavendel": "Lavender",
+      "saphir": "Safir",
+      "silber": "Perak",
+      "smaragd": "Zamrud",
+      "thema": "Warna tema",
+      "title": "Warna aksen",
+      "tuerkis": "Turkois"
+    },
     "asrEarlier": "Lebih awal (Syafi'i/Maliki/Hanbali - standard)",
     "asrLater": "Lebih lewat (Hanafi)",
     "asrSchool": "Mazhab Asar",
     "autoHide": {
-      "title": "Panduan pada skrin",
+      "after": "Selepas {n} saat",
       "hint": "Hilang selepas tempoh ini tanpa tekanan butang. Mana-mana butang memaparkannya semula.",
       "never": "Sentiasa kelihatan",
-      "after": "Selepas {n} saat"
+      "title": "Panduan pada skrin"
     },
     "azan": {
       "allOff": "Matikan semua",
@@ -143,17 +171,42 @@
       "volume": "Kelantangan"
     },
     "background": {
-      "title": "Latar belakang",
+      "bewegt": "Bergerak",
+      "foto": "Foto",
+      "fotos": "Foto",
+      "gezeichnet": "Lukisan",
       "hint": "Berada di belakang semua bahagian dan sesuai dengan setiap warna.",
+      "kuppel": "Kubah",
+      "ladeFehler": "Motif tidak dapat dimuat.",
+      "muster": "Corak",
+      "nachweis": "Kredit imej",
       "ruhig": "Polos",
       "schein": "Cahaya",
+      "sterne": "Langit berbintang",
+      "title": "Latar belakang",
       "verlauf": "Kecerunan",
-      "muster": "Corak",
-      "bewegt": "Bergerak"
+      "video": "Video",
+      "videos": "Video"
+    },
+    "clockScale": {
+      "large": "Besar",
+      "medium": "Sederhana",
+      "small": "Kecil",
+      "title": "Saiz jam",
+      "xlarge": "Sangat besar"
     },
     "current": "Semasa",
+    "dimmung": {
+      "hint": "Hanya untuk foto dan video — makin gelap, makin jelas jamnya.",
+      "leicht": "Ringan",
+      "mittel": "Sederhana",
+      "sehrStark": "Sangat kuat",
+      "stark": "Kuat",
+      "title": "Malapan"
+    },
     "format12": "12 jam (2:30 PM)",
     "format24": "24 jam (14:30)",
+    "fotoBewegung": "Gerakkan foto perlahan",
     "highLatitude": {
       "auto": "Automatik (disyorkan)",
       "hint": "Di utara kira-kira latitud 48°, pada musim panas matahari tidak turun cukup rendah untuk mencapai sudut Subuh dan Isyak. Peraturan ini menetapkan cara kedua-dua waktu itu diperoleh daripada panjang malam. Bergantung pada peraturan, waktu Subuh dan Isyak boleh berbeza sehingga sejam, dan tiada penyelesaian yang disepakati semua. Jika anda mahu mengikut masjid anda, pilih peraturan yang sepadan dengan waktunya.",
@@ -162,6 +215,7 @@
       "title": "Peraturan latitud tinggi",
       "twilightAngle": "Berdasarkan sudut"
     },
+    "jumuaModus": "Penanda Jumaat",
     "language": "Bahasa",
     "location": "Lokasi",
     "method": "Kaedah pengiraan",
@@ -200,8 +254,10 @@
     },
     "readerTranslation": "Terjemahan",
     "readerTranslit": "Transliterasi",
+    "screensaverContent": "Papar pada jam solat",
     "sections": {
       "azan": "Azan",
+      "background": "Latar",
       "display": "Rupa",
       "prayer": "Waktu solat",
       "reader": "Al-Quran",
@@ -212,6 +268,9 @@
       "deleteHint": "OK memadam",
       "empty": "Tiada yang disimpan",
       "hint": "Surah tersimpan boleh dimainkan tanpa internet. Fail berada dalam apl — hilang apabila dinyahpasang.",
+      "motive": "Motif latar",
+      "motiveBelegt": "{n} motif · {size}",
+      "motiveLeer": "Tiada yang disimpan",
       "title": "Tilawah tersimpan",
       "used": "{n} surah · {size}",
       "usedOne": "1 surah · {size}"
@@ -238,14 +297,17 @@
     },
     "timeFormat": "Format masa",
     "title": "Tetapan",
-    "jumuaModus": "Penanda Jumaat",
-    "screensaverContent": "Papar pada jam solat",
-    "clockScale": {
-      "title": "Saiz jam",
-      "small": "Kecil",
-      "medium": "Sederhana",
-      "large": "Besar",
-      "xlarge": "Sangat besar"
+    "uhr": {
+      "analog": "Muka jam",
+      "digital": "Angka",
+      "gewicht": "Ketebalan",
+      "hint": "Rupa masa pada skrin rehat.",
+      "kraeftig": "Tebal",
+      "leicht": "Nipis",
+      "normal": "Biasa",
+      "sekunden": "Tunjuk saat",
+      "stil": "Gaya",
+      "title": "Jam"
     },
     "versDesTages": "Ayat hari ini",
     "wetter": "Cuaca"
@@ -258,9 +320,5 @@
   "videos": {
     "loadError": "Video tidak dapat dimuatkan.",
     "title": "Video"
-  },
-  "azan": {
-    "running": "Azan · {prayer}",
-    "runningHint": "Kembali menghentikan azan"
   }
 }

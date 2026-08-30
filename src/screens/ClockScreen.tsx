@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import { AmbientGlow } from '@/components/AmbientGlow';
+import { Ziffernblatt } from '@/components/Ziffernblatt';
 import { useBedienungSichtbar } from '@/lib/bedienungSichtbar';
 import { HintergrundStreifen } from '@/components/HintergrundStreifen';
 
@@ -17,8 +18,8 @@ import { locationLabel } from '@/data/cities';
 import { hijriParts } from '@/lib/hijri';
 import { useTranslation } from '@/lib/i18n';
 import { DATE_LOCALE_TAGS } from '@/lib/locale';
-import { calcExtras, useTvSettings } from '@/lib/settings';
-import { tagAmOrt, zeitInZone, zoneWeichtAb } from '@/lib/timezone';
+import { calcExtras, UHR_GEWICHT_WERTE, useTvSettings } from '@/lib/settings';
+import { tagAmOrt, zeitInZone, zeitTeileInZone, zoneWeichtAb } from '@/lib/timezone';
 import type { Theme } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 import { ladeVersDesTages, type VersDesTagesInhalt } from '@/lib/versDesTages';
@@ -75,9 +76,10 @@ export function ClockScreen({ location: override }: { location?: TvLocation } = 
   // in der Zone des Fernsehers abgelesen (Audit-Befund P10).
   const zeit = (d: Date) => zeitInZone(d, location.tz, is24h);
   const clock = zeit(now);
-  // Sekunden sind in jeder Zone gleich — nur Minuten-Offsets (Indien +5:30,
-  // Nepal +5:45) verschieben die Minute, nie die Sekunde.
-  const seconds = now.getSeconds().toString().padStart(2, '0');
+  // Stunde/Minute/Sekunde AM ORT — die Ziffernanzeige liest sie als Zeile, das
+  // Ziffernblatt braucht sie als Zahl (s. lib/timezone.ts).
+  const teile = zeitTeileInZone(now, location.tz);
+  const seconds = teile.sekunde.toString().padStart(2, '0');
   // Datum in der eingestellten Sprache (vorher fest 'de-DE' — die Uhr blieb
   // damit auch bei tuerkischer oder arabischer Oberflaeche deutsch).
   const dateLabel = formatDate(new Date(tagesSchluessel), DATE_LOCALE_TAGS[locale]);
@@ -123,8 +125,8 @@ export function ClockScreen({ location: override }: { location?: TvLocation } = 
   }, [settings.wetterAktiv, location.lat, location.lon]);
 
   const s = useMemo(
-    () => makeStyles(height, width, rtl, theme, settings.clockScale),
-    [height, width, rtl, theme, settings.clockScale],
+    () => makeStyles(height, width, rtl, theme, settings.clockScale, settings.uhrGewicht),
+    [height, width, rtl, theme, settings.clockScale, settings.uhrGewicht],
   );
   // Countdown-Einheiten in der Oberflaechensprache (Audit 2026-07-28, T17) —
   // vorher stand „1h 55m" auch mitten im arabischen Satz. Bewusst ohne useMemo:
@@ -171,10 +173,27 @@ export function ClockScreen({ location: override }: { location?: TvLocation } = 
         </View>
       </View>
 
-      {/* Große Uhr */}
+      {/* Die Uhr — Ziffern oder Ziffernblatt (Einstellung „Uhrenstil").
+          Beide lesen dieselbe Zeit am selben Ort; sie unterscheiden sich nur
+          in der Darstellung. */}
       <View style={s.clockBlock}>
-        <Text style={s.clock} numberOfLines={1} adjustsFontSizeToFit>{clock}</Text>
-        <Text style={s.seconds}>{seconds}</Text>
+        {settings.uhrStil === 'analog' ? (
+          <Ziffernblatt
+            groesse={s.ziffernblattGroesse}
+            stunde={teile.stunde}
+            minute={teile.minute}
+            sekunde={teile.sekunde}
+            sekundenZeiger={settings.uhrSekunden}
+            bisNaechstemGebetMs={next.diffMs}
+            strichstaerke={s.zeigerStaerke}
+            theme={theme}
+          />
+        ) : (
+          <>
+            <Text style={s.clock} numberOfLines={1} adjustsFontSizeToFit>{clock}</Text>
+            {settings.uhrSekunden ? <Text style={s.seconds}>{seconds}</Text> : null}
+          </>
+        )}
       </View>
 
       {/* Nächstes Gebet + Countdown */}
@@ -278,7 +297,14 @@ function formatDate(now: Date, tag: string): string {
 }
 
 /** Höhen-/breiten-relative Styles — fit-by-design auf jeder TV-Dichte. */
-function makeStyles(h: number, w: number, rtl: boolean, theme: Theme, clockScale = 1) {
+function makeStyles(
+  h: number,
+  w: number,
+  rtl: boolean,
+  theme: Theme,
+  clockScale = 1,
+  uhrGewicht: keyof typeof UHR_GEWICHT_WERTE = 'leicht',
+) {
   // Clamp gegen Extremwerte (sehr kleine/große dp-Flächen).
   const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
   const padV = clamp(h * 0.055, 24, 72);
@@ -287,8 +313,15 @@ function makeStyles(h: number, w: number, rtl: boolean, theme: Theme, clockScale
   // Buchstabenabstand zerreisst arabische/persische Ligaturen — im RTL-Layout
   // deshalb auf 0. Die lateinische Wortmarke „SALATI" behaelt ihren Abstand.
   const track = rtl ? 0 : undefined;
+  // Das Ziffernblatt bekommt dieselbe Hoehe wie die Ziffern, damit der
+  // Bildschirm beim Umschalten nicht springt — plus etwas Luft, weil ein Kreis
+  // seine Flaeche schlechter nutzt als eine Zeile.
+  const ziffernblattGroesse = clamp(Math.min(h * 0.42, w * 0.32), 120, 420) * clockScale;
+  // Die Strichstaerke der Zeiger folgt derselben Wahl wie der Schriftschnitt
+  // der Ziffern: ein „kraeftig" muss auf beiden Stilen dasselbe bedeuten.
+  const zeigerStaerke = uhrGewicht === 'leicht' ? 0.75 : uhrGewicht === 'kraeftig' ? 1.5 : 1;
 
-  return StyleSheet.create({
+  return Object.assign(StyleSheet.create({
     root: {
       flex: 1,
       paddingHorizontal: padH,
@@ -314,7 +347,13 @@ function makeStyles(h: number, w: number, rtl: boolean, theme: Theme, clockScale
     hijri: { color: theme.textFaint, fontSize: clamp(h * 0.032, 12, 24), marginTop: 2, textAlign: rtl ? 'left' : 'right' },
     wetter: { color: theme.textFaint, fontSize: clamp(h * 0.03, 12, 22), marginTop: 2, textAlign: rtl ? 'left' : 'right' },
     clockBlock: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center' },
-    clock: { color: theme.text, fontSize: clockSize, fontWeight: '200', letterSpacing: 2, lineHeight: clockSize * 1.02 },
+    clock: {
+      color: theme.text,
+      fontSize: clockSize,
+      fontWeight: UHR_GEWICHT_WERTE[uhrGewicht],
+      letterSpacing: 2,
+      lineHeight: clockSize * 1.02,
+    },
     seconds: { color: theme.accent, fontSize: clockSize * 0.3, fontWeight: '300', marginBottom: clockSize * 0.14, marginLeft: 10 },
     nextBlock: { alignItems: 'center', gap: clamp(h * 0.012, 4, 12) },
     nextLabel: { color: theme.textMuted, fontSize: clamp(h * 0.035, 14, 26), letterSpacing: track ?? 2, textTransform: 'uppercase' },
@@ -355,5 +394,10 @@ function makeStyles(h: number, w: number, rtl: boolean, theme: Theme, clockScale
     footer: { alignItems: 'center', gap: clamp(h * 0.008, 3, 8), marginTop: clamp(h * 0.022, 8, 20) },
     brand: { color: theme.accent, opacity: 0.75, fontSize: clamp(h * 0.03, 14, 26), letterSpacing: 12, textAlign: 'center' },
     hint: { color: theme.textFaint, fontSize: clamp(h * 0.024, 12, 20), letterSpacing: 1, textAlign: 'center' },
-  });
+  }),
+  // Zwei Masse, die KEIN Stil sind, sondern Groessen fuer das gezeichnete
+  // Ziffernblatt. Sie stehen trotzdem hier, weil sie aus denselben
+  // Bildschirmmassen kommen wie alles andere — dasselbe Muster wie
+  // `symbolGroesse` in components/HintergrundStreifen.tsx.
+  { ziffernblattGroesse, zeigerStaerke });
 }

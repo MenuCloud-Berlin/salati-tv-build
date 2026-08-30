@@ -13,7 +13,17 @@
  */
 import { render } from '@testing-library/react-native';
 
-import { Hintergrund, HINTERGRUENDE } from '@/components/Hintergrund';
+// Der Hintergrund kann seit 2026-08-30 auch ein Video sein (components/MedienGrund.tsx).
+// Hier geht es um das GEZEICHNETE — die native Video-Schicht wird deshalb
+// ersetzt, statt sie in einen Test zu ziehen, der sie nicht braucht.
+jest.mock('expo-video', () => ({
+  useVideoPlayer: () => ({ play: jest.fn(), addListener: () => ({ remove: jest.fn() }) }),
+  VideoView: 'VideoView',
+}));
+jest.mock('expo-image', () => ({ Image: 'Image' }));
+
+import { Hintergrund } from '@/components/Hintergrund';
+import { HINTERGRUENDE } from '@/lib/hintergruende';
 import { hydrateTvSettings, setHintergrund } from '@/lib/settings';
 
 beforeEach(async () => {
@@ -28,8 +38,18 @@ function punkte(d: string): { x: number; y: number }[] {
   }));
 }
 
-it('kennt genau fuenf Moeglichkeiten', () => {
-  expect([...HINTERGRUENDE]).toEqual(['ruhig', 'schein', 'verlauf', 'muster', 'bewegt']);
+it('kennt genau diese gezeichneten Moeglichkeiten', () => {
+  // Foto und Video stehen NICHT hier: sie kommen aus dem Katalog in R2 und
+  // heissen `medium:<id>` (s. lib/hintergruende.ts).
+  expect([...HINTERGRUENDE]).toEqual([
+    'ruhig',
+    'schein',
+    'verlauf',
+    'muster',
+    'bewegt',
+    'sterne',
+    'kuppel',
+  ]);
 });
 
 it('zeichnet bei „ruhig" nichts', async () => {

@@ -26,19 +26,41 @@ import { RecitersScreen } from '@/screens/RecitersScreen';
 import { ReelsScreen } from '@/screens/ReelsScreen';
 import { SettingsScreen } from '@/screens/SettingsScreen';
 import { VideosScreen } from '@/screens/VideosScreen';
+import { zuruecksetzenFuerTest as leseZuruecksetzen } from '@/lib/leseSitzung';
 
-jest.mock('expo-video', () => ({
-  useVideoPlayer: () => ({
-    play: jest.fn(),
-    pause: jest.fn(),
-    replace: jest.fn(),
-    addListener: () => ({ remove: jest.fn() }),
-    playing: false,
-    currentTime: 0,
-    loop: false,
-  }),
-  VideoView: 'VideoView',
-}));
+jest.mock('expo-video', () => {
+  // Eine Spieler-Attrappe, die ihre Zuhoerer wirklich benachrichtigt: die
+  // Wiedergabe-Anzeige des Lesers haengt seit 2026-08-30 am gemeinsamen
+  // Spieler (lib/hintergrundAudio.ts) und nicht mehr an einem eigenen Zustand
+  // des Bildschirms. Eine stumme Attrappe zeigte „pausiert", obwohl spielt.
+  const bau = () => {
+    const hoerer: Record<string, ((e: unknown) => void)[]> = {};
+    const rufe = (name: string, e: unknown) => (hoerer[name] ?? []).forEach((cb) => cb(e));
+    const p = {
+      playing: false,
+      currentTime: 0,
+      loop: false,
+      volume: 1,
+      addListener: (name: string, cb: (e: unknown) => void) => {
+        (hoerer[name] ??= []).push(cb);
+        return { remove: jest.fn() };
+      },
+      play: jest.fn(() => {
+        p.playing = true;
+        rufe('playingChange', { isPlaying: true });
+      }),
+      pause: jest.fn(() => {
+        p.playing = false;
+        rufe('playingChange', { isPlaying: false });
+      }),
+      release: jest.fn(),
+      replace: jest.fn(),
+      seekBy: jest.fn(),
+    };
+    return p;
+  };
+  return { createVideoPlayer: () => bau(), useVideoPlayer: () => bau(), VideoView: 'VideoView' };
+});
 jest.mock('expo-image', () => ({ Image: 'Image' }));
 jest.mock('react-native-qrcode-svg', () => 'QRCode');
 
@@ -94,6 +116,10 @@ async function expectRemoteUsable(ui: ReactElement) {
   expect(r.focusable).toBeGreaterThan(0);
   expect(r.preferred).toBe(1);
 }
+
+// Die Lesung lebt modulweit (lib/leseSitzung.ts): ohne Ruecksetzen uebersaenge
+// der Leser im naechsten Test die Suren-Auswahl.
+beforeEach(() => leseZuruecksetzen());
 
 describe('Fernbedienbarkeit: jeder Screen hat einen Fokus-Anker', () => {
   it('Home-Hub', async () => {

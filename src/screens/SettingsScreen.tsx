@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Image } from 'expo-image';
 
 import { FocusCard } from '@/components/FocusCard';
 import { fokusUeberstand } from '@/components/fokusUeberstand';
@@ -38,6 +39,7 @@ import { QURAN_FONTS, adaptQuranText } from '@/lib/quranFonts';
 import {
   adjustOffset,
   CLOCK_SCALES,
+  DIMMUNGEN,
   READER_SCALES,
   resetOffsets,
   setAzanAlle,
@@ -55,14 +57,31 @@ import {
   setVersDesTagesAktiv,
   setWetterAktiv,
   AUSBLEND_ZEITEN,
+  setAkzent,
   setBedienungAusblenden,
+  setFotoBewegung,
   setHintergrund,
+  setHintergrundDimmung,
   setTheme,
+  setUhrGewicht,
+  setUhrSekunden,
+  setUhrStil,
+  UHR_GEWICHTE,
+  UHR_STILE,
   toggleReaderOption,
   useTvSettings,
 } from '@/lib/settings';
-import { HINTERGRUENDE, hintergrundNameKey } from '@/components/Hintergrund';
-import { THEMES } from '@/lib/theme';
+import { HINTERGRUENDE, hintergrundNameKey, medienId } from '@/lib/hintergruende';
+import {
+  fetchHintergrundMedien,
+  istGespeichert as istMediumGespeichert,
+  medienBelegung,
+  mediumHerunterladen,
+  mediumLoeschen,
+  useHintergrundMedien,
+  type HintergrundMedium,
+} from '@/lib/hintergrundMedien';
+import { AKZENTE, THEMES } from '@/lib/theme';
 import type { Theme } from '@/lib/theme';
 import { useAllQuranFonts } from '@/lib/useQuranFont';
 import { useTheme } from '@/lib/useTheme';
@@ -105,6 +124,7 @@ const SECTION_KEYS: Record<SectionId, string> = {
   prayer: 'settings.sections.prayer',
   azan: 'settings.sections.azan',
   display: 'settings.sections.display',
+  hintergrund: 'settings.sections.background',
   reader: 'settings.sections.reader',
   storage: 'settings.sections.storage',
 };
@@ -158,6 +178,7 @@ export function SettingsScreen({ startBereich }: { startBereich?: SectionId | nu
         {section === 'prayer' && <PrayerSection s={s} />}
         {section === 'azan' && <AzanSection s={s} />}
         {section === 'display' && <DisplaySection s={s} />}
+        {section === 'hintergrund' && <HintergrundSection s={s} />}
         {section === 'reader' && <ReaderSection s={s} />}
         {section === 'storage' && <StorageSection s={s} />}
       </ScrollView>
@@ -503,9 +524,20 @@ function AzanSection({ s }: { s: Styles }) {
  * anderes als „Papier" in einem hellen Wohnzimmer.
  */
 function DisplaySection({ s }: { s: Styles }) {
-  const { theme: aktiv, hintergrund, bedienungAusblenden, clockScale, versDesTagesAktiv, jumuaModusAktiv, wetterAktiv } =
-    useTvSettings();
+  const {
+    theme: aktiv,
+    akzent,
+    bedienungAusblenden,
+    clockScale,
+    uhrStil,
+    uhrGewicht,
+    uhrSekunden,
+    versDesTagesAktiv,
+    jumuaModusAktiv,
+    wetterAktiv,
+  } = useTvSettings();
   const { t } = useTranslation();
+  const theme = useTheme();
   return (
     <>
       <Text style={s.section}>{t('settings.theme.title')}</Text>
@@ -535,25 +567,98 @@ function DisplaySection({ s }: { s: Styles }) {
         })}
       </View>
 
-      {/* Der Hintergrund ist bewusst von der Farbwelt GETRENNT: er wirkt in
-          jedem Thema und soll sich nicht mit ihm aendern. Wer „Papier" mit
-          Muster will, soll das haben. */}
-      <Text style={s.section}>{t('settings.background.title')}</Text>
-      <Text style={s.hint}>{t('settings.background.hint')}</Text>
-      <View style={s.grid}>
-        {HINTERGRUENDE.map((hg) => {
-          const active = hg === hintergrund;
+      {/* Der Akzent ist seit 2026-08-30 von der Farbwelt geloest (s. theme.ts):
+          wer den dunklen Grund mag, aber lieber Tuerkis als Gold sieht, musste
+          vorher die ganze Welt wechseln. */}
+      <Text style={s.section}>{t('settings.akzent.title')}</Text>
+      <Text style={s.hint}>{t('settings.akzent.hint')}</Text>
+      <View style={s.row}>
+        {AKZENTE.map((a) => {
+          const active = a.id === akzent;
+          // Die Probe zeigt die Farbe, die auf DIESEM Untergrund gilt — auf
+          // „Papier" ist es die dunkle Fassung.
+          const probe = a.id === 'thema' ? theme.accent : theme.dark ? a.hell : a.dunkel;
           return (
             <FocusCard
-              key={hg}
-              onPress={() => setHintergrund(hg)}
-              style={[s.themeCard, active && s.activeCard]}>
-              <Text style={[s.cardLabel, active && s.activeText]} numberOfLines={1}>
-                {t(hintergrundNameKey(hg))}
+              key={a.id}
+              onPress={() => setAkzent(a.id)}
+              style={[s.akzentCard, active && s.activeCard]}>
+              <View style={[s.swatch, s.akzentProbe, { backgroundColor: probe, borderColor: probe }]} />
+              <Text style={[s.akzentLabel, active && s.activeText]} numberOfLines={1}>
+                {t(a.nameKey)}
               </Text>
             </FocusCard>
           );
         })}
+      </View>
+
+      <Text style={s.section}>{t('settings.uhr.title')}</Text>
+      <Text style={s.hint}>{t('settings.uhr.hint')}</Text>
+      <Text style={s.groupLabel}>{t('settings.uhr.stil')}</Text>
+      <View style={s.row}>
+        {UHR_STILE.map((stil) => {
+          const active = stil === uhrStil;
+          return (
+            <FocusCard key={stil} onPress={() => setUhrStil(stil)} style={[s.stepWide, active && s.activeCard]}>
+              <Text style={[s.toggleLabel, active && s.activeText]} numberOfLines={1}>
+                {t(`settings.uhr.${stil}`)}
+              </Text>
+            </FocusCard>
+          );
+        })}
+      </View>
+
+      <Text style={s.groupLabel}>{t('settings.uhr.gewicht')}</Text>
+      <View style={s.row}>
+        {UHR_GEWICHTE.map((g) => {
+          const active = g === uhrGewicht;
+          return (
+            <FocusCard key={g} onPress={() => setUhrGewicht(g)} style={[s.stepWide, active && s.activeCard]}>
+              <Text style={[s.toggleLabel, active && s.activeText]} numberOfLines={1}>
+                {t(`settings.uhr.${g}`)}
+              </Text>
+            </FocusCard>
+          );
+        })}
+      </View>
+
+      <Text style={s.groupLabel}>{t('settings.clockScale.title')}</Text>
+      <View style={s.row}>
+        {CLOCK_SCALES.map((v, i) => {
+          const active = clockScale === v;
+          return (
+            <FocusCard
+              key={v}
+              onPress={() => setClockScale(v)}
+              style={[s.stepWide, active && s.activeCard]}>
+              <Text style={[s.toggleLabel, active && s.activeText]} numberOfLines={1}>
+                {t(`settings.clockScale.${['small', 'medium', 'large', 'xlarge'][i]}`)}
+              </Text>
+            </FocusCard>
+          );
+        })}
+      </View>
+
+      <Text style={s.section}>{t('settings.screensaverContent')}</Text>
+      <View style={s.row}>
+        {(
+          [
+            [uhrSekunden, setUhrSekunden, 'settings.uhr.sekunden'],
+            [versDesTagesAktiv, setVersDesTagesAktiv, 'settings.versDesTages'],
+            [jumuaModusAktiv, setJumuaModusAktiv, 'settings.jumuaModus'],
+            [wetterAktiv, setWetterAktiv, 'settings.wetter'],
+          ] as const
+        ).map(([an, setter, labelKey]) => (
+          <FocusCard
+            key={labelKey}
+            onPress={() => setter(!an)}
+            style={[s.toggleCard, an && s.activeCard]}>
+            <Text style={[s.toggleLabel, an && s.activeText]} numberOfLines={2}>
+              {t(labelKey)}
+            </Text>
+            <Text style={[s.toggleState, an && s.activeText]}>{an ? '✓' : '—'}</Text>
+          </FocusCard>
+        ))}
       </View>
 
       {/* Bedienhinweise ausblenden. Nutzerwunsch 2026-08-16: ein Fernseher
@@ -579,45 +684,208 @@ function DisplaySection({ s }: { s: Styles }) {
           );
         })}
       </View>
+    </>
+  );
+}
 
-      <Text style={s.section}>{t('settings.clockScale.title')}</Text>
-      <View style={s.row}>
-        {CLOCK_SCALES.map((v, i) => {
-          const active = clockScale === v;
+/**
+ * Hintergrund — gezeichnet oder ein Motiv.
+ *
+ * Der Bereich wurde am 2026-08-30 aus „Darstellung" herausgeloest: mit Fotos
+ * und Videos sind es zu viele Kacheln fuer eine Seite, und jede zusaetzliche
+ * Kachel ist mit der Fernbedienung ein Tastendruck.
+ *
+ * Ein Motiv wird beim Waehlen HERUNTERGELADEN und danach von der Platte
+ * gespielt (der Grund steht in lib/hintergrundMedien.ts). Bis die Datei liegt,
+ * steht schon das Standbild hinter der Uhr — es ist also nie ein leerer
+ * Zustand zu sehen, nur ein noch nicht bewegter.
+ */
+function HintergrundSection({ s }: { s: Styles }) {
+  const { hintergrund, hintergrundDimmung, fotoBewegung } = useTvSettings();
+  const { t } = useTranslation();
+  const { katalog, speicher } = useHintergrundMedien();
+  const [fehler, setFehler] = useState(false);
+  // Fortschritt je Motiv (0…1), nur waehrend des Ladens gesetzt.
+  const [laedt, setLaedt] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    let lebt = true;
+    fetchHintergrundMedien().catch(() => {
+      if (lebt) setFehler(true);
+    });
+    return () => {
+      lebt = false;
+    };
+  }, []);
+
+  async function waehlen(m: HintergrundMedium) {
+    setFehler(false);
+    // ZUERST setzen, dann laden: der Nutzer soll sofort sehen, dass seine Wahl
+    // angekommen ist — das Standbild steht ja schon.
+    setHintergrund(medienId(m.id));
+    if (speicher[m.id]) return;
+    setLaedt((v) => ({ ...v, [m.id]: 0 }));
+    try {
+      await mediumHerunterladen(m, (anteil) => setLaedt((v) => ({ ...v, [m.id]: anteil })));
+    } catch {
+      setFehler(true);
+    } finally {
+      setLaedt((v) => {
+        const rest = { ...v };
+        delete rest[m.id];
+        return rest;
+      });
+    }
+  }
+
+  const fotos = katalog?.filter((m) => m.art === 'foto') ?? [];
+  const videos = katalog?.filter((m) => m.art === 'video') ?? [];
+
+  return (
+    <>
+      <Text style={s.section}>{t('settings.background.title')}</Text>
+      <Text style={s.hint}>{t('settings.background.hint')}</Text>
+      <Text style={s.groupLabel}>{t('settings.background.gezeichnet')}</Text>
+      <View style={s.grid}>
+        {HINTERGRUENDE.map((hg) => {
+          const active = hg === hintergrund;
           return (
             <FocusCard
-              key={v}
-              onPress={() => setClockScale(v)}
-              style={[s.stepWide, active && s.activeCard]}>
-              <Text style={[s.toggleLabel, active && s.activeText]} numberOfLines={1}>
-                {t(`settings.clockScale.${['small', 'medium', 'large', 'xlarge'][i]}`)}
+              key={hg}
+              onPress={() => setHintergrund(hg)}
+              style={[s.themeCard, active && s.activeCard]}>
+              <Text style={[s.cardLabel, active && s.activeText]} numberOfLines={2}>
+                {t(hintergrundNameKey(hg))}
               </Text>
             </FocusCard>
           );
         })}
       </View>
 
-      <Text style={s.section}>{t('settings.screensaverContent')}</Text>
+      <Text style={s.groupLabel}>{t('settings.background.videos')}</Text>
+      {videos.length === 0 ? (
+        <Text style={s.hint}>{fehler ? t('settings.background.ladeFehler') : t('common.loading')}</Text>
+      ) : (
+        <View style={s.grid}>
+          {videos.map((m) => (
+            <MediumKachel
+              key={m.id}
+              s={s}
+              medium={m}
+              aktiv={hintergrund === medienId(m.id)}
+              gespeichert={!!speicher[m.id]}
+              fortschritt={laedt[m.id]}
+              onPress={() => void waehlen(m)}
+            />
+          ))}
+        </View>
+      )}
+
+      <Text style={s.groupLabel}>{t('settings.background.fotos')}</Text>
+      {fotos.length === 0 ? (
+        <Text style={s.hint}>{fehler ? t('settings.background.ladeFehler') : t('common.loading')}</Text>
+      ) : (
+        <View style={s.grid}>
+          {fotos.map((m) => (
+            <MediumKachel
+              key={m.id}
+              s={s}
+              medium={m}
+              aktiv={hintergrund === medienId(m.id)}
+              gespeichert={!!speicher[m.id]}
+              fortschritt={laedt[m.id]}
+              onPress={() => void waehlen(m)}
+            />
+          ))}
+        </View>
+      )}
+
+      <Text style={s.section}>{t('settings.dimmung.title')}</Text>
+      <Text style={s.hint}>{t('settings.dimmung.hint')}</Text>
       <View style={s.row}>
-        {(
-          [
-            [versDesTagesAktiv, setVersDesTagesAktiv, 'settings.versDesTages'],
-            [jumuaModusAktiv, setJumuaModusAktiv, 'settings.jumuaModus'],
-            [wetterAktiv, setWetterAktiv, 'settings.wetter'],
-          ] as const
-        ).map(([an, setter, labelKey]) => (
-          <FocusCard
-            key={labelKey}
-            onPress={() => setter(!an)}
-            style={[s.toggleCard, an && s.activeCard]}>
-            <Text style={[s.toggleLabel, an && s.activeText]} numberOfLines={2}>
-              {t(labelKey)}
-            </Text>
-            <Text style={[s.toggleState, an && s.activeText]}>{an ? '✓' : '—'}</Text>
-          </FocusCard>
-        ))}
+        {DIMMUNGEN.map((d, i) => {
+          const active = d === hintergrundDimmung;
+          return (
+            <FocusCard
+              key={d}
+              onPress={() => setHintergrundDimmung(d)}
+              style={[s.stepWide, active && s.activeCard]}>
+              <Text style={[s.toggleLabel, active && s.activeText]} numberOfLines={1}>
+                {t(`settings.dimmung.${['leicht', 'mittel', 'stark', 'sehrStark'][i]}`)}
+              </Text>
+            </FocusCard>
+          );
+        })}
       </View>
+
+      <View style={s.row}>
+        <FocusCard
+          onPress={() => setFotoBewegung(!fotoBewegung)}
+          style={[s.toggleCard, fotoBewegung && s.activeCard]}>
+          <Text style={[s.toggleLabel, fotoBewegung && s.activeText]} numberOfLines={2}>
+            {t('settings.fotoBewegung')}
+          </Text>
+          <Text style={[s.toggleState, fotoBewegung && s.activeText]}>{fotoBewegung ? '✓' : '—'}</Text>
+        </FocusCard>
+      </View>
+
+      {/* Bildnachweis. Die Motive stehen unter freien Lizenzen (CC0, CC BY,
+          CC BY-SA); CC BY verlangt die Nennung von Urheber und Lizenz, und die
+          gehoert dorthin, wo der Nutzer die Bilder sieht — nicht in eine Datei
+          im Quelltext. */}
+      {katalog && katalog.length > 0 ? (
+        <>
+          <Text style={s.section}>{t('settings.background.nachweis')}</Text>
+          {katalog.map((m) => (
+            <View key={m.id} style={s.lizenzBlock}>
+              <Text style={s.lizenzTitel}>{m.nameKey ? t(m.nameKey) : m.name}</Text>
+              <Text style={s.lizenzZeile}>
+                {[m.autor, m.lizenz, m.quelle].filter(Boolean).join(' · ')}
+              </Text>
+            </View>
+          ))}
+        </>
+      ) : null}
     </>
+  );
+}
+
+/**
+ * Eine Motiv-Kachel: Standbild, Name und der Speicherzustand.
+ *
+ * Das Standbild ist der Punkt — ein Name wie „Kaaba bei Nacht" sagt nichts
+ * darueber, wie das Bild hinter der Uhr wirkt. Der Zustand steht als Zeichen
+ * daneben: „↓" noch nicht geladen, Prozent waehrend des Ladens, „✓" auf dem
+ * Geraet.
+ */
+function MediumKachel({
+  s,
+  medium,
+  aktiv,
+  gespeichert,
+  fortschritt,
+  onPress,
+}: {
+  s: Styles;
+  medium: HintergrundMedium;
+  aktiv: boolean;
+  gespeichert: boolean;
+  fortschritt?: number;
+  onPress: () => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <FocusCard onPress={onPress} style={[s.medienCard, aktiv && s.activeCard]}>
+      <Image source={{ uri: medium.posterUrl }} style={s.medienBild} contentFit="cover" transition={300} />
+      <View style={s.medienZeile}>
+        <Text style={[s.medienName, aktiv && s.activeText]} numberOfLines={1}>
+          {medium.nameKey ? t(medium.nameKey) : medium.name}
+        </Text>
+        <Text style={[s.medienZustand, aktiv && s.activeText]}>
+          {fortschritt !== undefined ? `${Math.round(fortschritt * 100)}%` : gespeichert ? '✓' : '↓'}
+        </Text>
+      </View>
+    </FocusCard>
   );
 }
 
@@ -749,6 +1017,10 @@ function StorageSection({ s }: { s: Styles }) {
   useOfflineAudio();
   const liste = gespeicherteListe();
   const { anzahl, bytes } = belegung();
+  // Hintergrund-Motive belegen denselben Speicher und gehoeren deshalb in
+  // dieselbe Uebersicht — sonst waere ein voller Fernseher nicht erklaerbar.
+  const { katalog } = useHintergrundMedien();
+  const medien = medienBelegung();
 
   return (
     <>
@@ -788,6 +1060,32 @@ function StorageSection({ s }: { s: Styles }) {
             </FocusCard>
           </View>
         </>
+      ) : null}
+
+      <Text style={s.section}>{t('settings.storage.motive')}</Text>
+      <Text style={s.current}>
+        {medien.anzahl === 0
+          ? t('settings.storage.motiveLeer')
+          : t('settings.storage.motiveBelegt', {
+              n: String(medien.anzahl),
+              size: formatBytes(medien.bytes),
+            })}
+      </Text>
+      {medien.anzahl > 0 && katalog ? (
+        <View style={s.grid}>
+          {katalog
+            .filter((m) => istMediumGespeichert(m.id))
+            .map((m) => (
+              <FocusCard key={m.id} onPress={() => void mediumLoeschen(m)} style={s.wideCard}>
+                <Text style={s.cardLabel} numberOfLines={1}>
+                  {m.nameKey ? t(m.nameKey) : m.name}
+                </Text>
+                <Text style={s.toggleState} numberOfLines={1}>
+                  {t(`settings.background.${m.art}`)} · {t('settings.storage.deleteHint')}
+                </Text>
+              </FocusCard>
+            ))}
+        </View>
       ) : null}
     </>
   );
@@ -971,6 +1269,42 @@ function makeStyles(w: number, h: number, rtl: boolean, theme: Theme) {
       gap: clamp(cardH * 0.1, 5, 10),
     },
     swatchRow: { flexDirection: 'row', gap: 6 },
+    akzentCard: {
+      width: cardW,
+      minHeight: cardH,
+      paddingHorizontal: clamp(cardW * 0.08, 10, 18),
+      flexDirection: rtl ? 'row-reverse' : 'row',
+      alignItems: 'center',
+      gap: clamp(cardW * 0.05, 8, 14),
+    },
+    akzentProbe: { width: clamp(cardH * 0.34, 18, 30), height: clamp(cardH * 0.34, 18, 30) },
+    akzentLabel: { color: theme.text, fontSize: clamp(cardH * 0.24, 12, 19), fontWeight: '600', flexShrink: 1 },
+    // Die Kachel eines Motivs ist im Wesentlichen sein Standbild: 16:9, damit
+    // sie zeigt, was spaeter auch am Bildschirm steht. GENAU zwei je Reihe:
+    // drei gewoehnliche Kacheln fuellen die Reihe, also ist die Haelfte davon
+    // `1,5 × Kachel + halber Abstand`. Mit `1,6 ×` passte nur eine, und die
+    // Kachel wurde dann zwei Drittel des Bildschirms hoch (Emulator-Befund).
+    medienCard: {
+      width: cardW * 1.5 + gap / 2,
+      paddingBottom: clamp(cardH * 0.1, 6, 12),
+      overflow: 'hidden',
+    },
+    medienBild: {
+      width: '100%',
+      height: ((cardW * 1.5 + gap / 2) * 9) / 16,
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
+    },
+    medienZeile: {
+      flexDirection: rtl ? 'row-reverse' : 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 8,
+      paddingHorizontal: clamp(cardW * 0.07, 10, 18),
+      paddingTop: clamp(cardH * 0.1, 6, 12),
+    },
+    medienName: { color: theme.text, fontSize: clamp(cardH * 0.24, 12, 19), fontWeight: '600', flexShrink: 1, textAlign: align },
+    medienZustand: { color: theme.textFaint, fontSize: clamp(cardH * 0.24, 12, 19), fontWeight: '700' },
     swatch: { width: clamp(cardH * 0.24, 14, 22), height: clamp(cardH * 0.24, 14, 22), borderRadius: 999, borderWidth: 1 },
     fontCard: {
       width: cardW,

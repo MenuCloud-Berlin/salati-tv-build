@@ -51,7 +51,25 @@ module.exports = {
   // 1.10.0 (Release 2026-08-23): nativer Adhan-Hintergrunddienst (Android,
   // Foreground-Service statt reinem JS-Interval), plus Screensaver-Optionen
   // (Uhr-Groesse, Vers des Tages, Jumu'a-Kennzeichnung, Wetter).
-  version: '1.11.0',
+  // 1.12.0 (2026-08-30): drei Befunde vom Geraet, alle drei behoben.
+  //   • STEUERKREUZ DES HANDYS. Das Handy schickte seit jeher `key`-Kommandos,
+  //     der Fernseher wertete nur „zurueck" aus — hoch/runter/links/rechts und
+  //     OK liefen ins Leere. Der Fokus wird jetzt ueber ein eigenes Verzeichnis
+  //     bewegt (src/lib/fernfokus.ts) und `requestTVFocus` an die Plattform
+  //     gereicht; das gibt es auf Android TV UND tvOS, also ohne natives Modul.
+  //   • KORAN IM HINTERGRUND. Die Rezitation des Lesers hing an seinem
+  //     Bildschirm und brach beim Wechsel zur Uhr ab — nur Radio/Rezitatoren
+  //     ueberlebten. Die Lesung liegt jetzt neben dem Baum
+  //     (src/lib/leseSitzung.ts): Vers und Sure laufen weiter, waehrend vorne
+  //     die Gebetsuhr steht, und der Streifen auf der Uhr laesst sie anhalten.
+  //   • HINTERGRUENDE UND GESTALTUNG. Zwei neue gezeichnete Hintergruende
+  //     (Sternenhimmel, Kuppel) und ein Katalog aus Fotos und Videos (Kaaba,
+  //     Kiswa, Masjid al-Haram, Prophetenmoschee, Kuppelornament, Tawaf, Kaaba
+  //     bei Nacht, Abendhimmel) aus R2, einmal geladen statt gestreamt, mit
+  //     Bildnachweis in den Einstellungen. Dazu Akzentfarbe getrennt vom Thema,
+  //     Ziffernblatt statt Ziffern (mit Countdown-Bogen), Strichstaerke,
+  //     Sekunden an/aus und die Abdunkelung der Motive.
+  version: '1.12.0',
   scheme: 'salatitv',
   orientation: 'landscape',
   icon: './assets/icon.png',
@@ -65,7 +83,8 @@ module.exports = {
     // 8 = 1.4.0; 7 liegt als 1.3.0 im Produktions-Track. 9 = 1.5.0, 10 = 1.6.0,
     // 11 = 1.7.0, 12 = 1.8.0 (von Play abgelehnt, siehe oben).
     // 16 = 1.10.0 (nativer Adhan-Dienst, Screensaver-Optionen).
-    versionCode: 17,
+    // 18 = 1.12.0 (Steuerkreuz vom Handy, Koran im Hintergrund, Motive).
+    versionCode: 18,
     // Der Vordergrund darf NICHT icon.png sein: das ist seit 1.8.1 vollflaechig,
     // und die Maske zeigt vom 108-dp-Vordergrund nur die mittleren 72 dp — die
     // Zacken waeren abgeschnitten.
@@ -77,7 +96,7 @@ module.exports = {
     bundleIdentifier: 'de.salatibox.tv',
     // Wird beim Bauen vom Workflow hochgezaehlt; Apple lehnt eine schon
     // hochgeladene Build-Nummer ab, auch wenn die Version dieselbe bleibt.
-    buildNumber: '2',
+    buildNumber: '3',
     infoPlist: {
       // Der Fernseher oeffnet fuer die Handy-Kopplung einen TCP-Server im WLAN
       // (src/lib/pairing.ts). Ohne diesen Text verweigert tvOS den Zugriff aufs

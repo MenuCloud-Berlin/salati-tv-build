@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Animated, Pressable, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 
+import { useFernFokusKarte } from '@/lib/useFernFokusKarte';
 import { useTheme } from '@/lib/useTheme';
 
 // Fokussierbare Karte für die 10-Fuß-/D-Pad-Bedienung. react-native-tvos steuert
@@ -14,6 +15,12 @@ import { useTheme } from '@/lib/useTheme';
 // PRESSABLE selbst hängen, sonst kollabiert das Layout (Grid-Karten wurden sonst
 // zu schmalen Spalten). Deshalb ein Animated-Pressable statt eines inneren
 // Animated.View-Wrappers.
+//
+// Seit 2026-08-30 meldet sich jede Karte zusaetzlich beim Fokus-Verzeichnis an
+// (lib/fernfokus.ts). Nur dadurch koennen Steuerkreuz und OK des gekoppelten
+// HANDYS ueberhaupt etwas bewegen: die App weiss sonst nicht, welche Karten es
+// gibt und wo sie liegen. Fuer die echte Fernbedienung aendert sich nichts —
+// die Plattform steuert den Fokus weiterhin selbst, das Verzeichnis hoert nur zu.
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export function FocusCard({
@@ -39,6 +46,7 @@ export function FocusCard({
   // Einmal erzeugt ueber den useState-Initialisierer: `useRef(...).current`
   // liest einen Ref waehrend des Renderns (react-hooks/refs).
   const [scale] = useState(() => new Animated.Value(1));
+  const { setzeRef, beiLayout, beiFokus, beiFokusVerlust } = useFernFokusKarte(onPress);
 
   const styles = useMemo(
     () =>
@@ -62,15 +70,19 @@ export function FocusCard({
 
   return (
     <AnimatedPressable
+      ref={setzeRef}
       onPress={onPress}
+      onLayout={beiLayout}
       onFocus={() => {
         setFocused(true);
         animate(1.05);
+        beiFokus();
         onFocus?.();
       }}
       onBlur={() => {
         setFocused(false);
         animate(1);
+        beiFokusVerlust();
         onBlur?.();
       }}
       hasTVPreferredFocus={hasTVPreferredFocus}

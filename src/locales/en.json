@@ -1,4 +1,8 @@
 {
+  "azan": {
+    "running": "Call to prayer · {prayer}",
+    "runningHint": "Back ends the call"
+  },
   "clock": {
     "hijriDate": "{day} {month} {year}",
     "jumua": "Jumu'a Mubarak",
@@ -14,6 +18,17 @@
     "offlineReaderPaket": "Offline — bundled text, translation and recitation need a connection",
     "offlineStreams": "Offline — list from storage, playback needs a connection",
     "retry": "Retry"
+  },
+  "hintergrund": {
+    "abendhimmel": "Evening sky",
+    "haram": "Masjid al-Haram",
+    "kaaba": "Kaaba",
+    "kaabaNacht": "Kaaba at night",
+    "kiswa": "Kiswah",
+    "medina": "Green Dome",
+    "medinaLuft": "Prophet's Mosque",
+    "ornament": "Dome ornament",
+    "tawaf": "Tawaf"
   },
   "home": {
     "clock": "Prayer clock",
@@ -119,14 +134,27 @@
     "title": "Reels"
   },
   "settings": {
+    "akzent": {
+      "bernstein": "Amber",
+      "gold": "Gold",
+      "hint": "Applies to every theme — the background stays, only the accent changes.",
+      "koralle": "Coral",
+      "lavendel": "Lavender",
+      "saphir": "Sapphire",
+      "silber": "Silver",
+      "smaragd": "Emerald",
+      "thema": "Theme colour",
+      "title": "Accent colour",
+      "tuerkis": "Turquoise"
+    },
     "asrEarlier": "Earlier (Shafi/Maliki/Hanbali - standard)",
     "asrLater": "Later (Hanafi)",
     "asrSchool": "Asr school",
     "autoHide": {
-      "title": "On-screen controls",
+      "after": "After {n} seconds",
       "hint": "They disappear after this long without a keypress. Any key brings them back.",
       "never": "Always visible",
-      "after": "After {n} seconds"
+      "title": "On-screen controls"
     },
     "azan": {
       "allOff": "All off",
@@ -143,17 +171,42 @@
       "volume": "Volume"
     },
     "background": {
-      "title": "Background",
+      "bewegt": "Moving",
+      "foto": "Photo",
+      "fotos": "Photos",
+      "gezeichnet": "Drawn",
       "hint": "Sits behind every area and works with any colour world.",
+      "kuppel": "Dome",
+      "ladeFehler": "The motifs could not be loaded.",
+      "muster": "Pattern",
+      "nachweis": "Image credits",
       "ruhig": "Plain",
       "schein": "Glow",
+      "sterne": "Starry sky",
+      "title": "Background",
       "verlauf": "Gradient",
-      "muster": "Pattern",
-      "bewegt": "Moving"
+      "video": "Video",
+      "videos": "Videos"
+    },
+    "clockScale": {
+      "large": "Large",
+      "medium": "Medium",
+      "small": "Small",
+      "title": "Clock size",
+      "xlarge": "Extra large"
     },
     "current": "Current",
+    "dimmung": {
+      "hint": "For photos and videos only — the darker it is, the easier the clock reads.",
+      "leicht": "Light",
+      "mittel": "Medium",
+      "sehrStark": "Very strong",
+      "stark": "Strong",
+      "title": "Dimming"
+    },
     "format12": "12-hour (2:30 PM)",
     "format24": "24-hour (14:30)",
+    "fotoBewegung": "Move photos slowly",
     "highLatitude": {
       "auto": "Automatic (recommended)",
       "hint": "North of about 48° latitude the sun no longer dips far enough below the horizon in summer to reach the Fajr and Isha angles. This rule decides how both times are then derived from the length of the night. Depending on the rule, Fajr and Isha can end up as much as an hour apart, and there is no universally accepted answer. If you want to follow your mosque, pick the rule that matches its times.",
@@ -162,6 +215,7 @@
       "title": "High-latitude rule",
       "twilightAngle": "Angle based"
     },
+    "jumuaModus": "Friday marker",
     "language": "Language",
     "location": "Location",
     "method": "Calculation method",
@@ -188,14 +242,6 @@
       },
       "title": "Quran font"
     },
-    "clockScale": {
-      "large": "Large",
-      "medium": "Medium",
-      "small": "Small",
-      "title": "Clock size",
-      "xlarge": "Extra large"
-    },
-    "jumuaModus": "Friday marker",
     "railHint": "Choose on the right · Back leaves settings",
     "readerAutoAdvance": "Continue to next surah",
     "readerContent": "Below the verse",
@@ -211,6 +257,7 @@
     "screensaverContent": "Show on the prayer clock",
     "sections": {
       "azan": "Call to prayer",
+      "background": "Background",
       "display": "Appearance",
       "prayer": "Prayer times",
       "reader": "Quran",
@@ -221,6 +268,9 @@
       "deleteHint": "OK deletes",
       "empty": "Nothing saved",
       "hint": "A saved surah plays without internet. The files live inside the app — uninstalling removes them.",
+      "motive": "Background motifs",
+      "motiveBelegt": "{n} motifs · {size}",
+      "motiveLeer": "Nothing saved",
       "title": "Saved recitations",
       "used": "{n} surahs · {size}",
       "usedOne": "1 surah · {size}"
@@ -247,6 +297,18 @@
     },
     "timeFormat": "Time format",
     "title": "Settings",
+    "uhr": {
+      "analog": "Dial",
+      "digital": "Digits",
+      "gewicht": "Weight",
+      "hint": "How the time looks on the idle screen.",
+      "kraeftig": "Bold",
+      "leicht": "Light",
+      "normal": "Regular",
+      "sekunden": "Show seconds",
+      "stil": "Style",
+      "title": "Clock"
+    },
     "versDesTages": "Verse of the day",
     "wetter": "Weather"
   },
@@ -258,9 +320,5 @@
   "videos": {
     "loadError": "Videos could not be loaded.",
     "title": "Videos"
-  },
-  "azan": {
-    "running": "Call to prayer · {prayer}",
-    "runningHint": "Back ends the call"
   }
 }

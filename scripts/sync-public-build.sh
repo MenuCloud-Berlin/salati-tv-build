@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Spiegelt apps/tv in das OEFFENTLICHE Build-Repo
-# (MenuCloud-Berlin/salati-tv-build). Grund: GitHub gibt oeffentlichen Repos
+# (DomenicMoran/salati-tv-build). Grund: GitHub gibt oeffentlichen Repos
 # unbegrenzte Actions-Minuten — auch auf macOS-Runnern, und nur dort laesst sich
 # eine Apple-TV-App bauen. Dasselbe Vorgehen wie bei apps/mobile.
 #
@@ -11,7 +11,7 @@
 # Aufruf aus apps/tv:  GH_TOKEN=... bash scripts/sync-public-build.sh
 set -euo pipefail
 
-PUBLIC_REPO="https://x-access-token:${GH_TOKEN}@github.com/MenuCloud-Berlin/salati-tv-build.git"
+PUBLIC_REPO="https://x-access-token:${GH_TOKEN}@github.com/DomenicMoran/salati-tv-build.git"
 SRC="$(cd "$(dirname "$0")/.." && pwd)"   # apps/tv
 ROOT="$(cd "$SRC/../.." && pwd)"          # Monorepo-Root
 WORK="$(mktemp -d)"

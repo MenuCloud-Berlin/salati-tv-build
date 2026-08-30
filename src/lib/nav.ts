@@ -113,6 +113,11 @@ export const SETTINGS_BEREICHE = [
   'prayer',
   'azan',
   'display',
+  // Eigener Bereich seit 2026-08-30: mit Fotos und Videos sind es zu viele
+  // Kacheln fuer „Darstellung" geworden, und mit der Fernbedienung ist jede
+  // zusaetzliche Kachel ein Tastendruck (derselbe Grund, aus dem es die
+  // Bereiche ueberhaupt gibt).
+  'hintergrund',
   'reader',
   'storage',
 ] as const;

@@ -29,6 +29,9 @@ import { SettingsScreen } from '@/screens/SettingsScreen';
 import { VideosScreen } from '@/screens/VideosScreen';
 import { appleEinstellungen } from '@/lib/appleEinstellungen';
 import { azanLaeuft, azanStoppen, useAzanAusloeser, useAzanLauf, useNativenAdhanPlan } from '@/lib/azanRuf';
+import { fernTaste, istFernTaste } from '@/lib/fernfokus';
+import { useHintergrundAudio } from '@/lib/hintergrundAudio';
+import { useFernFokusKarte } from '@/lib/useFernFokusKarte';
 import { useTranslation } from '@/lib/i18n';
 import {
   isScreen,
@@ -41,6 +44,7 @@ import {
   type SettingsBereich,
 } from '@/lib/nav';
 import { onPairCommand, startPairing, stopPairing } from '@/lib/pairing';
+import { hydrateHintergrundMedien } from '@/lib/hintergrundMedien';
 import { hydrateOfflineAudio, verwaisteEintraegeAufraeumen } from '@/lib/offlineAudio';
 import { applyRemoteSettings, useTvSettings } from '@/lib/settings';
 import { useTheme } from '@/lib/useTheme';
@@ -74,6 +78,13 @@ export default function App() {
   );
   const theme = useTheme();
   const { bedienungAusblenden } = useTvSettings();
+  // Laeuft im Hintergrund etwas (Rezitation, Radio, Podcast), zeigt die Uhr
+  // dafuer einen bedienbaren Streifen. Dann darf eine Richtungstaste dort NICHT
+  // mehr blind ins Menue springen — sonst waere der Streifen unerreichbar,
+  // obwohl er genau fuer diesen Fall gebaut ist (s. useTVEventHandler unten).
+  const { stueck: hintergrundStueck } = useHintergrundAudio();
+  const hintergrundLaeuft = hintergrundStueck !== null;
+  const hintergrundLaeuftRef = useLatestRef(hintergrundLaeuft);
 
   // Die Wartezeit steht in den Einstellungen, gezaehlt wird sie neben dem Baum
   // (lib/bedienungSichtbar.ts). Der Bildschirmwechsel gilt als Bedienung: wer
@@ -141,11 +152,16 @@ export default function App() {
       goBack();
       return;
     }
-    if (
-      screenRef.current === 'clock' &&
-      (type === 'select' || type === 'up' || type === 'down' || type === 'left' || type === 'right')
-    ) {
-      setScreen('home');
+    // Auf der Uhr oeffnet jede Taste das Menue — SOLANGE dort nichts anderes
+    // zu bedienen ist. Laeuft eine Rezitation im Hintergrund, traegt die Uhr
+    // den Wiedergabe-Streifen; dann muss das Steuerkreuz ihn erreichen koennen
+    // (runter zum Streifen, hoch zurueck zur Uhr), und nur „OK" auf der
+    // Uhrflaeche selbst oeffnet das Menue. Das erledigt deren `onPress` —
+    // deshalb hier gar nichts mehr.
+    if (screenRef.current === 'clock' && !hintergrundLaeuftRef.current) {
+      if (type === 'select' || type === 'up' || type === 'down' || type === 'left' || type === 'right') {
+        setScreen('home');
+      }
     }
   });
 
@@ -156,6 +172,9 @@ export default function App() {
   // mehr gibt.
   useEffect(() => {
     void hydrateOfflineAudio().then(() => verwaisteEintraegeAufraeumen());
+    // Dasselbe fuer die Hintergrund-Motive: auch sie liegen als Dateien im
+    // Dokumentverzeichnis (s. lib/hintergrundMedien.ts).
+    void hydrateHintergrundMedien();
   }, []);
 
   // Android-TV-Hardware-Back: zurück statt App beenden (außer am Clock).
@@ -180,15 +199,26 @@ export default function App() {
         setScreen(cmd.screen);
       } else if (cmd.t === 'key' && cmd.dir === 'back') {
         goBack();
-      } else if (cmd.t === 'key' && cmd.dir === 'select' && screenRef.current === 'clock') {
-        setScreen('home');
+      } else if (cmd.t === 'key' && istFernTaste(cmd.dir)) {
+        // Steuerkreuz und OK des Handys (Nutzerbefund 2026-08-30: vier der
+        // sechs Tasten waren wirkungslos). Der Fokus wird ueber das
+        // Verzeichnis bewegt, nicht ueber die Plattform — s. lib/fernfokus.ts.
+        //
+        // Die Uhr ist der einzige Sonderfall, und aus demselben Grund wie beim
+        // `useTVEventHandler` oben: solange dort nichts zu bedienen ist,
+        // oeffnet jede Taste das Menue.
+        if (screenRef.current === 'clock' && !hintergrundLaeuftRef.current) {
+          setScreen('home');
+        } else {
+          void fernTaste(cmd.dir);
+        }
       }
     });
     return () => {
       off();
       stopPairing();
     };
-  }, [goBack, screenRef]);
+  }, [goBack, screenRef, hintergrundLaeuftRef]);
 
   // Deep Links: `salatitv://screen/<name>` schaltet um. Das ist dieselbe
   // Umschaltung wie ueber die Handy-Fernbedienung, nur ueber den Weg, den das
@@ -219,22 +249,9 @@ export default function App() {
       {/* Liegt EINMAL hinter allen Bildschirmen. Vor der eingeblendeten
           Flaeche, damit der Wechsel darueber laeuft und der Hintergrund
           dabei stehen bleibt. */}
-      <Hintergrund />
+      <Hintergrund screen={screen} />
       <Animated.View style={[styles.fill, { opacity: fade, transform: [{ translateY: rutsch }] }]}>
-      {screen === 'clock' && (
-        // Fokussierbar + Initialfokus: auf dem TV muss ein Element den Fokus
-        // halten, sonst erreichen Fernbedienungs-Tasten (OK/DPAD) das onPress
-        // NICHT — sonst hängt der Nutzer auf der Uhr fest (Gerätetest-Fund
-        // 2026-07-24). Mit Fokus öffnet OK das Menü; zusätzlich schaltet der
-        // useTVEventHandler oben bei jeder Richtungstaste auf Home.
-        <Pressable
-          focusable
-          hasTVPreferredFocus
-          style={styles.fill}
-          onPress={() => setScreen('home')}>
-          <ClockScreen />
-        </Pressable>
-      )}
+      {screen === 'clock' && <UhrFlaeche onOeffnen={() => setScreen('home')} />}
       {screen === 'home' && <HomeScreen navigate={navigate} />}
       {screen === 'videos' && <VideosScreen />}
       {screen === 'reciters' && <RecitersScreen />}
@@ -250,6 +267,35 @@ export default function App() {
           uebernehmen. Der Hinweis nennt die Taste, die ihn beendet. */}
       {azanLauf ? <AzanBanner prayer={azanLauf.prayer} /> : null}
     </View>
+  );
+}
+
+/**
+ * Die Uhr als fokussierbare Flaeche.
+ *
+ * Fokussierbar + Initialfokus: auf dem TV muss ein Element den Fokus halten,
+ * sonst erreichen Fernbedienungs-Tasten (OK/DPAD) das `onPress` NICHT — sonst
+ * haengt der Nutzer auf der Uhr fest (Geraetetest-Fund 2026-07-24).
+ *
+ * Sie meldet sich zusaetzlich beim Fokus-Verzeichnis an (lib/fernfokus.ts),
+ * damit das Steuerkreuz des HANDYS zwischen ihr und dem Wiedergabe-Streifen
+ * wechseln kann. Ohne diese Anmeldung fuehrte „runter" in den Streifen und
+ * „hoch" nirgendwohin zurueck.
+ */
+function UhrFlaeche({ onOeffnen }: { onOeffnen: () => void }) {
+  const { setzeRef, beiLayout, beiFokus, beiFokusVerlust } = useFernFokusKarte(onOeffnen);
+  return (
+    <Pressable
+      ref={setzeRef}
+      focusable
+      hasTVPreferredFocus
+      style={styles.fill}
+      onLayout={beiLayout}
+      onFocus={beiFokus}
+      onBlur={beiFokusVerlust}
+      onPress={onOeffnen}>
+      <ClockScreen />
+    </Pressable>
   );
 }
 

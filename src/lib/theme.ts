@@ -195,6 +195,92 @@ export const THEMES: readonly Theme[] = [
 
 export const DEFAULT_THEME_ID: ThemeId = 'mitternacht';
 
+// --------------------------------------------------------------------------
+// Akzentfarbe getrennt vom Thema
+//
+// WARUM (Nutzerwunsch 2026-08-30: „dass man das Design mehr individualisieren
+// kann"): Die Farbwelt legt Grundflaeche UND Akzent zusammen fest — wer den
+// dunklen Grund von „Mitternacht" mochte, aber lieber Tuerkis als Gold sah,
+// musste die ganze Welt wechseln. Der Akzent ist jetzt eine eigene Wahl.
+//
+// Jeder Akzent traegt ZWEI Werte: einen fuer dunkle Untergruende und einen
+// fuer den hellen. Ein einziger Wert ginge nicht — helles Gold auf „Papier"
+// ist nicht lesbar, dunkles Braun auf „Mitternacht" ebenso wenig. Genau daran
+// scheitert die naive Umsetzung einer Farbwahl, und der Kontrast-Test in
+// theme.test.ts wuerde es sofort melden.
+
+export type AkzentId =
+  | 'thema'
+  | 'gold'
+  | 'bernstein'
+  | 'tuerkis'
+  | 'smaragd'
+  | 'saphir'
+  | 'lavendel'
+  | 'koralle'
+  | 'silber';
+
+interface Akzent {
+  id: AkzentId;
+  /** Uebersetzungs-Schluessel des Anzeigenamens. */
+  nameKey: string;
+  /** Auf dunklem Grund. */
+  hell: string;
+  /** Auf hellem Grund („Papier"). */
+  dunkel: string;
+}
+
+export const AKZENTE: readonly Akzent[] = [
+  // „thema" ist keine Farbe, sondern die Abwesenheit einer Wahl: es bleibt bei
+  // dem Akzent, den die Farbwelt selbst mitbringt.
+  { id: 'thema', nameKey: 'settings.akzent.thema', hell: '', dunkel: '' },
+  { id: 'gold', nameKey: 'settings.akzent.gold', hell: '#d4af37', dunkel: '#8a5c14' },
+  { id: 'bernstein', nameKey: 'settings.akzent.bernstein', hell: '#e8a33d', dunkel: '#95591a' },
+  { id: 'tuerkis', nameKey: 'settings.akzent.tuerkis', hell: '#67c7d8', dunkel: '#116b7c' },
+  { id: 'smaragd', nameKey: 'settings.akzent.smaragd', hell: '#6ddba0', dunkel: '#1c7245' },
+  { id: 'saphir', nameKey: 'settings.akzent.saphir', hell: '#8ab4f8', dunkel: '#2b5aa8' },
+  { id: 'lavendel', nameKey: 'settings.akzent.lavendel', hell: '#b9a7f0', dunkel: '#5b3fa8' },
+  { id: 'koralle', nameKey: 'settings.akzent.koralle', hell: '#f0947a', dunkel: '#a33e22' },
+  { id: 'silber', nameKey: 'settings.akzent.silber', hell: '#cfd4dd', dunkel: '#4a5260' },
+];
+
+const AKZENT_IDS = new Set(AKZENTE.map((a) => a.id));
+
+export function istAkzentId(v: unknown): v is AkzentId {
+  return typeof v === 'string' && AKZENT_IDS.has(v as AkzentId);
+}
+
+/** `#rrggbb` mit Deckkraft — die Karten-Farben sind halbdurchsichtig, sie
+ *  liegen ueber dem Grund und muessen ihn durchscheinen lassen. */
+function mitDeckkraft(hex: string, a: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+/**
+ * Das Thema mit einem eigenen Akzent.
+ *
+ * Es werden GENAU die vier Werte ersetzt, die den Akzent tragen: die Farbe
+ * selbst, ihre gedimmte Flaeche und die beiden Kartenzustaende. `glowRing`
+ * bleibt beim Thema — er ist die ZWEITE Lichtfarbe des Hintergrunds, und
+ * zweimal dieselbe Farbe ergaebe keinen Schein, sondern einen Fleck.
+ */
+export function themaMitAkzent(theme: Theme, akzent: unknown): Theme {
+  if (!istAkzentId(akzent) || akzent === 'thema') return theme;
+  const eintrag = AKZENTE.find((a) => a.id === akzent);
+  if (!eintrag) return theme;
+  const farbe = theme.dark ? eintrag.hell : eintrag.dunkel;
+  return {
+    ...theme,
+    accent: farbe,
+    accentSoft: mitDeckkraft(farbe, theme.dark ? 0.16 : 0.14),
+    cardFocus: mitDeckkraft(farbe, theme.dark ? 0.14 : 0.16),
+    cardActive: mitDeckkraft(farbe, theme.dark ? 0.18 : 0.2),
+  };
+}
+
 const BY_ID = new Map(THEMES.map((t) => [t.id, t]));
 
 export function isThemeId(v: unknown): v is ThemeId {

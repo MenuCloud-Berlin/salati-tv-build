@@ -1,11 +1,15 @@
 {
+  "azan": {
+    "running": "Appel à la prière · {prayer}",
+    "runningHint": "Retour arrête l’appel"
+  },
   "clock": {
     "hijriDate": "{day} {month} {year}",
+    "jumua": "Joumou'a Moubarak",
     "localTime": "Heure locale de {city} · OK ouvre le menu",
     "next": "Prochaine prière",
     "openMenu": "OK ouvre le menu",
-    "timeLeft": "dans {time}",
-    "jumua": "Joumou'a Moubarak"
+    "timeLeft": "dans {time}"
   },
   "common": {
     "loading": "Chargement…",
@@ -14,6 +18,17 @@
     "offlineReaderPaket": "Hors ligne — texte fourni ; la traduction et la récitation nécessitent une connexion",
     "offlineStreams": "Hors ligne — liste en mémoire, la lecture nécessite une connexion",
     "retry": "Réessayer"
+  },
+  "hintergrund": {
+    "abendhimmel": "Ciel du soir",
+    "haram": "Masjid al-Haram",
+    "kaaba": "Kaaba",
+    "kaabaNacht": "La Kaaba la nuit",
+    "kiswa": "Kiswa",
+    "medina": "Dôme vert",
+    "medinaLuft": "Mosquée du Prophète",
+    "ornament": "Ornement de coupole",
+    "tawaf": "Tawaf"
   },
   "home": {
     "clock": "Horloge de prière",
@@ -119,14 +134,27 @@
     "title": "Reels"
   },
   "settings": {
+    "akzent": {
+      "bernstein": "Ambre",
+      "gold": "Or",
+      "hint": "Vaut pour chaque thème — le fond reste, seul l’accent change.",
+      "koralle": "Corail",
+      "lavendel": "Lavande",
+      "saphir": "Saphir",
+      "silber": "Argent",
+      "smaragd": "Émeraude",
+      "thema": "Couleur du thème",
+      "title": "Couleur d’accent",
+      "tuerkis": "Turquoise"
+    },
     "asrEarlier": "Tôt (Shafi/Maliki/Hanbali - standard)",
     "asrLater": "Tard (Hanafi)",
     "asrSchool": "École pour l'Asr",
     "autoHide": {
-      "title": "Indications à l’écran",
+      "after": "Après {n} secondes",
       "hint": "Elles disparaissent après ce délai sans appui. N’importe quelle touche les ramène.",
       "never": "Toujours visibles",
-      "after": "Après {n} secondes"
+      "title": "Indications à l’écran"
     },
     "azan": {
       "allOff": "Tout désactiver",
@@ -143,17 +171,42 @@
       "volume": "Volume"
     },
     "background": {
-      "title": "Arrière-plan",
+      "bewegt": "En mouvement",
+      "foto": "Photo",
+      "fotos": "Photos",
+      "gezeichnet": "Dessinés",
       "hint": "Se place derrière toutes les sections et fonctionne avec chaque palette.",
+      "kuppel": "Coupole",
+      "ladeFehler": "Impossible de charger les motifs.",
+      "muster": "Motif",
+      "nachweis": "Crédits photo",
       "ruhig": "Sobre",
       "schein": "Lueur",
+      "sterne": "Ciel étoilé",
+      "title": "Arrière-plan",
       "verlauf": "Dégradé",
-      "muster": "Motif",
-      "bewegt": "En mouvement"
+      "video": "Vidéo",
+      "videos": "Vidéos"
+    },
+    "clockScale": {
+      "large": "Grand",
+      "medium": "Moyen",
+      "small": "Petit",
+      "title": "Taille de l'horloge",
+      "xlarge": "Très grand"
     },
     "current": "Actuelle",
+    "dimmung": {
+      "hint": "Uniquement pour les photos et vidéos — plus c’est sombre, plus l’heure reste lisible.",
+      "leicht": "Léger",
+      "mittel": "Moyen",
+      "sehrStark": "Très fort",
+      "stark": "Fort",
+      "title": "Assombrissement"
+    },
     "format12": "12 heures (2:30 PM)",
     "format24": "24 heures (14:30)",
+    "fotoBewegung": "Faire bouger lentement les photos",
     "highLatitude": {
       "auto": "Automatique (recommandé)",
       "hint": "Au nord d'environ 48° de latitude, en été le soleil ne descend plus assez bas pour atteindre les angles du Fajr et de l'Isha. Cette règle définit comment ces deux heures sont alors déduites de la durée de la nuit. Selon la règle, le Fajr et l'Isha peuvent différer jusqu'à une heure, et il n'existe pas de solution reconnue par tous. Si vous souhaitez suivre votre mosquée, choisissez la règle qui correspond à ses horaires.",
@@ -162,6 +215,7 @@
       "title": "Règle des hautes latitudes",
       "twilightAngle": "Basé sur l'angle"
     },
+    "jumuaModus": "Repère du vendredi",
     "language": "Langue",
     "location": "Position",
     "method": "Méthode de calcul",
@@ -200,8 +254,10 @@
     },
     "readerTranslation": "Traduction",
     "readerTranslit": "Translittération",
+    "screensaverContent": "Afficher sur l'horloge de prière",
     "sections": {
       "azan": "Appel à la prière",
+      "background": "Arrière-plan",
       "display": "Apparence",
       "prayer": "Horaires de prière",
       "reader": "Coran",
@@ -212,6 +268,9 @@
       "deleteHint": "OK supprime",
       "empty": "Rien d’enregistré",
       "hint": "Une sourate enregistrée se lit sans internet. Les fichiers sont dans l’app ; la désinstaller les supprime.",
+      "motive": "Motifs d’arrière-plan",
+      "motiveBelegt": "{n} motifs · {size}",
+      "motiveLeer": "Rien d’enregistré",
       "title": "Récitations enregistrées",
       "used": "{n} sourates · {size}",
       "usedOne": "1 sourate · {size}"
@@ -238,14 +297,17 @@
     },
     "timeFormat": "Format de l'heure",
     "title": "Réglages",
-    "jumuaModus": "Repère du vendredi",
-    "screensaverContent": "Afficher sur l'horloge de prière",
-    "clockScale": {
-      "title": "Taille de l'horloge",
-      "small": "Petit",
-      "medium": "Moyen",
-      "large": "Grand",
-      "xlarge": "Très grand"
+    "uhr": {
+      "analog": "Cadran",
+      "digital": "Chiffres",
+      "gewicht": "Épaisseur",
+      "hint": "L’aspect de l’heure sur l’écran de veille.",
+      "kraeftig": "Gras",
+      "leicht": "Fin",
+      "normal": "Normal",
+      "sekunden": "Afficher les secondes",
+      "stil": "Style",
+      "title": "Horloge"
     },
     "versDesTages": "Verset du jour",
     "wetter": "Météo"
@@ -258,9 +320,5 @@
   "videos": {
     "loadError": "Impossible de charger les vidéos.",
     "title": "Vidéos"
-  },
-  "azan": {
-    "running": "Appel à la prière · {prayer}",
-    "runningHint": "Retour arrête l’appel"
   }
 }

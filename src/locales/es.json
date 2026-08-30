@@ -1,11 +1,15 @@
 {
+  "azan": {
+    "running": "Llamada a la oración · {prayer}",
+    "runningHint": "Atrás detiene la llamada"
+  },
   "clock": {
     "hijriDate": "{day} {month} {year}",
+    "jumua": "Yumu'a Mubarak",
     "localTime": "Hora local de {city} · OK abre el menú",
     "next": "Próxima oración",
     "openMenu": "OK abre el menú",
-    "timeLeft": "faltan {time}",
-    "jumua": "Yumu'a Mubarak"
+    "timeLeft": "faltan {time}"
   },
   "common": {
     "loading": "Cargando…",
@@ -14,6 +18,17 @@
     "offlineReaderPaket": "Sin conexión — texto incluido; la traducción y la recitación requieren conexión",
     "offlineStreams": "Sin conexión — lista desde la memoria, la reproducción requiere conexión",
     "retry": "Reintentar"
+  },
+  "hintergrund": {
+    "abendhimmel": "Cielo del atardecer",
+    "haram": "Masyid al-Haram",
+    "kaaba": "Kaaba",
+    "kaabaNacht": "La Kaaba de noche",
+    "kiswa": "Kiswa",
+    "medina": "Cúpula Verde",
+    "medinaLuft": "Mezquita del Profeta",
+    "ornament": "Ornamento de cúpula",
+    "tawaf": "Tawaf"
   },
   "home": {
     "clock": "Reloj de oración",
@@ -119,14 +134,27 @@
     "title": "Reels"
   },
   "settings": {
+    "akzent": {
+      "bernstein": "Ámbar",
+      "gold": "Oro",
+      "hint": "Vale para cada tema — el fondo se mantiene, solo cambia el acento.",
+      "koralle": "Coral",
+      "lavendel": "Lavanda",
+      "saphir": "Zafiro",
+      "silber": "Plata",
+      "smaragd": "Esmeralda",
+      "thema": "Color del tema",
+      "title": "Color de acento",
+      "tuerkis": "Turquesa"
+    },
     "asrEarlier": "Temprano (Shafi/Maliki/Hanbali - estándar)",
     "asrLater": "Tarde (Hanafi)",
     "asrSchool": "Escuela para Asr",
     "autoHide": {
-      "title": "Indicaciones en pantalla",
+      "after": "Tras {n} segundos",
       "hint": "Desaparecen tras este tiempo sin pulsar nada. Cualquier tecla las devuelve.",
       "never": "Siempre visibles",
-      "after": "Tras {n} segundos"
+      "title": "Indicaciones en pantalla"
     },
     "azan": {
       "allOff": "Desactivar todo",
@@ -143,17 +171,42 @@
       "volume": "Volumen"
     },
     "background": {
-      "title": "Fondo",
+      "bewegt": "En movimiento",
+      "foto": "Foto",
+      "fotos": "Fotos",
+      "gezeichnet": "Dibujados",
       "hint": "Está detrás de todas las áreas y funciona con cualquier paleta.",
+      "kuppel": "Cúpula",
+      "ladeFehler": "No se han podido cargar los motivos.",
+      "muster": "Patrón",
+      "nachweis": "Créditos de imagen",
       "ruhig": "Liso",
       "schein": "Resplandor",
+      "sterne": "Cielo estrellado",
+      "title": "Fondo",
       "verlauf": "Degradado",
-      "muster": "Patrón",
-      "bewegt": "En movimiento"
+      "video": "Vídeo",
+      "videos": "Vídeos"
+    },
+    "clockScale": {
+      "large": "Grande",
+      "medium": "Mediano",
+      "small": "Pequeño",
+      "title": "Tamaño del reloj",
+      "xlarge": "Muy grande"
     },
     "current": "Actual",
+    "dimmung": {
+      "hint": "Solo para fotos y vídeos — cuanto más oscuro, más legible queda la hora.",
+      "leicht": "Ligera",
+      "mittel": "Media",
+      "sehrStark": "Muy fuerte",
+      "stark": "Fuerte",
+      "title": "Atenuación"
+    },
     "format12": "12 horas (2:30 PM)",
     "format24": "24 horas (14:30)",
+    "fotoBewegung": "Mover las fotos lentamente",
     "highLatitude": {
       "auto": "Automático (recomendado)",
       "hint": "Al norte de unos 48° de latitud, en verano el sol ya no baja lo suficiente para alcanzar los ángulos del Fajr y del Isha. Esta regla determina cómo se deducen ambas horas a partir de la duración de la noche. Según la regla, el Fajr y el Isha pueden diferir hasta en una hora, y no existe una solución aceptada por todos. Si quieres seguir a tu mezquita, elige la regla que coincida con sus horarios.",
@@ -162,6 +215,7 @@
       "title": "Regla de latitudes altas",
       "twilightAngle": "Basado en el ángulo"
     },
+    "jumuaModus": "Marca del viernes",
     "language": "Idioma",
     "location": "Ubicación",
     "method": "Método de cálculo",
@@ -200,8 +254,10 @@
     },
     "readerTranslation": "Traducción",
     "readerTranslit": "Transliteración",
+    "screensaverContent": "Mostrar en el reloj de oración",
     "sections": {
       "azan": "Llamada a la oración",
+      "background": "Fondo",
       "display": "Apariencia",
       "prayer": "Horarios de oración",
       "reader": "Corán",
@@ -212,6 +268,9 @@
       "deleteHint": "OK borra",
       "empty": "Nada guardado",
       "hint": "Una sura guardada suena sin internet. Los archivos están dentro de la app; al desinstalarla se borran.",
+      "motive": "Motivos de fondo",
+      "motiveBelegt": "{n} motivos · {size}",
+      "motiveLeer": "Nada guardado",
       "title": "Recitaciones guardadas",
       "used": "{n} suras · {size}",
       "usedOne": "1 sura · {size}"
@@ -238,14 +297,17 @@
     },
     "timeFormat": "Formato de hora",
     "title": "Ajustes",
-    "jumuaModus": "Marca del viernes",
-    "screensaverContent": "Mostrar en el reloj de oración",
-    "clockScale": {
-      "title": "Tamaño del reloj",
-      "small": "Pequeño",
-      "medium": "Mediano",
-      "large": "Grande",
-      "xlarge": "Muy grande"
+    "uhr": {
+      "analog": "Esfera",
+      "digital": "Dígitos",
+      "gewicht": "Grosor",
+      "hint": "El aspecto de la hora en la pantalla de reposo.",
+      "kraeftig": "Grueso",
+      "leicht": "Fino",
+      "normal": "Normal",
+      "sekunden": "Mostrar segundos",
+      "stil": "Estilo",
+      "title": "Reloj"
     },
     "versDesTages": "Versículo del día",
     "wetter": "Tiempo"
@@ -258,9 +320,5 @@
   "videos": {
     "loadError": "No se pudieron cargar los vídeos.",
     "title": "Vídeos"
-  },
-  "azan": {
-    "running": "Llamada a la oración · {prayer}",
-    "runningHint": "Atrás detiene la llamada"
   }
 }

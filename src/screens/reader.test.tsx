@@ -23,17 +23,41 @@ import {
   tvSettingsState,
 } from '@/lib/settings';
 import { adaptQuranText, quranFontDef } from '@/lib/quranFonts';
+import { zuruecksetzenFuerTest as leseZuruecksetzen } from '@/lib/leseSitzung';
 
-jest.mock('expo-video', () => ({
-  useVideoPlayer: () => ({
-    play: jest.fn(),
-    pause: jest.fn(),
-    replace: jest.fn(),
-    addListener: () => ({ remove: jest.fn() }),
-    playing: false,
-    currentTime: 0,
-  }),
-}));
+jest.mock('expo-video', () => {
+  // Eine Spieler-Attrappe, die ihre Zuhoerer wirklich benachrichtigt: die
+  // Wiedergabe-Anzeige des Lesers haengt seit 2026-08-30 am gemeinsamen
+  // Spieler (lib/hintergrundAudio.ts) und nicht mehr an einem eigenen Zustand
+  // des Bildschirms. Eine stumme Attrappe zeigte „pausiert", obwohl spielt.
+  const bau = () => {
+    const hoerer: Record<string, ((e: unknown) => void)[]> = {};
+    const rufe = (name: string, e: unknown) => (hoerer[name] ?? []).forEach((cb) => cb(e));
+    const p = {
+      playing: false,
+      currentTime: 0,
+      loop: false,
+      volume: 1,
+      addListener: (name: string, cb: (e: unknown) => void) => {
+        (hoerer[name] ??= []).push(cb);
+        return { remove: jest.fn() };
+      },
+      play: jest.fn(() => {
+        p.playing = true;
+        rufe('playingChange', { isPlaying: true });
+      }),
+      pause: jest.fn(() => {
+        p.playing = false;
+        rufe('playingChange', { isPlaying: false });
+      }),
+      release: jest.fn(),
+      replace: jest.fn(),
+      seekBy: jest.fn(),
+    };
+    return p;
+  };
+  return { createVideoPlayer: () => bau(), useVideoPlayer: () => bau(), VideoView: 'VideoView' };
+});
 
 // Die Schrift gilt als geladen — sonst faellt `useQuranFont` bewusst auf die
 // Systemschrift zurueck und schreibt den Text NICHT um (s. useQuranFont.ts).
@@ -94,6 +118,9 @@ async function oeffneLeser(el: ReactElement) {
 }
 
 beforeEach(async () => {
+  // Die Lesung lebt modulweit (lib/leseSitzung.ts) und traegt sonst die Sure
+  // des vorigen Tests weiter — der Leser uebersaenge dann die Suren-Auswahl.
+  leseZuruecksetzen();
   // Feste Oberflaechensprache — sonst haengen die erwarteten Texte an der
   // Systemsprache des Testlaeufers (detectDeviceLocale).
   setLanguage('de');

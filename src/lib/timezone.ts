@@ -109,6 +109,42 @@ export function tagAmOrt(now: Date, tz: string | undefined): Date {
 }
 
 /**
+ * Stunde, Minute und Sekunde am ORT — als Zahlen.
+ *
+ * `zeitInZone` liefert eine fertige Zeile und ist damit fuer alles richtig,
+ * was Zeit ANZEIGT. Das Ziffernblatt (components/Ziffernblatt.tsx) braucht
+ * aber Winkel, also Zahlen; sie aus der formatierten Zeile zurueckzulesen
+ * waere eine zweite, stillschweigend andere Wahrheit — genau der Fehlertyp,
+ * der die Uhr am 2026-08-08 in der Zone des FERNSEHERS ablesen liess.
+ *
+ * Sekunden sind in jeder Zone gleich; nur Zonen mit Minuten-Versatz (Indien
+ * +5:30, Nepal +5:45) verschieben die Minute.
+ */
+export function zeitTeileInZone(
+  date: Date,
+  tz: string | undefined,
+): { stunde: number; minute: number; sekunde: number } {
+  const sekunde = date.getSeconds();
+  if (!tz || !zeitzonenFaehig()) {
+    return { stunde: date.getHours(), minute: date.getMinutes(), sekunde };
+  }
+  try {
+    const teile = new Intl.DateTimeFormat('en-GB', {
+      timeZone: tz,
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(date); // "23:05"
+    const [h, m] = teile.split(':').map(Number);
+    if (!Number.isFinite(h) || !Number.isFinite(m)) throw new Error('unlesbar');
+    // 24:00 kommt bei manchen ICU-Staenden fuer Mitternacht heraus.
+    return { stunde: h % 24, minute: m, sekunde };
+  } catch {
+    return { stunde: date.getHours(), minute: date.getMinutes(), sekunde };
+  }
+}
+
+/**
  * Weicht die Zone des Ortes gerade von der des Fernsehers ab?
  *
  * Nur dann ist ein Hinweis am Bildschirm sinnvoll — im Normalfall (Fernseher

@@ -1,11 +1,15 @@
 {
+  "azan": {
+    "running": "Ezan · {prayer}",
+    "runningHint": "Geri tuşu ezanı durdurur"
+  },
   "clock": {
     "hijriDate": "{day} {month} {year}",
+    "jumua": "Cuma Mübarek",
     "localTime": "{city} yerel saati · OK menüyü açar",
     "next": "Sonraki namaz",
     "openMenu": "OK menüyü açar",
-    "timeLeft": "{time} kaldı",
-    "jumua": "Cuma Mübarek"
+    "timeLeft": "{time} kaldı"
   },
   "common": {
     "loading": "Yükleniyor…",
@@ -14,6 +18,17 @@
     "offlineReaderPaket": "Çevrimdışı — pakette gelen metin, meal ve tilavet için bağlantı gerekir",
     "offlineStreams": "Çevrimdışı — liste bellekten, oynatma için bağlantı gerekir",
     "retry": "Tekrar dene"
+  },
+  "hintergrund": {
+    "abendhimmel": "Akşam göğü",
+    "haram": "Mescid-i Haram",
+    "kaaba": "Kâbe",
+    "kaabaNacht": "Gece Kâbe",
+    "kiswa": "Kisve",
+    "medina": "Yeşil Kubbe",
+    "medinaLuft": "Mescid-i Nebevî",
+    "ornament": "Kubbe süslemesi",
+    "tawaf": "Tavaf"
   },
   "home": {
     "clock": "Namaz saati",
@@ -119,14 +134,27 @@
     "title": "Reels"
   },
   "settings": {
+    "akzent": {
+      "bernstein": "Kehribar",
+      "gold": "Altın",
+      "hint": "Her renk dünyasında geçerli — zemin kalır, yalnızca vurgu değişir.",
+      "koralle": "Mercan",
+      "lavendel": "Lavanta",
+      "saphir": "Safir",
+      "silber": "Gümüş",
+      "smaragd": "Zümrüt",
+      "thema": "Tema rengi",
+      "title": "Vurgu rengi",
+      "tuerkis": "Turkuaz"
+    },
     "asrEarlier": "Erken (Şafiî/Malikî/Hanbelî - standart)",
     "asrLater": "Geç (Hanefî)",
     "asrSchool": "İkindi mezhebi",
     "autoHide": {
-      "title": "Ekran bilgileri",
+      "after": "{n} saniye sonra",
       "hint": "Tuşa basılmadan bu süre geçince kaybolur. Herhangi bir tuş geri getirir.",
       "never": "Her zaman görünür",
-      "after": "{n} saniye sonra"
+      "title": "Ekran bilgileri"
     },
     "azan": {
       "allOff": "Hepsi kapalı",
@@ -143,17 +171,42 @@
       "volume": "Ses düzeyi"
     },
     "background": {
-      "title": "Arka plan",
+      "bewegt": "Hareketli",
+      "foto": "Fotoğraf",
+      "fotos": "Fotoğraflar",
+      "gezeichnet": "Çizim",
       "hint": "Tüm bölümlerin arkasında durur ve her renk dünyasında çalışır.",
+      "kuppel": "Kubbe",
+      "ladeFehler": "Görseller yüklenemedi.",
+      "muster": "Desen",
+      "nachweis": "Görsel künyesi",
       "ruhig": "Sade",
       "schein": "Işıltı",
+      "sterne": "Yıldızlı gökyüzü",
+      "title": "Arka plan",
       "verlauf": "Geçiş",
-      "muster": "Desen",
-      "bewegt": "Hareketli"
+      "video": "Video",
+      "videos": "Videolar"
+    },
+    "clockScale": {
+      "large": "Büyük",
+      "medium": "Orta",
+      "small": "Küçük",
+      "title": "Saat boyutu",
+      "xlarge": "Çok büyük"
     },
     "current": "Şu an",
+    "dimmung": {
+      "hint": "Yalnızca fotoğraf ve videolar için — ne kadar koyu olursa saat o kadar okunaklı kalır.",
+      "leicht": "Az",
+      "mittel": "Orta",
+      "sehrStark": "Çok güçlü",
+      "stark": "Güçlü",
+      "title": "Karartma"
+    },
     "format12": "12 saat (2:30 PM)",
     "format24": "24 saat (14:30)",
+    "fotoBewegung": "Fotoğrafları yavaşça hareket ettir",
     "highLatitude": {
       "auto": "Otomatik (önerilen)",
       "hint": "Yaklaşık 48° enlemin kuzeyinde güneş yazın imsak ve yatsı açılarına ulaşacak kadar alçalmaz. Bu kural, her iki vaktin gecenin uzunluğundan nasıl türetileceğini belirler. Kurala göre imsak ile yatsı arasında bir saate varan fark oluşabilir; herkesçe kabul edilmiş bir çözüm yoktur. Kendi caminizi esas almak isterseniz onun vakitlerine uyan kuralı seçin.",
@@ -162,6 +215,7 @@
       "title": "Yüksek enlem kuralı",
       "twilightAngle": "Açıya dayalı"
     },
+    "jumuaModus": "Cuma işareti",
     "language": "Dil",
     "location": "Konum",
     "method": "Hesaplama yöntemi",
@@ -200,8 +254,10 @@
     },
     "readerTranslation": "Çeviri",
     "readerTranslit": "Çeviriyazı",
+    "screensaverContent": "Namaz saatinde göster",
     "sections": {
       "azan": "Ezan",
+      "background": "Arka plan",
       "display": "Görünüm",
       "prayer": "Namaz vakitleri",
       "reader": "Kur'an",
@@ -212,6 +268,9 @@
       "deleteHint": "OK siler",
       "empty": "Kayıtlı bir şey yok",
       "hint": "Kaydedilen sure internetsiz çalar. Dosyalar uygulamanın içinde durur — kaldırınca silinirler.",
+      "motive": "Arka plan görselleri",
+      "motiveBelegt": "{n} görsel · {size}",
+      "motiveLeer": "Kayıt yok",
       "title": "Kaydedilen tilavetler",
       "used": "{n} sure · {size}",
       "usedOne": "1 sure · {size}"
@@ -238,14 +297,17 @@
     },
     "timeFormat": "Saat biçimi",
     "title": "Ayarlar",
-    "jumuaModus": "Cuma işareti",
-    "screensaverContent": "Namaz saatinde göster",
-    "clockScale": {
-      "title": "Saat boyutu",
-      "small": "Küçük",
-      "medium": "Orta",
-      "large": "Büyük",
-      "xlarge": "Çok büyük"
+    "uhr": {
+      "analog": "Kadran",
+      "digital": "Rakam",
+      "gewicht": "Kalınlık",
+      "hint": "Bekleme ekranında saatin görünümü.",
+      "kraeftig": "Kalın",
+      "leicht": "İnce",
+      "normal": "Normal",
+      "sekunden": "Saniyeleri göster",
+      "stil": "Biçim",
+      "title": "Saat"
     },
     "versDesTages": "Günün ayeti",
     "wetter": "Hava durumu"
@@ -258,9 +320,5 @@
   "videos": {
     "loadError": "Videolar yüklenemedi.",
     "title": "Videolar"
-  },
-  "azan": {
-    "running": "Ezan · {prayer}",
-    "runningHint": "Geri tuşu ezanı durdurur"
   }
 }

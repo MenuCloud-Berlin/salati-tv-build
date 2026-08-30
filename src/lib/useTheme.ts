@@ -1,4 +1,4 @@
-import { themeById, type Theme } from '@/lib/theme';
+import { themaMitAkzent, themeById, type Theme } from '@/lib/theme';
 import { useTvSettings } from '@/lib/settings';
 
 /**
@@ -12,5 +12,9 @@ import { useTvSettings } from '@/lib/settings';
  * unbrauchbar macht.
  */
 export function useTheme(): Theme {
-  return themeById(useTvSettings().theme);
+  const { theme, akzent } = useTvSettings();
+  // Die Akzentfarbe ist seit 2026-08-30 eine eigene Wahl (s. theme.ts):
+  // dieselbe Farbwelt, ein anderer Akzent. Ohne Wahl (`thema`) bleibt alles,
+  // wie es war.
+  return themaMitAkzent(themeById(theme), akzent);
 }
